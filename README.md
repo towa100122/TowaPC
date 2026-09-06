@@ -6,7 +6,7 @@
 
 ロゴは `assets/TowaPC.svg`。同じ名前で置き換えると、ヘッダー・フッターの両方に反映されます。別形式の場合は `content-v2.js` の `logo` を変更してください。
 
-`content-v2.js` に製品・お知らせ・紹介文・参加先URLをまとめています。製品とお知らせはサンプルです。製品画像は `assets/product-*.svg`、お知らせ画像は各項目の `image` で変更できます。
+`content-v2.js` に製品・お知らせ・紹介文・参加先URLをまとめています。製品とお知らせはサンプルです。製品画像は `assets/product-*.svg`、お知らせ画像は各項目の `image` で変更できます。お知らせページではリスト表示とグリッド表示を切り替えられます。
 
 各ページは `/product/`、`/information/`、`/about/`、`/join/`、`/cooperation/`、`/members/`、`/contact/` の通常URLで開きます。以前の `/#/product` 形式でアクセスした場合も、新しいURLへ自動で移動します。
 
