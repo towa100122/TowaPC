@@ -1,10 +1,10 @@
 // ここを編集すると、サイトの内容を変更できます。
 window.SITE = {
   // assets/TowaPC.svg にロゴを置くだけで、ヘッダーとフッターに反映されます。
-  logo: 'assets/TowaPC.svg',
+  logo: '/assets/TowaPC.svg',
   // 自分の写真を使う場合は 'assets/hero.jpg' などを指定してください。
   // 背景には文字を含めず、headline の文字を上に重ねます。
-  hero: 'assets/hero-original.jpg',
+  hero: '/assets/hero-original.jpg',
   headline: "Toward Solving Humanity’s Timeless Challenges.",
   description: '人類の普遍的な課題を、テクノロジーで解決する未来へ。小さな気づきと自由な発想を大切に、暮らしを少し豊かにするものづくりを目指します。',
   // 正式な参加フォームなどのURLに差し替えると、参加リンクが表示されます。
