@@ -28,3 +28,15 @@
 .custom-logo{display:block;visibility:visible;aspect-ratio:485/100}.brand-fallback{display:none}
 @media(max-width:620px){.header nav{position:absolute;background:rgba(255,255,255,.5);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}}
 @media(prefers-reduced-motion:reduce){.nav-ready .nav-selection{transition:none}}
+
+/* Consistent thin-line navigation arrows */
+.arrow .icon,.text-link .icon{width:18px;height:18px;transition:transform .25s ease}
+.text-link{align-items:center}.product-bottom span:last-child{display:inline-flex;align-items:center;gap:6px}
+.product-bottom .icon{width:14px;height:14px}.article .text-link .icon{transform:rotate(0)}
+.quick-link:hover .arrow .icon,.news-row:hover .arrow .icon,.text-link:hover .icon{transform:translate(3px,-3px)}
+.back-top{display:grid;place-items:center}.back-top svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+
+/* Slimmer responsive header */
+:root{--header-height:80px}.header{height:var(--header-height)}.header .custom-logo{width:190px;max-height:44px}.header nav a{padding:10px 15px}
+@media(max-width:900px){:root{--header-height:72px}.header .custom-logo{width:175px;max-height:40px}}
+@media(max-width:620px){:root{--header-height:64px}.header .custom-logo{width:155px;max-height:36px}.header nav{top:58px}}
