@@ -2,7 +2,7 @@
 window.SITE={
   logo:'/assets/TowaPC.svg',hero:'/assets/hero-original.jpg',headline:"Toward Solving Humanity’s Timeless Challenges.",
   description:'人類の普遍的な課題を、テクノロジーで解決する未来へ。小さな気づきと自由な発想を大切に、暮らしを少し豊かにするものづくりを目指します。',
-  joinUrl:'https://discord.gg/WJrAwzMp2U',contactUrl:'mailto:contact@towapc.com',socials:{youtube:'https://www.youtube.com/@TowaPC',x:'https://x.com/TowaPC_Official',discord:'https://discord.gg/WJrAwzMp2U'},
+  joinUrl:'',contactUrl:'mailto:contact@towapc.com',socials:{youtube:'https://www.youtube.com/@TowaPC',x:'https://x.com/TowaPC_Official',discord:'https://discord.gg/WJrAwzMp2U'},
   // imageのSVGを同じファイル名で置き換えると、ホームと製品ページの両方に反映されます。
   products:[
     {id:'workspace',name:'毎日を、もっとスムーズに。',category:'アプリケーション',type:'app',description:'日々の作業を心地よくする、シンプルで使いやすいツール。',color:'lavender',image:'/assets/product-workspace.svg'},
