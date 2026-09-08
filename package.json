@@ -1,0 +1,9 @@
+{
+  "name": "towapc-website",
+  "private": true,
+  "scripts": {
+    "sync-pages": "bun scripts/sync-pages.mjs",
+    "check": "bun scripts/check-site.mjs",
+    "format": "bunx prettier --write app-v2.js site-data.js style-v2.css scripts/*.mjs"
+  }
+}

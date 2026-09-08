@@ -1,25 +1,44 @@
 # TowaPC Webサイト
 
-`index.html` を入口にした静的サイトです。スマートフォンにも対応しています。
+GitHub Pagesで公開する静的サイトです。ページの表示内容は `data` フォルダー内のCSVで管理します。
 
-## ロゴ・内容の変更
+## 内容を更新する
 
-ロゴは `assets/TowaPC.svg`。同じ名前で置き換えると、ヘッダー・フッターの両方に反映されます。別形式の場合は `content-v2.js` の `logo` を変更してください。
+- `data/site.csv`: トップページ、ロゴ、参加先、連絡先、SNS
+- `data/products.csv`: 製品
+- `data/news.csv`: お知らせ
+- `data/partners.csv`: 協力関係
+- `data/members.csv`: メンバー
 
-`content-v2.js` に製品・お知らせ・紹介文・参加先URLをまとめています。製品とお知らせはサンプルです。製品画像は `assets/product-*.svg`、お知らせ画像は各項目の `image` で変更できます。お知らせページではリスト表示とグリッド表示を切り替えられます。
+画像は `assets` フォルダーへ入れ、CSVの `image` 列に `/assets/ファイル名` と記入します。詳しい入力規則は [data/README.md](data/README.md) にあります。
 
-各ページは `/product/`、`/information/`、`/about/`、`/join/`、`/cooperation/`、`/members/`、`/contact/` の通常URLで開きます。以前の `/#/product` 形式でアクセスした場合も、新しいURLへ自動で移動します。
+製品またはお知らせのIDを追加・変更・削除した場合は、詳細ページを生成します。
 
-協力関係とメンバーは、`content-v2.js` の `partners` と `members` に項目を追加すると一覧に表示されます。YouTube・X・Discord・お問い合わせ先は、同じファイルの `socials`、`contactUrl` で設定できます。
+```powershell
+bun run sync-pages
+```
 
-## ヒーロー
+## 公開前に確認する
 
-背景は `assets/hero-original.jpg`、重ねる文字は `content-v2.js` の `headline` です。文字は選択・編集できるHTMLで表示しています。
+次のコマンドで、CSVの列・必須項目・ID重複・日付・URL・画像・詳細ページ・JavaScriptをまとめて確認できます。
 
-背景はご提供の元写真をそのまま使用しています。ホームでは写真が最初からヘッダーの背後に重なります。
+```powershell
+bun run check
+```
 
-## 動きとデザイン
+GitHubへ送信した際にも同じ検査が自動実行されます。
 
-初回表示で背景がゆっくり落ち着き、見出しがフェードインします。スクロール時にカードが順に現れ、カーソルを重ねると少し浮き上がります。端末で視覚効果を減らす設定にしている場合はアニメーションを無効にします。端末のライト／ダーク設定に合わせて配色も自動で切り替わります。
+## 構成
 
-ヘッダーは `#FFFF99` の75%、ナビゲーションは白の50%、選択項目は白の100%です。ブラーは7pxです。ナビゲーションの選択背景はページ移動時に滑らかに移動します。色・透明度・アニメーションは `style-v2.css` で調整できます。
+- `app-v2.js`: ページ表示と画面操作
+- `site-data.js`: CSVの読み込み、入力値の安全な処理、読み込み失敗時の最小表示
+- `style-v2.css`: レイアウトと配色
+- `templates/page.html`: 全ページ共通のHTML
+- `scripts/sync-pages.mjs`: 共通HTMLと詳細ページの生成
+- `scripts/check-site.mjs`: 公開前の自動検査
+
+各ページのHTMLを個別に編集せず、共通部分は `templates/page.html` を編集してから `bun run sync-pages` を実行します。CSVの読み込みに失敗した場合は、古い予備データではなく読み込みエラーを表示します。
+
+## デザイン
+
+端末幅に応じてレイアウトが変わり、ライト・ダークテーマにも対応しています。端末で視覚効果を減らす設定にしている場合はアニメーションを無効にします。
