@@ -1,4 +1,5 @@
-// サイトの文章・画像・外部リンクは、このファイルから変更できます。
+// 通常の情報更新は data フォルダー内のCSVを編集してください。
+// 以下はCSVが読み込めなかった場合にも表示を保つための予備データです。
 window.SITE={
   logo:'/assets/TowaPC.svg',hero:'/assets/hero-original.jpg',headline:"Toward Solving Humanity’s Timeless Challenges.",
   description:'人類の普遍的な課題を、テクノロジーで解決する未来へ。小さな気づきと自由な発想を大切に、暮らしを少し豊かにするものづくりを目指します。',

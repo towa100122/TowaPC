@@ -1,0 +1,4 @@
+﻿id,name,category,type,description,color,image
+workspace,毎日を、もっとスムーズに。,アプリケーション,app,日々の作業を心地よくする、シンプルで使いやすいツール。,lavender,/assets/product-workspace.svg
+connect,つながりから、新しい発見を。,Webサービス,web,アイデアや情報が行き交う、新しいコミュニケーションのかたち。,mint,/assets/product-connect.svg
+lab,「あったらいいな」を、かたちに。,開発プロジェクト,project,未来の可能性を探る、小さな実験とものづくり。,peach,/assets/product-lab.svg
