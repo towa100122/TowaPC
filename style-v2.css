@@ -311,7 +311,7 @@ p {
   min-width: 128px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 10px;
 }
@@ -331,6 +331,7 @@ p {
 }
 .news-all {
   width: fit-content;
+  padding-right: 0;
   padding-left: 0;
 }
 .news-row {
