@@ -316,6 +316,10 @@ p {
   flex: 1;
   min-width: 0;
 }
+.news-all {
+  width: fit-content;
+  margin-top: 8px;
+}
 .news-row {
   display: flex;
   align-items: center;

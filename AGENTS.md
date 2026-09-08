@@ -24,7 +24,7 @@
 - `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、共通HTML、JavaScriptを検査する。
 - 公開前に必ず `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` でも同じ検査を行う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v32`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v33`。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
 
@@ -51,13 +51,14 @@
   - `小さな不便を見つける。`
   - `確実に便利にする。`
   - `少しずつ、育てる。`
-- Aboutの3つ目のリンクはContactではなくJoin。
+- Aboutの3つ目のリンクはJoinページへの「メンバーになる」。
 
 ## ナビゲーションと連絡先
 
 - ヘッダー: `Home / Product / Information / About / Contact`
-- フッターの一般リンクからJoinを外し、右側にJoin専用欄を置く。
-- フッターのJoin欄からDiscordの `TowaPC Community` 招待リンクを開く。
+- ホームのお知らせ欄には一覧の下に「すべて見る」を置く。ショートカットは `Product / About / Contact / Join` の順。
+- フッターのLinksにはJoinを含め、右側にContact欄を置く。
+- フッターのContact欄にはYouTube、X、Discord、お問い合わせを置く。
 - Joinページの参加ボタンも同じDiscord招待リンクを開く。
 - Discord招待URL: `https://discord.gg/WJrAwzMp2U`
 - Contactカードの補足表示:
