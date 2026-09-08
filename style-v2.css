@@ -497,11 +497,6 @@ p {
   height: 14px;
   font-size: 14px;
 }
-.sample-note {
-  color: #92958d;
-  font-size: 10px;
-  margin-top: 17px;
-}
 .page-hero {
   padding: 58px 0 44px;
   background: #efeee8;
@@ -1342,7 +1337,6 @@ footer {
 :root[data-theme="dark"] .text-link {
   border-color: #72796d;
 }
-:root[data-theme="dark"] .sample-note,
 :root[data-theme="dark"] .breadcrumbs {
   color: #929b90;
 }

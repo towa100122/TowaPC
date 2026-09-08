@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=31";
+} from "./site-data.js?v=32";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -40,10 +40,10 @@ function art(p) {
   return `<div class="product-art ${E(p.color)}">${img(p.image, p.name, "product-image")}</div>`;
 }
 function cards(items) {
-  return `<div class="grid">${items.map((p) => `<a class="product floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${E(p.description)}</p><div class="product-bottom"><span>サンプルプロジェクト</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
+  return `<div class="grid">${items.map((p) => `<a class="product floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${E(p.description)}</p><div class="product-bottom"><span>TowaPC.com</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
 }
 function productRows(items) {
-  return `<div class="product-list">${items.map((p) => `<a class="product-row floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${E(p.description)}</p><div class="product-bottom"><span>サンプルプロジェクト</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
+  return `<div class="product-list">${items.map((p) => `<a class="product-row floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${E(p.description)}</p><div class="product-bottom"><span>TowaPC.com</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
 }
 function productView() {
   try {
@@ -71,8 +71,6 @@ function newsCards(items) {
 function pageHero(title, jp, extra = "") {
   return `<section class="page-hero ${extra}"><div class="wrap"><div class="breadcrumbs"><a href="/">Home</a> / ${E(title)}</div><h1>${E(title)}</h1><p>${E(jp)}</p></div></section>`;
 }
-const note =
-  '<p class="sample-note">※ 製品・お知らせの内容は、レイアウト確認用のサンプルです。</p>';
 function home() {
   const quick = [
     ["information", "Information", "お知らせ", "pink", "bell"],
@@ -81,7 +79,7 @@ function home() {
     ["join", "Join", "TowaPCに参加する", "cream", "join"],
   ];
   const heroSource = safeImageSource(S.hero);
-  return `<section class="hero">${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}<h1>${E(S.headline)}</h1></section><div class="wrap"><section class="intro floating"><h2>What’s “TowaPC”?</h2><p>${E(S.description)}</p><a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a></section><section class="news-strip floating"><a class="news-label" href="/information/">${icon("bell")}Information</a><div class="news-list">${rows(S.news)}</div></section><section class="quick-links">${quick.map(([path, label, jp, color, type]) => `<a href="/${path}/" class="quick-link floating ${color}">${icon(type)}<div><strong>${label}</strong><small>${jp}</small></div><span class="arrow">${icon("right")}</span></a>`).join("")}</section><section class="section"><div class="section-heading"><h2>Our products.</h2><a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a></div>${cards(S.products)}${note}</section></div>`;
+  return `<section class="hero">${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}<h1>${E(S.headline)}</h1></section><div class="wrap"><section class="intro floating"><h2>What’s “TowaPC”?</h2><p>${E(S.description)}</p><a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a></section><section class="news-strip floating"><a class="news-label" href="/information/">${icon("bell")}Information</a><div class="news-list">${rows(S.news)}</div></section><section class="quick-links">${quick.map(([path, label, jp, color, type]) => `<a href="/${path}/" class="quick-link floating ${color}">${icon(type)}<div><strong>${label}</strong><small>${jp}</small></div><span class="arrow">${icon("right")}</span></a>`).join("")}</section><section class="section"><div class="section-heading"><h2>Our products.</h2><a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a></div>${cards(S.products)}</section></div>`;
 }
 function products() {
   const filters = [
@@ -91,7 +89,7 @@ function products() {
       ["project", "開発プロジェクト"],
     ],
     view = productView();
-  return `${pageHero("Product", "製品紹介")}<section class="section wrap"><div class="product-toolbar"><div class="filters">${filters.map(([v, t]) => `<button class="filter ${v === "all" ? "active" : ""}" data-filter="${v}" aria-pressed="${v === "all"}">${t}</button>`).join("")}</div><div class="view-switch" role="group" aria-label="製品の表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-product-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-product-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div></div><div id="product-results">${productResults(S.products, view)}</div>${note}</section>`;
+  return `${pageHero("Product", "製品紹介")}<section class="section wrap"><div class="product-toolbar"><div class="filters">${filters.map(([v, t]) => `<button class="filter ${v === "all" ? "active" : ""}" data-filter="${v}" aria-pressed="${v === "all"}">${t}</button>`).join("")}</div><div class="view-switch" role="group" aria-label="製品の表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-product-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-product-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div></div><div id="product-results">${productResults(S.products, view)}</div></section>`;
 }
 function newsView() {
   try {
@@ -104,27 +102,27 @@ function newsView() {
 }
 function information() {
   const view = newsView();
-  return `${pageHero("Information", "TowaPCからのお知らせ")}<section class="section wrap"><div class="view-switch" role="group" aria-label="お知らせの表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div><div id="information-results" class="${view === "list" ? "info-list floating" : "news-results"}">${view === "list" ? rows(S.news) : newsCards(S.news)}</div>${note}</section>`;
+  return `${pageHero("Information", "TowaPCからのお知らせ")}<section class="section wrap"><div class="view-switch" role="group" aria-label="お知らせの表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div><div id="information-results" class="${view === "list" ? "info-list floating" : "news-results"}">${view === "list" ? rows(S.news) : newsCards(S.news)}</div></section>`;
 }
 function about() {
   const values = [
     [
-      "好奇心を大切に。",
-      "身近な疑問に目を向け、新しい可能性を探ります。",
+      "小さな不便を見つける。",
+      "日常の細やかな部分に目を向け、改善できることを探します。",
       "lavender",
     ],
     [
-      "つくりながら、学ぶ。",
-      "まずは試して、少しずつ。小さな一歩を積み重ねます。",
+      "確実に便利にする。",
+      "派手さよりも使いやすさを大切に、役立つものをつくります。",
       "mint",
     ],
     [
-      "一緒に、前へ。",
-      "異なる視点やアイデアから、次のものづくりが生まれます。",
+      "少しずつ、育てる。",
+      "試して、調整して、長く安心して使える形へ育てていきます。",
       "cream",
     ],
   ];
-  return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><h2>TowaPCについて</h2><p>${E(S.description)}</p><p>「もっと便利にできないか」「こんな仕組みがあったら」。そんな身近な問いを出発点に、学び、試し、つくることを大切にしています。</p><div class="about-links"><a class="soft-button" href="/cooperation/">協力関係 ${icon("right")}</a><a class="soft-button" href="/members/">メンバー ${icon("right")}</a><a class="soft-button" href="/contact/">お問い合わせ ${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
+  return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><h2>TowaPCについて</h2><p>${E(S.description)}</p><p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p><div class="about-links"><a class="soft-button" href="/cooperation/">協力関係 ${icon("right")}</a><a class="soft-button" href="/members/">メンバー ${icon("right")}</a><a class="soft-button" href="/join/">Join ${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
 }
 function join() {
   const url = safeHttpUrl(S.joinUrl);
@@ -137,9 +135,12 @@ function join() {
       "アイデアを持ち寄る",
       "経験の多さよりも、知りたい・つくりたいという気持ちを。",
     ],
-    ["一歩を踏み出す", "参加窓口の公開後に、詳しい参加方法をご案内します。"],
+    [
+      "TowaPC Communityへ",
+      "Discordの招待リンクから参加し、興味のあることを共有できます。",
+    ],
   ];
-  return `${pageHero("Join", "TowaPCに参加する")}<section class="section wrap join-section"><div class="join-box floating"><h2>あなたの「つくりたい」を、<br>ここから。</h2><p>プログラミング、デザイン、アイデア。<br>それぞれの得意や好奇心を持ち寄って、一緒に新しいものづくりをはじめませんか。</p>${url ? `<a class="cta" href="${E(url)}" target="_blank" rel="noopener">参加について問い合わせる ${icon("right")}</a>` : '<span class="status">参加方法は、ただいま準備中です</span>'}</div><div class="values">${steps.map(([h, p]) => `<div class="value floating join-value"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
+  return `${pageHero("Join", "TowaPCに参加する")}<section class="section wrap join-section"><div class="join-box floating"><h2>あなたの「つくりたい」を、<br>ここから。</h2><p>プログラミング、デザイン、アイデア。<br>それぞれの得意や好奇心を持ち寄って、一緒に新しいものづくりをはじめませんか。</p>${url ? `<a class="cta" href="${E(url)}" target="_blank" rel="noopener">TowaPC Communityに参加する ${icon("right")}</a>` : '<span class="status">参加方法は、ただいま準備中です</span>'}</div><div class="values">${steps.map(([h, p]) => `<div class="value floating join-value"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
 }
 function directory(kind) {
   const cooperation = kind === "cooperation",
@@ -159,16 +160,16 @@ function directory(kind) {
 }
 function contact() {
   const contacts = [
-    ["youtube", "YouTube", S.socials.youtube],
-    ["x", "X", S.socials.x],
-    ["discord", "Discord", S.socials.discord],
-    ["mail", "お問い合わせ", S.contactUrl],
+    ["youtube", "YouTube", S.socials.youtube, S.labels.youtube],
+    ["x", "X", S.socials.x, S.labels.x],
+    ["discord", "Discord", S.socials.discord, S.labels.discord],
+    ["mail", "お問い合わせ", S.contactUrl, S.labels.contact],
   ];
   const cards = contacts
-    .map(([type, label, value]) => {
+    .map(([type, label, value, detail]) => {
       const url = type === "mail" ? safeContactUrl(value) : safeHttpUrl(value);
       return url
-        ? `<a id="${type}" class="contact-card floating" href="${E(url)}"${type === "mail" ? "" : ' target="_blank" rel="noopener"'}>${type === "mail" ? icon(type) : brandIcon(type)}<div><h2>${label}</h2><p>${type === "mail" ? "メールアプリを開く" : "公式ページを開く"}</p></div>${icon("right")}</a>`
+        ? `<a id="${type}" class="contact-card floating" href="${E(url)}"${type === "mail" ? "" : ' target="_blank" rel="noopener"'}>${type === "mail" ? icon(type) : brandIcon(type)}<div><h2>${label}</h2><p>${E(detail || "公式ページ")}</p></div>${icon("right")}</a>`
         : `<button id="${type}" class="contact-card floating pending" type="button" aria-label="${label}：URL準備中">${type === "mail" ? icon(type) : brandIcon(type)}<div><h2>${label}</h2><p>URL準備中</p></div>${icon("right")}</button>`;
     })
     .join("");
@@ -179,7 +180,7 @@ function detail(kind, id) {
   const isProduct = kind === "product",
     item = (isProduct ? S.products : S.news).find((x) => x.id === id);
   if (!item) return missing();
-  const copy = `<div class="detail-copy"><span class="category">${isProduct ? E(item.category) : `${E(item.date)} · ${E(item.tag)}`}</span><h2>${E(isProduct ? item.name : item.title)}</h2><p>${E(isProduct ? item.description : item.body)}</p>${note}<a class="text-link" href="/${kind}/">${icon("left")} 一覧に戻る</a></div>`;
+  const copy = `<div class="detail-copy"><span class="category">${isProduct ? E(item.category) : `${E(item.date)} · ${E(item.tag)}`}</span><h2>${E(isProduct ? item.name : item.title)}</h2><p>${E(isProduct ? item.description : item.body)}</p><a class="text-link" href="/${kind}/">${icon("left")} 一覧に戻る</a></div>`;
   return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "製品紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
 function missing() {
@@ -191,7 +192,7 @@ function headerNav(route) {
     ["product", "Product"],
     ["information", "Information"],
     ["about", "About"],
-    ["join", "Join"],
+    ["contact", "Contact"],
   ];
   return `<span class="nav-selection"></span>${items.map(([path, label]) => `<a href="/${path ? `${path}/` : ""}" data-route="${path}">${label}</a>`).join("")}`;
 }
@@ -222,24 +223,13 @@ function render() {
     .querySelectorAll("[data-route]")
     .forEach((a) => a.classList.toggle("active", a.dataset.route === route));
   document.querySelector("[data-footer-links]").innerHTML = routes
-    .filter(([p]) => p !== "/contact")
+    .filter(([p]) => !["/contact", "/join"].includes(p))
     .map(([p, t]) => `<a href="${p === "/" ? "/" : p + "/"}">${t}</a>`)
     .join("");
-  const footerSocials = [
-      ["YouTube", S.socials.youtube],
-      ["X", S.socials.x],
-      ["Discord", S.socials.discord],
-    ],
-    footerMail = safeContactUrl(S.contactUrl) || "/contact/";
-  document.querySelector("[data-footer-contact]").innerHTML =
-    footerSocials
-      .map(([label, value]) => [label, safeHttpUrl(value)])
-      .filter(([, url]) => url)
-      .map(
-        ([label, url]) =>
-          `<a href="${E(url)}" target="_blank" rel="noopener">${label}</a>`,
-      )
-      .join("") + `<a href="${E(footerMail)}">お問い合わせ</a>`;
+  const joinUrl = safeHttpUrl(S.joinUrl);
+  document.querySelector("[data-footer-join]").innerHTML = joinUrl
+    ? `<a href="${E(joinUrl)}" target="_blank" rel="noopener">TowaPC Community</a>`
+    : '<a href="/join/">参加案内</a>';
   nav.classList.remove("open");
   document.body.classList.remove("menu-open");
   document.body.style.removeProperty("--menu-scroll-y");

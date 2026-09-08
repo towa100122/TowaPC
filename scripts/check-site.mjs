@@ -136,6 +136,10 @@ const requiredSiteKeys = [
   "socials.youtube",
   "socials.x",
   "socials.discord",
+  "labels.youtube",
+  "labels.x",
+  "labels.discord",
+  "labels.contact",
 ];
 for (const key of requiredSiteKeys) {
   if (!(key in site)) problem(`site.csv: ${key}の行がありません。`);
@@ -149,6 +153,10 @@ for (const key of [
   "socials.youtube",
   "socials.x",
   "socials.discord",
+  "labels.youtube",
+  "labels.x",
+  "labels.discord",
+  "labels.contact",
 ]) {
   if (key in site && !site[key])
     problem(`site.csv: ${key}を空欄にできません。`);

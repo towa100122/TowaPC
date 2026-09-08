@@ -7,6 +7,7 @@ export const site = {
   joinUrl: "",
   contactUrl: "/contact/",
   socials: {},
+  labels: {},
   products: [],
   news: [],
   partners: [],
@@ -136,6 +137,7 @@ export async function loadSiteData() {
       result.value.forEach(({ key, value }) => {
         if (directKeys.has(key)) site[key] = value;
         else if (key.startsWith("socials.")) site.socials[key.slice(8)] = value;
+        else if (key.startsWith("labels.")) site.labels[key.slice(7)] = value;
       });
     } else site[name] = result.value;
   });
