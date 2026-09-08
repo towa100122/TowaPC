@@ -1,2 +1,2 @@
-﻿id,name,category,type,description,color,image
-site-preparing,サイト現在準備中,Webサービス,web,現在、TowaPC.comは準備中です。まだ不完全なところがあり、調整をおこなっています。完成までしばらくお待ちください。,lavender,/assets/product-site-preparing.svg
+id,name,category,type,description,color,image,url
+site-preparing,サイト現在準備中,Webサービス,web,現在、TowaPC.comは準備中です。まだ不完全なところがあり、調整をおこなっています。完成までしばらくお待ちください。,lavender,/assets/product-site-preparing.svg,

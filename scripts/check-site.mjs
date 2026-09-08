@@ -16,8 +16,9 @@ const schemas = {
     "description",
     "color",
     "image",
+    "url",
   ],
-  "news.csv": ["id", "date", "tag", "title", "body", "image"],
+  "news.csv": ["id", "date", "tag", "title", "body", "image", "url"],
   "partners.csv": ["name", "role", "description", "image", "url"],
   "members.csv": ["name", "role", "description", "image", "url"],
 };

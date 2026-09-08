@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=35";
+} from "./site-data.js?v=36";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -65,6 +65,14 @@ function rows(items) {
     )
     .join("");
 }
+function informationRows(items) {
+  return `<div class="information-list">${items
+    .map(
+      (n) =>
+        `<a class="information-row floating" href="/information/${E(n.id)}/"><div class="information-row-art">${n.image ? img(n.image, "", "information-row-image") : `<span>${icon("bell")}</span>`}</div><div class="information-row-copy"><div><time>${E(n.date)}</time><span class="badge ${E(String(n.tag || "").toLowerCase())}">${E(n.tag)}</span></div><h2>${E(n.title)}</h2><p>${E(n.body)}</p><span class="information-row-more">詳しく見る ${icon("right")}</span></div></a>`,
+    )
+    .join("")}</div>`;
+}
 function newsCards(items) {
   return `<div class="news-grid">${items.map((n) => `<a class="news-card floating" href="/information/${E(n.id)}/"><div class="news-card-art">${n.image ? img(n.image, "", "news-card-image") : `<span>${icon("bell")}</span>`}</div><div class="news-card-copy"><div><time>${E(n.date)}</time><span class="badge ${E(String(n.tag || "").toLowerCase())}">${E(n.tag)}</span></div><h2>${E(n.title)}</h2><p>${E(n.body)}</p><span class="news-card-more">詳しく見る ${icon("right")}</span></div></a>`).join("")}</div>`;
 }
@@ -79,7 +87,7 @@ function home() {
     ["join", "Join", "私たちの一員になる", "cream", "join"],
   ];
   const heroSource = safeImageSource(S.hero);
-  return `<section class="hero">${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}<h1>${E(S.headline)}</h1></section><div class="wrap"><section class="intro floating"><h2>What’s “TowaPC”?</h2><p>${E(S.description)}</p><a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a></section><section class="news-strip floating"><a class="news-label" href="/information/">${icon("bell")}Information</a><div class="news-list">${rows(S.news)}<a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a></div></section><section class="quick-links">${quick.map(([path, label, jp, color, type]) => `<a href="/${path}/" class="quick-link floating ${color}">${icon(type)}<div><strong>${label}</strong><small>${jp}</small></div><span class="arrow">${icon("right")}</span></a>`).join("")}</section><section class="section"><div class="section-heading"><h2>Our products.</h2><a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a></div>${cards(S.products)}</section></div>`;
+  return `<section class="hero">${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}<h1>${E(S.headline)}</h1></section><div class="wrap"><section class="intro floating"><h2>What’s “TowaPC”?</h2><p>${E(S.description)}</p><a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a></section><section class="news-strip floating"><a class="news-label" href="/information/">${icon("bell")}Information</a><div class="news-list">${rows(S.news)}<a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a></div></section><section class="quick-links">${quick.map(([path, label, jp, color, type]) => `<a href="/${path}/" class="quick-link floating ${color}">${icon(type)}<div><strong>${label}</strong><small>${jp}</small></div><span class="arrow">${icon("right")}</span></a>`).join("")}</section><section class="section"><div class="section-heading"><h2>Our products</h2><a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a></div>${cards(S.products)}</section></div>`;
 }
 function products() {
   const filters = [
@@ -102,7 +110,7 @@ function newsView() {
 }
 function information() {
   const view = newsView();
-  return `${pageHero("Information", "TowaPCからのお知らせ")}<section class="section wrap"><div class="view-switch" role="group" aria-label="お知らせの表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div><div id="information-results" class="${view === "list" ? "info-list floating" : "news-results"}">${view === "list" ? rows(S.news) : newsCards(S.news)}</div></section>`;
+  return `${pageHero("Information", "TowaPCからのお知らせ")}<section class="section wrap"><div class="view-switch" role="group" aria-label="お知らせの表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div><div id="information-results" class="${view === "list" ? "info-list" : "news-results"}">${view === "list" ? informationRows(S.news) : newsCards(S.news)}</div></section>`;
 }
 function about() {
   const values = [
@@ -122,7 +130,7 @@ function about() {
       "cream",
     ],
   ];
-  return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><h2>TowaPCについて</h2><p>${E(S.description)}</p><p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p><div class="about-links"><a class="soft-button" href="/cooperation/">協力関係がある団体・個人 ${icon("right")}</a><a class="soft-button" href="/members/">TowaPCのメンバー ${icon("right")}</a><a class="soft-button" href="/join/">私たちの一員になる ${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
+  return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><h2>TowaPCについて</h2><p>${E(S.description)}</p><p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p><div class="about-links"><a class="soft-button" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a><a class="soft-button" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a><a class="soft-button" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
 }
 function join() {
   const url = safeHttpUrl(S.joinUrl);
@@ -180,7 +188,8 @@ function detail(kind, id) {
   const isProduct = kind === "product",
     item = (isProduct ? S.products : S.news).find((x) => x.id === id);
   if (!item) return missing();
-  const copy = `<div class="detail-copy"><span class="category">${isProduct ? E(item.category) : `${E(item.date)} · ${E(item.tag)}`}</span><h2>${E(isProduct ? item.name : item.title)}</h2><p>${E(isProduct ? item.description : item.body)}</p><a class="text-link" href="/${kind}/">${icon("left")} 一覧に戻る</a></div>`;
+  const itemUrl = safeHttpUrl(item.url);
+  const copy = `<div class="detail-copy"><span class="category">${isProduct ? E(item.category) : `${E(item.date)} · ${E(item.tag)}`}</span><h2>${E(isProduct ? item.name : item.title)}</h2><p>${E(isProduct ? item.description : item.body)}</p>${itemUrl ? `<a class="cta item-url" href="${E(itemUrl)}" target="_blank" rel="noopener">${isProduct ? "Webサイトを見る" : "関連リンクを開く"} ${icon("right")}</a>` : ""}<a class="text-link back-link" href="/${kind}/">${icon("left")} 一覧に戻る</a></div>`;
   return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
 function missing() {
@@ -298,9 +307,11 @@ function render() {
       } catch {}
       const results = document.getElementById("information-results");
       results.className =
-        b.dataset.newsView === "list" ? "info-list floating" : "news-results";
+        b.dataset.newsView === "list" ? "info-list" : "news-results";
       results.innerHTML =
-        b.dataset.newsView === "list" ? rows(S.news) : newsCards(S.news);
+        b.dataset.newsView === "list"
+          ? informationRows(S.news)
+          : newsCards(S.news);
       reveal();
     }),
   );
@@ -337,17 +348,32 @@ function setMenuLock(open) {
     window.scrollTo({ top: menuScrollY, behavior: "instant" });
   }
 }
-document.querySelector(".menu-button").addEventListener("click", (e) => {
-  const open = document.querySelector(".header nav").classList.toggle("open");
+function setMenuState(open) {
+  const nav = document.querySelector(".header nav"),
+    button = document.querySelector(".menu-button");
+  nav.classList.toggle("open", open);
   setMenuLock(open);
-  e.currentTarget.setAttribute("aria-expanded", String(open));
-  e.currentTarget.setAttribute(
+  button.setAttribute("aria-expanded", String(open));
+  button.setAttribute(
     "aria-label",
     open ? "メニューを閉じる" : "メニューを開く",
   );
-  e.currentTarget.querySelector(".material-symbols-rounded").textContent = open
+  button.querySelector(".material-symbols-rounded").textContent = open
     ? "close"
     : "menu";
+}
+document.querySelector(".menu-button").addEventListener("click", () => {
+  const nav = document.querySelector(".header nav");
+  setMenuState(!nav.classList.contains("open"));
+});
+document.addEventListener("click", (e) => {
+  const nav = document.querySelector(".header nav");
+  if (
+    nav.classList.contains("open") &&
+    !e.target.closest(".header nav") &&
+    !e.target.closest(".menu-button")
+  )
+    setMenuState(false);
 });
 document
   .querySelector(".back-top")
@@ -370,6 +396,8 @@ document.addEventListener("click", (e) => {
   const u = new URL(a.href, location.href);
   if (u.origin !== location.origin) return;
   e.preventDefault();
+  if (document.querySelector(".header nav").classList.contains("open"))
+    setMenuState(false);
   const next = u.pathname === "/" ? "/" : u.pathname.replace(/\/?$/, "/");
   if (location.pathname !== next) history.pushState(null, "", next + u.hash);
   render();

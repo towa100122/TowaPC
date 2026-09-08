@@ -24,7 +24,7 @@
 - `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、共通HTML、JavaScriptを検査する。
 - 公開前に必ず `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` でも同じ検査を行う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v35`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v36`。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
 
@@ -51,13 +51,15 @@
   - `小さな不便を見つける。`
   - `確実に便利にする。`
   - `少しずつ、育てる。`
-- Aboutのリンクは「協力関係がある団体・個人」「TowaPCのメンバー」「私たちの一員になる」。
+- Aboutのリンクは「TowaPCのメンバー」「協力関係がある団体・個人」「私たちの一員になる」の順。
 
 ## ナビゲーションと連絡先
 
 - ヘッダー: `Home / Product / Information / About / Contact`
 - ホームのお知らせ欄には一覧の右下に「すべて見る」を置く。ショートカットは `Product / About / Contact / Join` の順。
 - Productの説明は「私たちの製品の紹介」、Joinの説明は「私たちの一員になる」。
+- 製品・お知らせの外部URLは各CSVの `url` 列へ記入し、詳細ページにボタンを表示する。
+- テキストリンクには下線を付けず、ホーム内の「TowaPCについて」や一覧リンクは右揃えにする。
 - フッターのLinksにはJoinを含め、右側にContact欄を置く。
 - フッターのContact欄にはYouTube、X、Discord、お問い合わせを置く。
 - Joinページの参加ボタンも同じDiscord招待リンクを開く。
@@ -72,10 +74,10 @@
 ## メンバーと協力関係
 
 - メンバー画像と企業ロゴは常に正方形。
-- PCは180×180px、スマートフォンは最大240×240px。
+- PCは180×180px、スマートフォンは104×104px。
 - メンバー画像は正方形にトリミングし、企業ロゴは正方形内に全体を収める。
 - Towaの画像: `assets/member-towa.png`
-- Arielogicは現在 `assets/partner-sample.svg`。利用者が後で自分で画像を用意する予定。
+- Arielogicは現在、淡い紫一色の `assets/partner-sample.svg`。利用者が後で自分で画像を用意する予定。
 
 ## この変更の確認状況
 
@@ -86,3 +88,21 @@
 - サンプル注記が表示されないことを確認済み。
 - ブラウザーの警告・エラーなし。
 - 変更を公開するときは、最終検査、コミット、`main`へのpush、配布ZIP更新、公開サイト確認までを一続きで行う。
+
+## v36 作業状態（2026-09-09）
+
+- 現在のHEADは `9e45a6b Align information link to the right`。以下のv36変更はまだコミット・公開前。
+- Aboutの3リンクは「メンバー」「協力関係」「参加」の順で、矢印をボタン右端へ固定。ボタンは単色・影なしにし、ダークテーマの文字と面のコントラストも上げた。
+- About、Join、ホームのリンク配置を調整し、テキストリンクの下線を削除。ホームの「TowaPCについて」は右揃え。
+- モバイルメニューは、メニュー外を押したときとリンク選択時に閉じる実装へ変更。
+- Information一覧をProduct一覧と同じ画像付き構成に変更。製品・お知らせCSVへ任意の `url` 列を追加し、値がある詳細ページでは外部リンクボタンを表示する。
+- モバイルのメンバー画像・協力団体ロゴは104px。協力団体の仮画像は淡い紫一色。
+- モバイルフッターはロゴの右にテーマ切替を置き、`© 2025〜2026 TowaPC` をフッター最下部に置く。
+- Joinのカード背景色を統一。参加ボタンはモバイルで横幅100%、折り返さない設定。
+- ホームのヒーロー画像は彩度・コントラスト・明るさを少し下げ、過度なHDR感を抑えた。
+- `Our products.` はピリオドを削除して `Our products` に変更。
+- PC幅、390px幅のAbout・Information、390px幅ダークテーマAboutは目視確認済み。横はみ出しなし、Aboutの矢印・フッターのテーマ切替・Information画像付き一覧・ダーク配色は正常。
+- 未確認は、最終調整後の390px幅Join参加ボタンと、メニュー外クリックで閉じる挙動。
+- 確認後に `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を再実行する。
+- その後、変更をコミットして `git push origin HEAD:main`、GitHub Actions成功確認、配布フォルダーとZIP更新、ZIP内容照合、公開サイトv36確認を行う。
+- ローカル確認サーバーは `http://127.0.0.1:4173/`、確認用Edgeのデバッグ先は `http://127.0.0.1:9229/`。完了後、確認専用プロセスを閉じ、`qa-*`、`.qa-v36-*`、`.edge-v36*`、`.cdp-v36` の一時ファイルだけを削除する。通常のEdgeは終了しない。
