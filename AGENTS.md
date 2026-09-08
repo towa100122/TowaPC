@@ -89,9 +89,9 @@
 - ブラウザーの警告・エラーなし。
 - 変更を公開するときは、最終検査、コミット、`main`へのpush、配布ZIP更新、公開サイト確認までを一続きで行う。
 
-## v36 作業状態（2026-09-09）
+## v36 完了状態（2026-09-09）
 
-- 現在のHEADは `9e45a6b Align information link to the right`。以下のv36変更はまだコミット・公開前。
+- v36の表示変更はコミット `8e8d8f4 Refine mobile layout and content lists` で `main` へ公開済み。
 - Aboutの3リンクは「メンバー」「協力関係」「参加」の順で、矢印をボタン右端へ固定。ボタンは単色・影なしにし、ダークテーマの文字と面のコントラストも上げた。
 - About、Join、ホームのリンク配置を調整し、テキストリンクの下線を削除。ホームの「TowaPCについて」は右揃え。
 - モバイルメニューは、メニュー外を押したときとリンク選択時に閉じる実装へ変更。
@@ -101,8 +101,8 @@
 - Joinのカード背景色を統一。参加ボタンはモバイルで横幅100%、折り返さない設定。
 - ホームのヒーロー画像は彩度・コントラスト・明るさを少し下げ、過度なHDR感を抑えた。
 - `Our products.` はピリオドを削除して `Our products` に変更。
-- PC幅、390px幅のAbout・Information、390px幅ダークテーマAboutは目視確認済み。横はみ出しなし、Aboutの矢印・フッターのテーマ切替・Information画像付き一覧・ダーク配色は正常。
-- 未確認は、最終調整後の390px幅Join参加ボタンと、メニュー外クリックで閉じる挙動。
-- 確認後に `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を再実行する。
-- その後、変更をコミットして `git push origin HEAD:main`、GitHub Actions成功確認、配布フォルダーとZIP更新、ZIP内容照合、公開サイトv36確認を行う。
-- ローカル確認サーバーは `http://127.0.0.1:4173/`、確認用Edgeのデバッグ先は `http://127.0.0.1:9229/`。完了後、確認専用プロセスを閉じ、`qa-*`、`.qa-v36-*`、`.edge-v36*`、`.cdp-v36` の一時ファイルだけを削除する。通常のEdgeは終了しない。
+- PC幅、390px幅のAbout・Information・Join、390px幅ダークテーマAboutは目視確認済み。横はみ出しなし、Aboutの矢印・Join参加ボタン・フッターのテーマ切替・Information画像付き一覧・ダーク配色は正常。
+- モバイルメニューは、開閉表示、スクロール固定、`aria-expanded` が外側クリックですべて閉じた状態へ戻ることを確認済み。
+- `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` は成功済み。
+- GitHub Actionsの「Check site」と「pages build and deployment」は成功済み。
+- 公開サイトでv36のCSS・JavaScript、製品1件、お知らせ1件、`Our products`、`© 2025〜2026 TowaPC`、390px幅の横はみ出しなし、ブラウザーエラーなしを確認済み。
