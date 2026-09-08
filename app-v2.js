@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=33";
+} from "./site-data.js?v=34";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -73,10 +73,10 @@ function pageHero(title, jp, extra = "") {
 }
 function home() {
   const quick = [
-    ["product", "Product", "製品紹介", "lavender", "grid"],
+    ["product", "Product", "私たちの製品の紹介", "lavender", "grid"],
     ["about", "About", "TowaPCについて", "mint", "about"],
     ["contact", "Contact", "お問い合わせ", "pink", "mail"],
-    ["join", "Join", "TowaPCに参加する", "cream", "join"],
+    ["join", "Join", "私たちの一員になる", "cream", "join"],
   ];
   const heroSource = safeImageSource(S.hero);
   return `<section class="hero">${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}<h1>${E(S.headline)}</h1></section><div class="wrap"><section class="intro floating"><h2>What’s “TowaPC”?</h2><p>${E(S.description)}</p><a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a></section><section class="news-strip floating"><a class="news-label" href="/information/">${icon("bell")}Information</a><div class="news-list">${rows(S.news)}<a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a></div></section><section class="quick-links">${quick.map(([path, label, jp, color, type]) => `<a href="/${path}/" class="quick-link floating ${color}">${icon(type)}<div><strong>${label}</strong><small>${jp}</small></div><span class="arrow">${icon("right")}</span></a>`).join("")}</section><section class="section"><div class="section-heading"><h2>Our products.</h2><a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a></div>${cards(S.products)}</section></div>`;
@@ -89,7 +89,7 @@ function products() {
       ["project", "開発プロジェクト"],
     ],
     view = productView();
-  return `${pageHero("Product", "製品紹介")}<section class="section wrap"><div class="product-toolbar"><div class="filters">${filters.map(([v, t]) => `<button class="filter ${v === "all" ? "active" : ""}" data-filter="${v}" aria-pressed="${v === "all"}">${t}</button>`).join("")}</div><div class="view-switch" role="group" aria-label="製品の表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-product-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-product-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div></div><div id="product-results">${productResults(S.products, view)}</div></section>`;
+  return `${pageHero("Product", "私たちの製品の紹介")}<section class="section wrap"><div class="product-toolbar"><div class="filters">${filters.map(([v, t]) => `<button class="filter ${v === "all" ? "active" : ""}" data-filter="${v}" aria-pressed="${v === "all"}">${t}</button>`).join("")}</div><div class="view-switch" role="group" aria-label="製品の表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-product-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-product-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div></div><div id="product-results">${productResults(S.products, view)}</div></section>`;
 }
 function newsView() {
   try {
@@ -122,7 +122,7 @@ function about() {
       "cream",
     ],
   ];
-  return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><h2>TowaPCについて</h2><p>${E(S.description)}</p><p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p><div class="about-links"><a class="soft-button" href="/cooperation/">協力関係 ${icon("right")}</a><a class="soft-button" href="/members/">メンバー ${icon("right")}</a><a class="soft-button" href="/join/">メンバーになる ${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
+  return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><h2>TowaPCについて</h2><p>${E(S.description)}</p><p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p><div class="about-links"><a class="soft-button" href="/cooperation/">協力関係がある団体・個人 ${icon("right")}</a><a class="soft-button" href="/members/">TowaPCのメンバー ${icon("right")}</a><a class="soft-button" href="/join/">私たちの一員になる ${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
 }
 function join() {
   const url = safeHttpUrl(S.joinUrl);
@@ -140,13 +140,13 @@ function join() {
       "Discordの招待リンクから参加し、興味のあることを共有できます。",
     ],
   ];
-  return `${pageHero("Join", "TowaPCに参加する")}<section class="section wrap join-section"><div class="join-box floating"><h2>あなたの「つくりたい」を、<br>ここから。</h2><p>プログラミング、デザイン、アイデア。<br>それぞれの得意や好奇心を持ち寄って、一緒に新しいものづくりをはじめませんか。</p>${url ? `<a class="cta" href="${E(url)}" target="_blank" rel="noopener">TowaPC Communityに参加する ${icon("right")}</a>` : '<span class="status">参加方法は、ただいま準備中です</span>'}</div><div class="values">${steps.map(([h, p]) => `<div class="value floating join-value"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
+  return `${pageHero("Join", "私たちの一員になる")}<section class="section wrap join-section"><div class="join-box floating"><h2>あなたの「つくりたい」を、<br>ここから。</h2><p>プログラミング、デザイン、アイデア。<br>それぞれの得意や好奇心を持ち寄って、一緒に新しいものづくりをはじめませんか。</p>${url ? `<a class="cta" href="${E(url)}" target="_blank" rel="noopener">TowaPC Communityに参加する ${icon("right")}</a>` : '<span class="status">参加方法は、ただいま準備中です</span>'}</div><div class="values">${steps.map(([h, p]) => `<div class="value floating join-value"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
 }
 function directory(kind) {
   const cooperation = kind === "cooperation",
     list = cooperation ? S.partners : S.members,
     title = cooperation ? "Cooperation" : "Members",
-    jp = cooperation ? "協力関係にある団体・個人" : "TowaPCのメンバー",
+    jp = cooperation ? "協力関係がある団体・個人" : "TowaPCのメンバー",
     imageClass = cooperation
       ? "directory-image company-logo"
       : "directory-image member-image";
@@ -181,7 +181,7 @@ function detail(kind, id) {
     item = (isProduct ? S.products : S.news).find((x) => x.id === id);
   if (!item) return missing();
   const copy = `<div class="detail-copy"><span class="category">${isProduct ? E(item.category) : `${E(item.date)} · ${E(item.tag)}`}</span><h2>${E(isProduct ? item.name : item.title)}</h2><p>${E(isProduct ? item.description : item.body)}</p><a class="text-link" href="/${kind}/">${icon("left")} 一覧に戻る</a></div>`;
-  return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "製品紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
+  return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
 function missing() {
   return `${pageHero("Page not found", "ページが見つかりませんでした")}<section class="section wrap"><a class="cta" href="/">ホームに戻る</a></section>`;

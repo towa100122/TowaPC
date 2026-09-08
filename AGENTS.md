@@ -24,7 +24,7 @@
 - `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、共通HTML、JavaScriptを検査する。
 - 公開前に必ず `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` でも同じ検査を行う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v33`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v34`。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
 
@@ -51,12 +51,13 @@
   - `小さな不便を見つける。`
   - `確実に便利にする。`
   - `少しずつ、育てる。`
-- Aboutの3つ目のリンクはJoinページへの「メンバーになる」。
+- Aboutのリンクは「協力関係がある団体・個人」「TowaPCのメンバー」「私たちの一員になる」。
 
 ## ナビゲーションと連絡先
 
 - ヘッダー: `Home / Product / Information / About / Contact`
-- ホームのお知らせ欄には一覧の下に「すべて見る」を置く。ショートカットは `Product / About / Contact / Join` の順。
+- ホームのお知らせ欄には一覧の右下に「すべて見る」を置く。ショートカットは `Product / About / Contact / Join` の順。
+- Productの説明は「私たちの製品の紹介」、Joinの説明は「私たちの一員になる」。
 - フッターのLinksにはJoinを含め、右側にContact欄を置く。
 - フッターのContact欄にはYouTube、X、Discord、お問い合わせを置く。
 - Joinページの参加ボタンも同じDiscord招待リンクを開く。
