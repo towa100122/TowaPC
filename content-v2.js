@@ -16,11 +16,11 @@ window.SITE={
     {id:'updates',date:'2026.09.07',tag:'Important',title:'今後のお知らせについて',body:'製品や活動に関する大切な情報を、お知らせページに掲載していく予定です。',image:''},
     {id:'products',date:'2026.09.07',tag:'Release',title:'製品紹介ページを公開しました',body:'製品紹介ページでは、取り組んでいるものづくりをご紹介します。',image:''}
   ],
-  // {name,role,description,image,url} の形式で追加します。以下の1件は入力例です。
+  // CSV読み込み前に表示する予備データです。
   partners:[
-    {name:'協力団体名',role:'協力団体',description:'TowaPCと協力関係にある団体・個人の紹介文を入力します。',image:'/assets/partner-sample.svg',url:''}
+    {name:'Arielogic',role:'協力団体',description:'TowaPCはArielogicに協力しています。',image:'/assets/partner-sample.svg',url:''}
   ],
   members:[
-    {name:'メンバー名',role:'担当・役割',description:'担当している分野や、簡単なプロフィールを入力します。',image:'/assets/member-sample.svg',url:''}
+    {name:'towa',role:'リーダー',description:'TowaPCのリーダー。2022年からScratchを始め、2026年にほぼ引退。主にUIデザインが得意です。現在、NekoBousaiNowという防災ソフトを開発中です。プログラミングはまだ乏しいですが、出来るように勉強していきます。',image:'/assets/member-towa.png',url:''}
   ]
 };
