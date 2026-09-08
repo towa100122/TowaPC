@@ -24,7 +24,7 @@
 - `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、共通HTML、JavaScriptを検査する。
 - 公開前に必ず `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` でも同じ検査を行う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v36`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v37`。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
 
@@ -56,7 +56,7 @@
 ## ナビゲーションと連絡先
 
 - ヘッダー: `Home / Product / Information / About / Contact`
-- ホームのお知らせ欄には一覧の右下に「すべて見る」を置く。ショートカットは `Product / About / Contact / Join` の順。
+- ホームのお知らせ欄の「すべて見る」は、PCでは「Information」の下、スマートフォンでは「Information」と同じ行の右端に置く。ショートカットは `Product / About / Contact / Join` の順。
 - Productの説明は「私たちの製品の紹介」、Joinの説明は「私たちの一員になる」。
 - 製品・お知らせの外部URLは各CSVの `url` 列へ記入し、詳細ページにボタンを表示する。
 - テキストリンクには下線を付けず、ホーム内の「TowaPCについて」や一覧リンクは右揃えにする。

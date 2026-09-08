@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=36";
+} from "./site-data.js?v=37";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -87,7 +87,7 @@ function home() {
     ["join", "Join", "私たちの一員になる", "cream", "join"],
   ];
   const heroSource = safeImageSource(S.hero);
-  return `<section class="hero">${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}<h1>${E(S.headline)}</h1></section><div class="wrap"><section class="intro floating"><h2>What’s “TowaPC”?</h2><p>${E(S.description)}</p><a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a></section><section class="news-strip floating"><a class="news-label" href="/information/">${icon("bell")}Information</a><div class="news-list">${rows(S.news)}<a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a></div></section><section class="quick-links">${quick.map(([path, label, jp, color, type]) => `<a href="/${path}/" class="quick-link floating ${color}">${icon(type)}<div><strong>${label}</strong><small>${jp}</small></div><span class="arrow">${icon("right")}</span></a>`).join("")}</section><section class="section"><div class="section-heading"><h2>Our products</h2><a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a></div>${cards(S.products)}</section></div>`;
+  return `<section class="hero">${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}<h1>${E(S.headline)}</h1></section><div class="wrap"><section class="intro floating"><h2>What’s “TowaPC”?</h2><p>${E(S.description)}</p><a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a></section><section class="news-strip floating"><div class="news-heading"><a class="news-label" href="/information/">${icon("bell")}Information</a><a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a></div><div class="news-list">${rows(S.news)}</div></section><section class="quick-links">${quick.map(([path, label, jp, color, type]) => `<a href="/${path}/" class="quick-link floating ${color}">${icon(type)}<div><strong>${label}</strong><small>${jp}</small></div><span class="arrow">${icon("right")}</span></a>`).join("")}</section><section class="section"><div class="section-heading"><h2>Our products</h2><a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a></div>${cards(S.products)}</section></div>`;
 }
 function products() {
   const filters = [
