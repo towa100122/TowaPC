@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=43";
+} from "./site-data.js?v=44";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -113,6 +113,7 @@ function information() {
   return `${pageHero("Information", "TowaPCからのお知らせ")}<section class="section wrap"><div class="view-switch" role="group" aria-label="お知らせの表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div><div id="information-results" class="${view === "list" ? "info-list" : "news-results"}">${view === "list" ? informationRows(S.news) : newsCards(S.news)}</div></section>`;
 }
 function about() {
+  const logo = safeImageSource(S.logo) || "/assets/TowaPC.svg";
   const values = [
     [
       "小さな不便を見つける。",
@@ -130,7 +131,7 @@ function about() {
       "cream",
     ],
   ];
-  return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><h2>TowaPCについて</h2><p>${E(S.description)}</p><p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p><div class="about-links"><a class="soft-button" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a><a class="soft-button" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a><a class="soft-button" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
+  return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><div class="about-heading"><button class="about-logo-trigger" type="button" aria-label="TowaPCロゴ" data-animation-trigger><img class="about-logo" src="${E(logo)}" alt="TowaPC"></button><h2>TowaPCについて</h2></div><p>${E(S.description)}</p><p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p><div class="about-links"><a class="soft-button" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a><a class="soft-button" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a><a class="soft-button" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
 }
 function join() {
   const url = safeHttpUrl(S.joinUrl);
@@ -193,7 +194,158 @@ function detail(kind, id) {
   return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
 function missing() {
-  return `${pageHero("Page not found", "ページが見つかりませんでした")}<section class="section wrap"><p>指定されたページは存在しないか、移動した可能性があります。</p></section>`;
+  return `${pageHero("Page not found", "ページが見つかりませんでした")}<section class="section wrap not-found"><div class="not-found-card floating"><span class="not-found-number">404</span><p>指定されたページは存在しないか、移動した可能性があります。</p><button class="mystery-trigger" type="button" aria-label="不思議な印を調べる" data-mystery-trigger>✦</button></div></section>`;
+}
+
+function showEggStatus(message) {
+  document.querySelector(".egg-status")?.remove();
+  const status = document.createElement("div");
+  status.className = "egg-status";
+  status.setAttribute("role", "status");
+  status.textContent = message;
+  document.body.append(status);
+  setTimeout(() => status.remove(), 2600);
+}
+
+function animationBurst() {
+  const burst = document.createElement("div");
+  burst.className = "animation-burst";
+  burst.setAttribute("aria-hidden", "true");
+  burst.innerHTML = Array.from(
+    { length: 18 },
+    (_, index) => `<span style="--i:${index}"></span>`,
+  ).join("");
+  document.body.append(burst);
+  setTimeout(() => burst.remove(), 1800);
+}
+
+function setupAnimationEgg() {
+  const trigger = document.querySelector("[data-animation-trigger]");
+  if (!trigger) return;
+  let clicks = 0;
+  let resetTimer;
+  trigger.addEventListener("click", () => {
+    clicks += 1;
+    trigger.classList.remove("logo-tap");
+    void trigger.offsetWidth;
+    trigger.classList.add("logo-tap");
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(() => (clicks = 0), 1800);
+    if (clicks < 5) return;
+    clicks = 0;
+    clearTimeout(resetTimer);
+    const enabled = document.body.classList.toggle("animation-mode");
+    if (enabled) animationBurst();
+    showEggStatus(`ANIMATION MODE // ${enabled ? "ON" : "OFF"}`);
+  });
+}
+
+const mysteryPrompts = [
+  "重力を忘れた猫",
+  "午前3時のWi-Fi",
+  "未来から来た非常口",
+  "考えごとをする雲",
+  "充電が1%の宇宙船",
+];
+const mysteryReadings = [
+  "空中で迷子になった猫型ルーター",
+  "月曜を回避するための秘密装置",
+  "まだ誰も名前を付けていない天気",
+  "夢の中だけで動く信号機",
+  "少し自信をなくした未確認生物",
+];
+
+function openMysteryGame() {
+  let game = document.querySelector(".mystery-game");
+  if (!game) {
+    game = document.createElement("dialog");
+    game.className = "mystery-game";
+    game.innerHTML = `<div class="mystery-game-head"><div><span>404 SECRET</span><h2>AIセンスの謎絵ゲーム</h2></div><button type="button" class="mystery-close" aria-label="ゲームを閉じる">×</button></div><p class="mystery-guide">お題を自由に描くと、AIらしき何かが独自のセンスで判定します。</p><div class="mystery-prompt"><span>今回のお題</span><strong></strong></div><canvas width="720" height="360" aria-label="お絵描きキャンバス"></canvas><div class="mystery-result" role="status">線を描いたら「AIに見せる」を押してください。</div><div class="mystery-actions"><button type="button" data-mystery-clear>消す</button><button type="button" data-mystery-next>お題を変える</button><button type="button" class="mystery-judge" data-mystery-judge>AIに見せる</button></div>`;
+    document.body.append(game);
+    const canvas = game.querySelector("canvas");
+    const context = canvas.getContext("2d");
+    let drawing = false;
+    let points = 0;
+    let strokes = 0;
+    let promptIndex = Math.floor(Math.random() * mysteryPrompts.length);
+    const prompt = game.querySelector(".mystery-prompt strong");
+    const result = game.querySelector(".mystery-result");
+    const updatePrompt = () => {
+      prompt.textContent = mysteryPrompts[promptIndex];
+      result.textContent = "線を描いたら「AIに見せる」を押してください。";
+    };
+    const clear = () => {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      points = 0;
+      strokes = 0;
+      result.textContent = "キャンバスを空にしました。";
+    };
+    const position = (event) => {
+      const box = canvas.getBoundingClientRect();
+      return {
+        x: ((event.clientX - box.left) / box.width) * canvas.width,
+        y: ((event.clientY - box.top) / box.height) * canvas.height,
+      };
+    };
+    canvas.addEventListener("pointerdown", (event) => {
+      drawing = true;
+      strokes += 1;
+      const point = position(event);
+      context.beginPath();
+      context.moveTo(point.x, point.y);
+      canvas.setPointerCapture(event.pointerId);
+    });
+    canvas.addEventListener("pointermove", (event) => {
+      if (!drawing) return;
+      const point = position(event);
+      context.lineWidth = 7;
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      context.strokeStyle = `hsl(${(points * 7 + promptIndex * 53) % 360} 72% 43%)`;
+      context.lineTo(point.x, point.y);
+      context.stroke();
+      points += 1;
+    });
+    const stopDrawing = () => (drawing = false);
+    canvas.addEventListener("pointerup", stopDrawing);
+    canvas.addEventListener("pointercancel", stopDrawing);
+    game.querySelector("[data-mystery-clear]").addEventListener("click", clear);
+    game.querySelector("[data-mystery-next]").addEventListener("click", () => {
+      promptIndex = (promptIndex + 1) % mysteryPrompts.length;
+      clear();
+      updatePrompt();
+    });
+    game.querySelector("[data-mystery-judge]").addEventListener("click", () => {
+      if (points < 4) {
+        result.textContent =
+          "AIは静寂を検出しました。もう少し線が必要なようです。";
+        return;
+      }
+      const score = Math.min(
+        99,
+        38 + ((points * 3 + strokes * 11 + promptIndex * 7) % 62),
+      );
+      const reading =
+        mysteryReadings[
+          (points + strokes + promptIndex) % mysteryReadings.length
+        ];
+      result.textContent = `AIは「${reading}」を受信。お題との謎の共鳴率は${score}%です。`;
+    });
+    game
+      .querySelector(".mystery-close")
+      .addEventListener("click", () => game.close());
+    game.addEventListener("click", (event) => {
+      if (event.target === game) game.close();
+    });
+    updatePrompt();
+  }
+  game.showModal();
+}
+
+function setupMysteryEgg() {
+  document
+    .querySelector("[data-mystery-trigger]")
+    ?.addEventListener("click", openMysteryGame);
 }
 function headerNav(route) {
   const items = [
@@ -320,6 +472,8 @@ function render() {
       reveal();
     }),
   );
+  setupAnimationEgg();
+  setupMysteryEgg();
   window.scrollTo({ top: 0, behavior: "instant" });
   reveal();
   main.classList.remove("page-enter");
@@ -500,6 +654,16 @@ window.addEventListener("popstate", () => {
 window.addEventListener("hashchange", () => {
   migrate();
   render();
+});
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Escape" &&
+    document.body.classList.contains("animation-mode") &&
+    !document.querySelector("dialog[open]")
+  ) {
+    document.body.classList.remove("animation-mode");
+    showEggStatus("ANIMATION MODE // OFF");
+  }
 });
 document.fonts.ready.then(positionSelection);
 setupTheme();
