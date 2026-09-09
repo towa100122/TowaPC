@@ -104,4 +104,4 @@
 - `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` は成功済み。
 - GitHub Actionsの「Check site」と「pages build and deployment」は成功済み。
 - 公開サイトでv43のCSS・JavaScript、About・Contact・Join・Informationの配色とレイアウト、各ページのホームリンク、ブラウザーエラーなしを確認済み。
-- 配布用フォルダーとZIPは公開内容と同じ47ファイル。ZIPのSHA-256は `B96C6976CF07B22E606F91C84F0A90CFEB8FC40348B55A5E003E3F164671B60B`。
+- 配布用フォルダーとZIPは公開内容と同じ47ファイルで、各ファイルの内容一致を確認済み。
