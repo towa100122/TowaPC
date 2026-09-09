@@ -2397,3 +2397,292 @@ footer,
   background: #3a311c;
   color: #f3dfaa;
 }
+
+/* えにいゲームは、あえて生成AIらしい過剰な未来感を出す。 */
+.mystery-game {
+  isolation: isolate;
+  border: 1px solid rgba(142, 104, 255, 0.62);
+  background:
+    radial-gradient(circle at 5% 0%, #ca72ff66, transparent 34%),
+    radial-gradient(circle at 96% 9%, #40e9ff55, transparent 31%),
+    radial-gradient(circle at 45% 105%, #ff70bd3d, transparent 39%),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(237, 240, 255, 0.94)
+    );
+  box-shadow:
+    0 32px 110px #4d22b477,
+    0 0 0 1px #ffffffcc inset,
+    0 0 70px #5ee7ff33;
+}
+.mystery-game::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 22%,
+    #ffffff24 42%,
+    #60eaff1d 49%,
+    transparent 68%
+  );
+  background-position: 140% 0;
+  background-size: 260% 100%;
+  animation: enii-ai-orbit 6s ease-in-out infinite;
+}
+.mystery-game > * {
+  position: relative;
+  z-index: 1;
+}
+.mystery-game::backdrop {
+  background:
+    radial-gradient(circle at 20% 15%, #713cff4a, transparent 38%),
+    radial-gradient(circle at 80% 75%, #13c9d83d, transparent 42%),
+    rgba(5, 6, 13, 0.78);
+  backdrop-filter: blur(14px) saturate(145%);
+}
+.mystery-game-head > div > span {
+  display: inline-flex;
+  padding: 5px 10px;
+  border: 1px solid #845dff66;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7954ff18, #22d9e71c);
+  box-shadow: 0 0 18px #704dff33;
+  color: #5a37d5;
+  text-shadow: 0 0 14px #7b5bff66;
+}
+.mystery-game-head h2 {
+  width: fit-content;
+  background: linear-gradient(90deg, #5f3fe2, #b435d0 48%, #078fa9);
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 5px 14px #734ce92e);
+}
+.mystery-close {
+  flex: 0 0 38px;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  aspect-ratio: 1 / 1;
+  border: 1px solid #ffffffbb;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ffffffd9, #ded9f4d9);
+  box-shadow:
+    0 7px 20px #5b36b83b,
+    0 0 0 1px #7c5dde24 inset;
+}
+.mystery-guide {
+  width: fit-content;
+  padding: 7px 11px;
+  border: 1px solid #9276ed33;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: 0 8px 24px #5f42aa18;
+}
+.enii-stats > div {
+  border: 1px solid #ffffffaa;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.72),
+      rgba(231, 221, 255, 0.68)
+    ),
+    linear-gradient(90deg, #7e5cff, #48d9e8);
+  box-shadow:
+    0 13px 28px #6943c72a,
+    0 0 0 1px #7d5eff1d inset;
+  backdrop-filter: blur(12px) saturate(150%);
+}
+.enii-stats strong {
+  background: linear-gradient(90deg, #5c3ad6, #0c94aa);
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 4px 18px #7252dd38;
+}
+.enii-progress {
+  height: 12px;
+  border: 1px solid #ffffffb8;
+  background: rgba(91, 78, 137, 0.17);
+  box-shadow:
+    0 0 24px #714eff36,
+    0 0 8px #3be5f733 inset;
+}
+.enii-progress span {
+  background: linear-gradient(90deg, #704cff, #ed53c9, #42e6f5, #704cff);
+  background-size: 260% 100%;
+  box-shadow: 0 0 18px #8a68ff99;
+  animation: enii-ai-flow 2.8s linear infinite;
+}
+.enii-progress-label strong {
+  color: #5d3bd4;
+  text-shadow: 0 0 12px #724eff44;
+}
+.enii-arena {
+  border-color: #9274f566;
+  background:
+    linear-gradient(#8f71e01d 1px, transparent 1px),
+    linear-gradient(90deg, #34cee31d 1px, transparent 1px),
+    radial-gradient(circle at 18% 22%, #a474ff80 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 72%, #26ddea80 0 3px, transparent 4px),
+    linear-gradient(145deg, #f4efff, #e9fbff);
+  background-size:
+    24px 24px,
+    24px 24px,
+    48px 48px,
+    62px 62px,
+    auto;
+  box-shadow:
+    0 18px 40px #653dc72c,
+    0 0 42px #37d9e525 inset;
+}
+.enii-arena::before {
+  content: "AI NEURAL ENII SPACE · GENERATIVE EXPERIENCE · 404";
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  color: #6746cf88;
+  font:
+    600 8px "Google Sans",
+    sans-serif;
+  letter-spacing: 0.16em;
+}
+.enii-target {
+  border: 1px solid #ffffffaa;
+  background: linear-gradient(145deg, #965cff, #d64dcc 48%, #29cde0);
+  box-shadow:
+    0 16px 35px #722ccf66,
+    0 0 30px #3de1f088,
+    0 0 0 4px #ffffff2b inset;
+  text-shadow: 0 2px 8px #42126b88;
+  animation: enii-ai-pulse 1.7s ease-in-out infinite;
+}
+.enii-target:hover {
+  background: linear-gradient(145deg, #8050f1, #c13db9 48%, #1bb9ca);
+}
+.enii-message {
+  border: 1px solid #ffffff55;
+  background: linear-gradient(90deg, #25174eea, #223d56e8);
+  box-shadow:
+    0 11px 28px #32186555,
+    0 0 24px #4edcea22 inset;
+  backdrop-filter: blur(13px) saturate(145%);
+}
+.mystery-actions button {
+  border: 1px solid #ffffff99;
+  background: linear-gradient(135deg, #f3efffd9, #dffaffd9);
+  box-shadow:
+    0 9px 22px #5a37b22d,
+    0 0 0 1px #7d5ddb22 inset;
+  color: #4f369b;
+}
+:root[data-theme="dark"] .mystery-game {
+  border-color: #8f6dff88;
+  background:
+    radial-gradient(circle at 5% 0%, #7e32bf66, transparent 34%),
+    radial-gradient(circle at 96% 9%, #087f9b66, transparent 31%),
+    radial-gradient(circle at 45% 105%, #a72d773d, transparent 39%),
+    linear-gradient(145deg, rgba(19, 16, 31, 0.98), rgba(13, 27, 35, 0.97));
+  box-shadow:
+    0 34px 120px #000b,
+    0 0 0 1px #aa8fff28 inset,
+    0 0 80px #2fdcec25;
+}
+:root[data-theme="dark"] .mystery-game-head > div > span {
+  border-color: #a58aff66;
+  background: linear-gradient(90deg, #8d68ff28, #28dce629);
+  color: #cabaff;
+}
+:root[data-theme="dark"] .mystery-game-head h2 {
+  background: linear-gradient(90deg, #b9a8ff, #f189df 48%, #62eaf5);
+  background-clip: text;
+  color: transparent;
+}
+:root[data-theme="dark"] .mystery-close {
+  border-color: #bbaaff55;
+  background: linear-gradient(145deg, #332c4d, #1f3540);
+  color: #f7f4ff;
+  box-shadow:
+    0 8px 24px #0008,
+    0 0 20px #8064ff2f inset;
+}
+:root[data-theme="dark"] .mystery-guide {
+  border-color: #a487ff35;
+  background: rgba(112, 81, 184, 0.16);
+  color: #d4d6e5;
+}
+:root[data-theme="dark"] .enii-stats > div {
+  border-color: #bcaaff2d;
+  background: linear-gradient(
+    135deg,
+    rgba(92, 60, 150, 0.56),
+    rgba(19, 95, 109, 0.42)
+  );
+  box-shadow:
+    0 13px 30px #0006,
+    0 0 25px #6d4be029 inset;
+}
+:root[data-theme="dark"] .enii-stats strong {
+  background: linear-gradient(90deg, #d0c4ff, #70eff7);
+  background-clip: text;
+  color: transparent;
+}
+:root[data-theme="dark"] .enii-progress-label strong {
+  color: #c7b9ff;
+}
+:root[data-theme="dark"] .enii-arena {
+  border-color: #9876ff55;
+  background:
+    linear-gradient(#a68cff1c 1px, transparent 1px),
+    linear-gradient(90deg, #35dce71c 1px, transparent 1px),
+    radial-gradient(circle at 18% 22%, #a474ff99 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 72%, #26ddea99 0 3px, transparent 4px),
+    linear-gradient(145deg, #151126, #0c252c);
+  background-size:
+    24px 24px,
+    24px 24px,
+    48px 48px,
+    62px 62px,
+    auto;
+  box-shadow:
+    0 18px 45px #0008,
+    0 0 45px #4251d52b inset;
+}
+:root[data-theme="dark"] .enii-arena::before {
+  color: #bda9ff88;
+}
+:root[data-theme="dark"] .enii-target {
+  background: linear-gradient(145deg, #a269ff, #ed60d8 48%, #3be3ef);
+  color: #fff;
+}
+:root[data-theme="dark"] .mystery-actions button {
+  border-color: #bcaaff33;
+  background: linear-gradient(135deg, #3b2d59, #1d4a55);
+  color: #f1edff;
+  box-shadow:
+    0 10px 24px #0006,
+    0 0 20px #6457d228 inset;
+}
+@keyframes enii-ai-orbit {
+  50%,
+  100% {
+    background-position: -120% 0;
+  }
+}
+@keyframes enii-ai-flow {
+  to {
+    background-position: 260% 0;
+  }
+}
+@keyframes enii-ai-pulse {
+  50% {
+    filter: saturate(1.35) brightness(1.12);
+    box-shadow:
+      0 18px 42px #8b35df88,
+      0 0 44px #39dfefaa,
+      0 0 0 4px #ffffff38 inset;
+  }
+}
