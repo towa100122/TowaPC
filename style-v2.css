@@ -853,6 +853,14 @@ p {
 .back-link {
   margin-top: 12px;
 }
+.page-home-link {
+  margin-top: -48px;
+  margin-bottom: 64px;
+}
+.page-home-link .text-link {
+  width: fit-content;
+  padding-left: 0;
+}
 .status {
   display: inline-block;
   background: #f4f3ed;
@@ -1299,6 +1307,10 @@ footer {
     gap: 8px;
     font-size: 12px;
     white-space: nowrap;
+  }
+  .page-home-link {
+    margin-top: -28px;
+    margin-bottom: 48px;
   }
   .directory-card {
     grid-template-columns: 104px minmax(0, 1fr);
@@ -1862,6 +1874,17 @@ footer,
 :root[data-theme="dark"] .contact-card p {
   color: #62685f;
 }
+:root[data-theme="dark"] .about-summary {
+  background: #fff;
+  color: #171a16;
+}
+:root[data-theme="dark"] .about-summary p {
+  color: #62685f;
+}
+:root[data-theme="dark"] .about-summary .soft-button {
+  background: #eceee8;
+  color: #171a16;
+}
 :root[data-theme="dark"] .info-list {
   background: transparent;
 }
@@ -1908,8 +1931,9 @@ footer,
   object-fit: contain;
   flex: 0 0 auto;
 }
+.brand-x,
 :root[data-theme="dark"] .brand-x {
-  filter: invert(1);
+  filter: none;
 }
 :root[data-theme="dark"] .data-warning {
   border-color: #755f2e;

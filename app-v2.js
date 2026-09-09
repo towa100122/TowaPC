@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=42";
+} from "./site-data.js?v=43";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -193,7 +193,7 @@ function detail(kind, id) {
   return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
 function missing() {
-  return `${pageHero("Page not found", "ページが見つかりませんでした")}<section class="section wrap"><a class="cta" href="/">ホームに戻る</a></section>`;
+  return `${pageHero("Page not found", "ページが見つかりませんでした")}<section class="section wrap"><p>指定されたページは存在しないか、移動した可能性があります。</p></section>`;
 }
 function headerNav(route) {
   const items = [
@@ -219,8 +219,13 @@ function render() {
       contact,
     };
   const main = document.getElementById("main");
-  main.innerHTML =
+  const pageContent =
     parts.length > 1 ? detail(route, parts[1]) : (pages[route] || missing)();
+  main.innerHTML =
+    pageContent +
+    (route
+      ? `<div class="page-home-link wrap"><a class="text-link" href="/">${icon("left")} ホームに戻る</a></div>`
+      : "");
   document.title = `TowaPC — ${routes.find(([p]) => p === `/${route}`)?.[1] || (route ? "Page" : "Home")}`;
   const logo = safeImageSource(S.logo) || "/assets/TowaPC.svg";
   document

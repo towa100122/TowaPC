@@ -24,7 +24,7 @@
 - `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、共通HTML、JavaScriptを検査する。
 - 公開前に必ず `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` でも同じ検査を行う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v42`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v43`。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
 
@@ -56,6 +56,7 @@
 ## ナビゲーションと連絡先
 
 - ヘッダー: `Home / Product / Information / About / Contact`
+- ホーム以外の全ページは、本文の下・フッターの手前に「← ホームに戻る」を表示する。
 - ホームのお知らせ欄の「すべて見る」は、PCでは中央揃えにした「Information」の下、スマートフォンでは「Information」と同じ行の右端に置き、矢印を下のお知らせ行の矢印とそろえる。ショートカットは `Product / About / Contact / Join` の順。
 - Productの説明は「私たちの製品の紹介」、Joinの説明は「私たちの一員になる」。
 - 製品・お知らせの外部URLは各CSVの `url` 列へ記入し、詳細ページにボタンを表示する。
@@ -64,7 +65,7 @@
 - フッターのContact欄にはYouTube、X、Discord、お問い合わせを置く。
 - Joinページの参加ボタンも同じDiscord招待リンクを開く。
 - Join上部の「あなたの『つくりたい』を、ここから。」カードはテーマと反転させ、ライトでは黒背景・白文字・白ボタン、ダークでは白背景・黒文字・黒ボタンにする。
-- ダークテーマで白背景・黒文字のままにするのは、Join最上部のカードとContactカードだけ。ほかのカードはダーク配色にする。Informationリストの外側は透明にして、角の後ろに四角い背景が見えないようにする。
+- ダークテーマで白背景・黒文字のままにするのは、Join最上部、Contact、Aboutの「TowaPCについて」カード。Aboutカード内のリンクは薄いグレー背景・黒文字にする。ほかのカードはダーク配色にする。Informationリストの外側は透明にして、角の後ろに四角い背景が見えないようにする。
 - Discord招待URL: `https://discord.gg/WJrAwzMp2U`
 - Contactカードの補足表示:
   - YouTube: `@TowaPC`
@@ -72,6 +73,7 @@
   - Discord: `TowaPC Community`
   - お問い合わせ: `contact@towapc.com`
 - Contactカードの値は `data/site.csv` の `labels.*` で管理する。
+- ContactのXロゴは、ライト・ダークとも黒で固定する。
 
 ## メンバーと協力関係
 
