@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=44";
+} from "./site-data.js?v=45";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -194,7 +194,7 @@ function detail(kind, id) {
   return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
 function missing() {
-  return `${pageHero("Page not found", "ページが見つかりませんでした")}<section class="section wrap not-found"><div class="not-found-card floating"><span class="not-found-number">404</span><p>指定されたページは存在しないか、移動した可能性があります。</p><button class="mystery-trigger" type="button" aria-label="不思議な印を調べる" data-mystery-trigger>✦</button></div></section>`;
+  return `<section class="section wrap not-found"><div class="not-found-card floating"><span class="not-found-number">404</span><p class="not-found-label">Not found</p><button class="mystery-trigger" type="button" aria-label="隠しボタン" data-mystery-trigger></button></div></section>`;
 }
 
 function showEggStatus(message) {
@@ -240,106 +240,95 @@ function setupAnimationEgg() {
   });
 }
 
-const mysteryPrompts = [
-  "重力を忘れた猫",
-  "午前3時のWi-Fi",
-  "未来から来た非常口",
-  "考えごとをする雲",
-  "充電が1%の宇宙船",
-];
-const mysteryReadings = [
-  "空中で迷子になった猫型ルーター",
-  "月曜を回避するための秘密装置",
-  "まだ誰も名前を付けていない天気",
-  "夢の中だけで動く信号機",
-  "少し自信をなくした未確認生物",
-];
-
 function openMysteryGame() {
   let game = document.querySelector(".mystery-game");
   if (!game) {
     game = document.createElement("dialog");
     game.className = "mystery-game";
-    game.innerHTML = `<div class="mystery-game-head"><div><span>404 SECRET</span><h2>AIセンスの謎絵ゲーム</h2></div><button type="button" class="mystery-close" aria-label="ゲームを閉じる">×</button></div><p class="mystery-guide">お題を自由に描くと、AIらしき何かが独自のセンスで判定します。</p><div class="mystery-prompt"><span>今回のお題</span><strong></strong></div><canvas width="720" height="360" aria-label="お絵描きキャンバス"></canvas><div class="mystery-result" role="status">線を描いたら「AIに見せる」を押してください。</div><div class="mystery-actions"><button type="button" data-mystery-clear>消す</button><button type="button" data-mystery-next>お題を変える</button><button type="button" class="mystery-judge" data-mystery-judge>AIに見せる</button></div>`;
+    game.innerHTML = `<div class="mystery-game-head"><div><span>404 SECRET</span><h2>AIセンスで作った全く謎の謎の&quot;えにい&quot;ゲーム</h2></div><button type="button" class="mystery-close" aria-label="ゲームを閉じる">×</button></div><p class="mystery-guide">目的は「えにい」をえにいすることです。説明は以上です。</p><div class="enii-stats"><div><span>失った時間</span><strong data-enii-time>0秒</strong></div><div><span>えにい度</span><strong data-enii-score>0 enii</strong></div></div><div class="enii-progress"><span data-enii-progress></span></div><div class="enii-progress-label">完成度 <strong data-enii-percent>0%</strong></div><div class="enii-arena"><button type="button" class="enii-target" data-enii-target aria-label="えにいを捕まえる">え</button><p class="enii-message" data-enii-message role="status">「え」を押してください。たぶん。</p></div><div class="mystery-actions"><button type="button" data-enii-manual>説明書を読む</button><button type="button" data-enii-reset>無かったことにする</button></div>`;
     document.body.append(game);
-    const canvas = game.querySelector("canvas");
-    const context = canvas.getContext("2d");
-    let drawing = false;
-    let points = 0;
-    let strokes = 0;
-    let promptIndex = Math.floor(Math.random() * mysteryPrompts.length);
-    const prompt = game.querySelector(".mystery-prompt strong");
-    const result = game.querySelector(".mystery-result");
-    const updatePrompt = () => {
-      prompt.textContent = mysteryPrompts[promptIndex];
-      result.textContent = "線を描いたら「AIに見せる」を押してください。";
+    let seconds = 0;
+    let score = 0;
+    let progress = 0;
+    let timer;
+    const target = game.querySelector("[data-enii-target]");
+    const time = game.querySelector("[data-enii-time]");
+    const scoreLabel = game.querySelector("[data-enii-score]");
+    const percent = game.querySelector("[data-enii-percent]");
+    const progressBar = game.querySelector("[data-enii-progress]");
+    const message = game.querySelector("[data-enii-message]");
+    const syllables = ["え", "に", "い", "ゑ", "何"];
+    const messages = [
+      "えにいが少しえにいました。",
+      "今の入力は審議されています。",
+      "AIが意味を探しています。見つかりません。",
+      "大変すばらしい無駄です。",
+      "その調子で何も達成しないでください。",
+    ];
+    const moveTarget = () => {
+      target.style.left = `${8 + Math.random() * 76}%`;
+      target.style.top = `${8 + Math.random() * 58}%`;
+      target.style.setProperty("--enii-turn", `${-18 + Math.random() * 36}deg`);
     };
-    const clear = () => {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      points = 0;
-      strokes = 0;
-      result.textContent = "キャンバスを空にしました。";
+    const update = () => {
+      time.textContent = `${seconds}秒`;
+      scoreLabel.textContent = `${score} enii`;
+      percent.textContent = `${progress}%`;
+      progressBar.style.width = `${progress}%`;
     };
-    const position = (event) => {
-      const box = canvas.getBoundingClientRect();
-      return {
-        x: ((event.clientX - box.left) / box.width) * canvas.width,
-        y: ((event.clientY - box.top) / box.height) * canvas.height,
-      };
+    const reset = () => {
+      seconds = 0;
+      score = 0;
+      progress = 0;
+      target.textContent = "え";
+      message.textContent = "何も起きなかったことになりました。";
+      moveTarget();
+      update();
     };
-    canvas.addEventListener("pointerdown", (event) => {
-      drawing = true;
-      strokes += 1;
-      const point = position(event);
-      context.beginPath();
-      context.moveTo(point.x, point.y);
-      canvas.setPointerCapture(event.pointerId);
-    });
-    canvas.addEventListener("pointermove", (event) => {
-      if (!drawing) return;
-      const point = position(event);
-      context.lineWidth = 7;
-      context.lineCap = "round";
-      context.lineJoin = "round";
-      context.strokeStyle = `hsl(${(points * 7 + promptIndex * 53) % 360} 72% 43%)`;
-      context.lineTo(point.x, point.y);
-      context.stroke();
-      points += 1;
-    });
-    const stopDrawing = () => (drawing = false);
-    canvas.addEventListener("pointerup", stopDrawing);
-    canvas.addEventListener("pointercancel", stopDrawing);
-    game.querySelector("[data-mystery-clear]").addEventListener("click", clear);
-    game.querySelector("[data-mystery-next]").addEventListener("click", () => {
-      promptIndex = (promptIndex + 1) % mysteryPrompts.length;
-      clear();
-      updatePrompt();
-    });
-    game.querySelector("[data-mystery-judge]").addEventListener("click", () => {
-      if (points < 4) {
-        result.textContent =
-          "AIは静寂を検出しました。もう少し線が必要なようです。";
-        return;
+    target.addEventListener("click", () => {
+      score += 1;
+      progress += 7 + (score % 5);
+      target.textContent = syllables[score % syllables.length];
+      message.textContent = messages[score % messages.length];
+      if (progress >= 99) {
+        progress = 0;
+        score = Math.max(0, score - 3);
+        message.textContent =
+          "完成度99%に到達したため、規約により進捗を没収しました。";
+      } else if (score > 0 && score % 13 === 0) {
+        score = 1;
+        message.textContent = "13 eniiは縁起が良すぎるため1 eniiに戻しました。";
       }
-      const score = Math.min(
-        99,
-        38 + ((points * 3 + strokes * 11 + promptIndex * 7) % 62),
-      );
-      const reading =
-        mysteryReadings[
-          (points + strokes + promptIndex) % mysteryReadings.length
-        ];
-      result.textContent = `AIは「${reading}」を受信。お題との謎の共鳴率は${score}%です。`;
+      moveTarget();
+      update();
     });
+    target.addEventListener("pointerenter", () => {
+      if (Math.random() < 0.24) moveTarget();
+    });
+    game.querySelector("[data-enii-manual]").addEventListener("click", () => {
+      message.textContent =
+        "説明書：えにいをえにいすると、えにいになります。以上です。";
+    });
+    game.querySelector("[data-enii-reset]").addEventListener("click", reset);
     game
       .querySelector(".mystery-close")
       .addEventListener("click", () => game.close());
     game.addEventListener("click", (event) => {
       if (event.target === game) game.close();
     });
-    updatePrompt();
+    game.addEventListener("close", () => clearInterval(timer));
+    game.addEventListener("enii-start", () => {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        seconds += 1;
+        update();
+      }, 1000);
+    });
+    moveTarget();
+    update();
   }
   game.showModal();
+  game.dispatchEvent(new Event("enii-start"));
 }
 
 function setupMysteryEgg() {
@@ -378,7 +367,7 @@ function render() {
     (route
       ? `<div class="page-home-link wrap"><a class="text-link" href="/">${icon("left")} ホームに戻る</a></div>`
       : "");
-  document.title = `TowaPC — ${routes.find(([p]) => p === `/${route}`)?.[1] || (route ? "Page" : "Home")}`;
+  document.title = `TowaPC — ${routes.find(([p]) => p === `/${route}`)?.[1] || (route ? "Not found" : "Home")}`;
   const logo = safeImageSource(S.logo) || "/assets/TowaPC.svg";
   document
     .querySelectorAll(".custom-logo")
