@@ -804,12 +804,21 @@ p {
   text-align: center;
   border-radius: 25px;
   padding: 55px 35px;
-  background: #fff;
+  background: #171a16;
+  color: #f7f8f4;
+}
+.join-box h2 {
+  color: #f5efa9;
 }
 .join-box p {
   margin: 18px auto;
   max-width: 600px;
-  color: #62655e;
+  color: #e1e4dc;
+}
+.join-box .cta {
+  background: #f5efa9;
+  color: #171a16;
+  box-shadow: inset 0 0 10px #0004;
 }
 .join-value {
   background: #fff;
@@ -1827,6 +1836,21 @@ footer,
 :root[data-theme="dark"] .join-box .status {
   background: #3b4338;
   color: #f7f8f4;
+}
+:root[data-theme="dark"] .join-box {
+  background: #f5efa9;
+  color: #171a16;
+}
+:root[data-theme="dark"] .join-box h2 {
+  color: #171a16;
+}
+:root[data-theme="dark"] .join-box p {
+  color: #3e4239;
+}
+:root[data-theme="dark"] .join-box .cta {
+  background: #171a16;
+  color: #f5efa9;
+  box-shadow: inset 0 0 10px #0008;
 }
 :root[data-theme="dark"] .contact-card.pending {
   background: #292d28;

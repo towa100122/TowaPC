@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=38";
+} from "./site-data.js?v=39";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
