@@ -924,6 +924,10 @@ p {
     sans-serif;
   letter-spacing: 0.04em;
 }
+.not-found-copy {
+  margin-top: 12px;
+  font-size: 12px;
+}
 .mystery-trigger {
   position: absolute;
   right: 0;

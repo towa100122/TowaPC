@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=45";
+} from "./site-data.js?v=46";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -194,7 +194,7 @@ function detail(kind, id) {
   return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
 function missing() {
-  return `<section class="section wrap not-found"><div class="not-found-card floating"><span class="not-found-number">404</span><p class="not-found-label">Not found</p><button class="mystery-trigger" type="button" aria-label="隠しボタン" data-mystery-trigger></button></div></section>`;
+  return `<section class="section wrap not-found"><div class="not-found-card floating"><span class="not-found-number">404</span><p class="not-found-label">Not found</p><p class="not-found-copy">お探しのページは迷子かもしれません。</p><button class="mystery-trigger" type="button" aria-label="隠しボタン" data-mystery-trigger></button></div></section>`;
 }
 
 function showEggStatus(message) {
