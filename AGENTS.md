@@ -24,7 +24,7 @@
 - `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、共通HTML、JavaScriptを検査する。
 - 公開前に必ず `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` でも同じ検査を行う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v39`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js` importを同じ番号にする。現在は `v40`。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
 
@@ -63,7 +63,7 @@
 - フッターのLinksにはJoinを含め、右側にContact欄を置く。
 - フッターのContact欄にはYouTube、X、Discord、お問い合わせを置く。
 - Joinページの参加ボタンも同じDiscord招待リンクを開く。
-- Join上部の「あなたの『つくりたい』を、ここから。」カードはテーマと反転させ、ライトでは黒背景・黄色タイトル・黄色ボタン、ダークでは黄色背景・黒文字・黒ボタンにする。
+- Join上部の「あなたの『つくりたい』を、ここから。」カードはテーマと反転させ、ライトでは黒背景・白文字・白ボタン、ダークでは白背景・黒文字・黒ボタンにする。
 - Discord招待URL: `https://discord.gg/WJrAwzMp2U`
 - Contactカードの補足表示:
   - YouTube: `@TowaPC`

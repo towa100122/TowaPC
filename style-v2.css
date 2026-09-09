@@ -808,7 +808,7 @@ p {
   color: #f7f8f4;
 }
 .join-box h2 {
-  color: #f5efa9;
+  color: #fff;
 }
 .join-box p {
   margin: 18px auto;
@@ -816,7 +816,7 @@ p {
   color: #e1e4dc;
 }
 .join-box .cta {
-  background: #f5efa9;
+  background: #fff;
   color: #171a16;
   box-shadow: inset 0 0 10px #0004;
 }
@@ -1838,7 +1838,7 @@ footer,
   color: #f7f8f4;
 }
 :root[data-theme="dark"] .join-box {
-  background: #f5efa9;
+  background: #fff;
   color: #171a16;
 }
 :root[data-theme="dark"] .join-box h2 {
@@ -1849,7 +1849,7 @@ footer,
 }
 :root[data-theme="dark"] .join-box .cta {
   background: #171a16;
-  color: #f5efa9;
+  color: #fff;
   box-shadow: inset 0 0 10px #0008;
 }
 :root[data-theme="dark"] .contact-card.pending {
