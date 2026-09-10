@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=48";
+} from "./site-data.js?v=49";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -265,6 +265,7 @@ function openMysteryGame() {
     const message = game.querySelector("[data-enii-message]");
     const guide = game.querySelector("[data-game-guide]");
     const factoryDigits = [...game.querySelectorAll("[data-factory-digit]")];
+    const factoryMachine = game.querySelector(".factory-machine");
     const factoryMessage = game.querySelector("[data-factory-message]");
     const petCreature = game.querySelector("[data-pet-creature]");
     const petMeter = game.querySelector("[data-pet-meter]");
@@ -349,7 +350,15 @@ function openMysteryGame() {
     };
     game.querySelector("[data-factory-build]").addEventListener("click", () => {
       const number = factoryDigits.map((digit) => digit.textContent).join("");
-      if (number === "404") {
+      if (number === "334") {
+        factoryMachine.classList.remove("kansai-alert");
+        void factoryMachine.offsetWidth;
+        factoryMachine.classList.add("kansai-alert");
+        factoryMessage.textContent = "なんでや！阪神関係ないやろ！";
+        metricLabel.textContent = "阪神関係";
+        modeValue.textContent = "ないやろ";
+        setTimeout(() => factoryMachine.classList.remove("kansai-alert"), 1800);
+      } else if (number === "404") {
         factoryWaste += 1;
         factoryMessage.textContent =
           "404の製造に成功。ページが存在しないため即時廃棄しました。";
@@ -357,7 +366,7 @@ function openMysteryGame() {
       } else {
         factoryMessage.textContent = `${number}を製造しましたが、404ではないので404として廃棄しました。`;
       }
-      updateMetric();
+      if (number !== "334") updateMetric();
     });
     game.querySelector("[data-factory-chaos]").addEventListener("click", () => {
       randomizeFactory();

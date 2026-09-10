@@ -2810,6 +2810,29 @@ footer,
   color: #fff;
   font-weight: 700;
 }
+.factory-machine.kansai-alert {
+  animation: kansai-alert 0.24s steps(2, end) 7;
+}
+.factory-machine.kansai-alert::after {
+  content: "33-4";
+  position: absolute;
+  z-index: 3;
+  inset: 50% auto auto 50%;
+  padding: 8px 22px;
+  border: 3px solid #fff;
+  border-radius: 16px;
+  background: #ffcf25;
+  color: #10120f;
+  box-shadow:
+    0 0 0 7px #111,
+    0 18px 45px #0009;
+  font:
+    800 48px/1 "Google Sans",
+    sans-serif;
+  letter-spacing: -0.06em;
+  transform: translate(-50%, -50%) rotate(-7deg);
+  pointer-events: none;
+}
 .panel-message {
   position: static;
   margin-top: auto;
@@ -2940,6 +2963,17 @@ footer,
 @keyframes enii-orb-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+@keyframes kansai-alert {
+  0%,
+  100% {
+    filter: none;
+    transform: translateX(0);
+  }
+  50% {
+    filter: saturate(2.2) hue-rotate(145deg);
+    transform: translateX(5px);
   }
 }
 @media (max-width: 720px) {
