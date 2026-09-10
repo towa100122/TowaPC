@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=49";
+} from "./site-data.js?v=50";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -194,7 +194,7 @@ function detail(kind, id) {
   return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
 function missing() {
-  return `<section class="section wrap not-found"><div class="not-found-card floating"><span class="not-found-number">404</span><p class="not-found-label">Not found</p><p class="not-found-copy">お探しのページは迷子かもしれません。</p><button class="mystery-trigger" type="button" aria-label="隠しボタン" data-mystery-trigger></button></div></section>`;
+  return `<section class="section wrap not-found"><div class="not-found-card floating"><span class="not-found-number">404</span><p class="not-found-label">Not found</p><p class="not-found-copy">お探しのページは迷子かもしれません。</p></div></section>`;
 }
 
 function showEggStatus(message) {
@@ -240,239 +240,6 @@ function setupAnimationEgg() {
   });
 }
 
-function openMysteryGame() {
-  let game = document.querySelector(".mystery-game");
-  if (!game) {
-    game = document.createElement("dialog");
-    game.className = "mystery-game";
-    game.innerHTML = `<div class="mystery-game-head"><div><span>404 SECRET</span><h2>AIセンスで作った全く謎の謎の&quot;えにい&quot;ゲーム</h2></div><button type="button" class="mystery-close" aria-label="ゲームを閉じる">×</button></div><p class="mystery-guide" data-game-guide>目的は「えにい」をえにいすることです。説明は以上です。</p><div class="enii-mode-switch" role="tablist" aria-label="謎のゲームを選択"><button type="button" role="tab" aria-selected="true" class="active" data-game-mode="chase">えにい捕獲</button><button type="button" role="tab" aria-selected="false" data-game-mode="factory">404工場</button><button type="button" role="tab" aria-selected="false" data-game-mode="pet">ページ育成</button><button type="button" role="tab" aria-selected="false" data-game-mode="void">虚無ロード</button></div><div class="enii-stats"><div><span>共通で失った時間</span><strong data-enii-time>0秒</strong></div><div><span data-mode-metric-label>えにい度</span><strong data-mode-value>0 enii</strong></div></div><section class="enii-panel" role="tabpanel" data-game-panel="chase"><div class="enii-progress"><span data-enii-progress></span></div><div class="enii-progress-label">完成度 <strong data-enii-percent>0%</strong></div><div class="enii-arena"><button type="button" class="enii-target" data-enii-target aria-label="えにいを捕まえる">え</button><p class="enii-message" data-enii-message role="status">「え」を押してください。たぶん。</p></div><div class="mystery-actions"><button type="button" data-enii-manual>説明書を読む</button><button type="button" data-enii-reset>成果を無かったことにする</button></div></section><section class="enii-panel" role="tabpanel" data-game-panel="factory" hidden><div class="factory-machine"><span class="machine-label">NONEXISTENT PAGE FACTORY</span><div class="factory-display" aria-label="現在の製造番号"><button type="button" data-factory-digit="0">1</button><button type="button" data-factory-digit="1">9</button><button type="button" data-factory-digit="2">7</button></div><button type="button" class="factory-lever" data-factory-build>この番号を製造</button><p class="enii-message panel-message" data-factory-message role="status">数字を押して404を製造してください。存在は許可されません。</p></div><div class="mystery-actions"><button type="button" data-factory-chaos>AIに番号を任せる</button></div></section><section class="enii-panel" role="tabpanel" data-game-panel="pet" hidden><div class="pet-lab"><span class="machine-label">LOST PAGE INCUBATOR</span><div class="lost-page-creature" data-pet-creature aria-hidden="true">·</div><div class="pet-meter"><span data-pet-meter></span></div><p class="enii-message panel-message" data-pet-message role="status">まだ何もいません。404を与えてください。</p></div><div class="mystery-actions"><button type="button" data-pet-praise>存在を褒める</button><button type="button" data-pet-feed>404を与える</button></div></section><section class="enii-panel" role="tabpanel" data-game-panel="void" hidden><div class="void-loader"><span class="machine-label">INFINITE CONTENT SYNTHESIS</span><div class="void-orb"><span>404</span></div><div class="void-progress"><span data-void-progress></span></div><p class="enii-message panel-message" data-void-message role="status">存在しないページを読み込んでいます。0%完了。</p></div><div class="mystery-actions"><button type="button" data-void-cancel>キャンセルを試す</button><button type="button" data-void-wait>さらに待つ</button></div></section>`;
-    document.body.append(game);
-    let seconds = 0;
-    let mode = "chase";
-    let score = 0;
-    let progress = 0;
-    let factoryWaste = 0;
-    let petLevel = 0;
-    let voidProgress = 0;
-    let voidRetries = 0;
-    let timer;
-    const target = game.querySelector("[data-enii-target]");
-    const time = game.querySelector("[data-enii-time]");
-    const metricLabel = game.querySelector("[data-mode-metric-label]");
-    const modeValue = game.querySelector("[data-mode-value]");
-    const percent = game.querySelector("[data-enii-percent]");
-    const progressBar = game.querySelector("[data-enii-progress]");
-    const message = game.querySelector("[data-enii-message]");
-    const guide = game.querySelector("[data-game-guide]");
-    const factoryDigits = [...game.querySelectorAll("[data-factory-digit]")];
-    const factoryMachine = game.querySelector(".factory-machine");
-    const factoryMessage = game.querySelector("[data-factory-message]");
-    const petCreature = game.querySelector("[data-pet-creature]");
-    const petMeter = game.querySelector("[data-pet-meter]");
-    const petMessage = game.querySelector("[data-pet-message]");
-    const voidBar = game.querySelector("[data-void-progress]");
-    const voidMessage = game.querySelector("[data-void-message]");
-    const syllables = ["え", "に", "い", "ゑ", "何"];
-    const petFaces = ["·", "◌", "◉", "ʘ", "404", "404?", "PAGE", "存在"];
-    const messages = [
-      "えにいが少しえにいました。",
-      "今の入力は審議されています。",
-      "AIが意味を探しています。見つかりません。",
-      "大変すばらしい無駄です。",
-      "その調子で何も達成しないでください。",
-    ];
-    const moveTarget = () => {
-      target.style.left = `${8 + Math.random() * 76}%`;
-      target.style.top = `${8 + Math.random() * 58}%`;
-      target.style.setProperty("--enii-turn", `${-18 + Math.random() * 36}deg`);
-    };
-    const updateMetric = () => {
-      const values = {
-        chase: ["えにい度", `${score} enii`],
-        factory: ["廃棄した404", `${factoryWaste}件`],
-        pet: ["迷子レベル", `Lv.${petLevel}`],
-        void: ["再試行", `${voidRetries}回`],
-      };
-      [metricLabel.textContent, modeValue.textContent] = values[mode];
-    };
-    const updateChase = () => {
-      time.textContent = `${seconds}秒`;
-      percent.textContent = `${progress}%`;
-      progressBar.style.width = `${progress}%`;
-      updateMetric();
-    };
-    const resetChase = () => {
-      score = 0;
-      progress = 0;
-      target.textContent = "え";
-      message.textContent = "成果だけ消しました。失った時間は戻りません。";
-      moveTarget();
-      updateChase();
-    };
-    target.addEventListener("click", () => {
-      score += 1;
-      progress += 7 + (score % 5);
-      target.textContent = syllables[score % syllables.length];
-      message.textContent = messages[score % messages.length];
-      if (progress >= 99) {
-        progress = 0;
-        score = Math.max(0, score - 3);
-        message.textContent =
-          "完成度99%に到達したため、規約により進捗を没収しました。";
-      } else if (score > 0 && score % 13 === 0) {
-        score = 1;
-        message.textContent = "13 eniiは縁起が良すぎるため1 eniiに戻しました。";
-      }
-      moveTarget();
-      updateChase();
-    });
-    target.addEventListener("pointerenter", () => {
-      if (Math.random() < 0.24) moveTarget();
-    });
-    game.querySelector("[data-enii-manual]").addEventListener("click", () => {
-      message.textContent =
-        "説明書：えにいをえにいすると、えにいになります。以上です。";
-    });
-    game
-      .querySelector("[data-enii-reset]")
-      .addEventListener("click", resetChase);
-    factoryDigits.forEach((digit) =>
-      digit.addEventListener("click", () => {
-        digit.textContent = String((Number(digit.textContent) + 1) % 10);
-        factoryMessage.textContent =
-          "数字は動きました。工場の生産性は変わりません。";
-      }),
-    );
-    const randomizeFactory = () => {
-      factoryDigits.forEach(
-        (digit) => (digit.textContent = String(Math.floor(Math.random() * 10))),
-      );
-    };
-    game.querySelector("[data-factory-build]").addEventListener("click", () => {
-      const number = factoryDigits.map((digit) => digit.textContent).join("");
-      if (number === "334") {
-        factoryMachine.classList.remove("kansai-alert");
-        void factoryMachine.offsetWidth;
-        factoryMachine.classList.add("kansai-alert");
-        factoryMessage.textContent = "なんでや！阪神関係ないやろ！";
-        metricLabel.textContent = "阪神関係";
-        modeValue.textContent = "ないやろ";
-        setTimeout(() => factoryMachine.classList.remove("kansai-alert"), 1800);
-      } else if (number === "404") {
-        factoryWaste += 1;
-        factoryMessage.textContent =
-          "404の製造に成功。ページが存在しないため即時廃棄しました。";
-        randomizeFactory();
-      } else {
-        factoryMessage.textContent = `${number}を製造しましたが、404ではないので404として廃棄しました。`;
-      }
-      if (number !== "334") updateMetric();
-    });
-    game.querySelector("[data-factory-chaos]").addEventListener("click", () => {
-      randomizeFactory();
-      factoryMessage.textContent =
-        "AIに任せました。責任の所在もランダムになりました。";
-    });
-    const updatePet = () => {
-      petCreature.textContent = petFaces[petLevel];
-      petCreature.style.setProperty(
-        "--pet-growth",
-        String(0.78 + petLevel * 0.08),
-      );
-      petMeter.style.width = `${(petLevel / 7) * 100}%`;
-      petMeter.style.opacity = petLevel ? "1" : "0";
-      updateMetric();
-    };
-    game.querySelector("[data-pet-feed]").addEventListener("click", () => {
-      petLevel += 1;
-      if (petLevel >= 7) {
-        petLevel = 0;
-        petMessage.textContent =
-          "ページが存在しかけたため、安全装置が初期化しました。";
-      } else {
-        petMessage.textContent = `404を吸収しました。存在まで残り${7 - petLevel}段階です。`;
-      }
-      updatePet();
-    });
-    game.querySelector("[data-pet-praise]").addEventListener("click", () => {
-      petMessage.textContent =
-        petLevel === 0
-          ? "何もいない場所を褒めました。反応もありません。"
-          : "ページは照れていますが、HTTPステータスは変わりません。";
-    });
-    const updateVoid = () => {
-      voidBar.style.width = `${voidProgress}%`;
-      updateMetric();
-    };
-    game.querySelector("[data-void-wait]").addEventListener("click", () => {
-      voidProgress += 6 + Math.floor(Math.random() * 14);
-      if (voidProgress >= 99) {
-        voidProgress = 4;
-        voidRetries += 1;
-        voidMessage.textContent =
-          "99%まで読み込みました。残り1%が存在しないため再試行します。";
-      } else {
-        voidMessage.textContent = `存在しないページを読み込んでいます。${voidProgress}%完了。`;
-      }
-      updateVoid();
-    });
-    game.querySelector("[data-void-cancel]").addEventListener("click", () => {
-      voidProgress = 98;
-      voidMessage.textContent =
-        "キャンセル処理を読み込んでいます。キャンセルまで残り2%。";
-      updateVoid();
-    });
-    const modes = {
-      chase: ["目的は「えにい」をえにいすることです。説明は以上です。"],
-      factory: [
-        "404を製造してください。完成品は存在できないため廃棄されます。",
-      ],
-      pet: ["存在しないページに404を与え、存在する直前まで育てます。"],
-      void: ["存在しないページを99%まで読み込み続けます。100%は未実装です。"],
-    };
-    game.querySelectorAll("[data-game-mode]").forEach((button) =>
-      button.addEventListener("click", () => {
-        mode = button.dataset.gameMode;
-        game.querySelectorAll("[data-game-mode]").forEach((item) => {
-          const active = item === button;
-          item.classList.toggle("active", active);
-          item.setAttribute("aria-selected", String(active));
-        });
-        game.querySelectorAll("[data-game-panel]").forEach((panel) => {
-          panel.hidden = panel.dataset.gamePanel !== mode;
-        });
-        guide.textContent = modes[mode][0];
-        updateMetric();
-      }),
-    );
-    game
-      .querySelector(".mystery-close")
-      .addEventListener("click", () => game.close());
-    game.addEventListener("click", (event) => {
-      if (event.target === game) game.close();
-    });
-    game.addEventListener("close", () => clearInterval(timer));
-    game.addEventListener("enii-start", () => {
-      clearInterval(timer);
-      timer = setInterval(() => {
-        seconds += 1;
-        time.textContent = `${seconds}秒`;
-      }, 1000);
-    });
-    moveTarget();
-    updateChase();
-    updatePet();
-    updateVoid();
-  }
-  game.showModal();
-  game.dispatchEvent(new Event("enii-start"));
-}
-
-function setupMysteryEgg() {
-  document
-    .querySelector("[data-mystery-trigger]")
-    ?.addEventListener("click", openMysteryGame);
-}
 function headerNav(route) {
   const items = [
     ["", "Home"],
@@ -599,7 +366,6 @@ function render() {
     }),
   );
   setupAnimationEgg();
-  setupMysteryEgg();
   window.scrollTo({ top: 0, behavior: "instant" });
   reveal();
   main.classList.remove("page-enter");
