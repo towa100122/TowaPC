@@ -1170,17 +1170,19 @@ footer {
   font-size: 25px;
 }
 .reveal {
-  opacity: 1;
-  transform: translate3d(0, 18px, 0);
-  will-change: transform;
+  filter: blur(8px);
+  opacity: 0;
+  transform: translate3d(0, 42px, 0) scale(0.965);
+  will-change: filter, opacity, transform;
 }
 .reveal.is-visible {
+  filter: none;
   opacity: 1;
-  transform: translate3d(0, var(--card-lift, 0px), 0);
+  transform: translate3d(0, var(--card-lift, 0px), 0) scale(1);
   transition: transform 0.42s cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 .reveal.play-reveal {
-  animation: reveal-in 0.62s cubic-bezier(0.22, 0.8, 0.24, 1)
+  animation: reveal-in 0.52s cubic-bezier(0.16, 1, 0.3, 1)
     var(--reveal-delay, 0ms) both;
 }
 .arrow .icon,
@@ -1216,10 +1218,14 @@ footer {
 }
 @keyframes reveal-in {
   from {
-    transform: translate3d(0, 18px, 0);
+    filter: blur(8px);
+    opacity: 0;
+    transform: translate3d(0, 42px, 0) scale(0.965);
   }
   to {
-    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+    opacity: 1;
+    transform: translate3d(0, var(--card-lift, 0px), 0) scale(1);
   }
 }
 
@@ -1740,8 +1746,10 @@ footer {
     transition: none !important;
   }
   .reveal {
+    filter: none !important;
     opacity: 1;
     transform: none !important;
+    will-change: auto;
   }
 }
 

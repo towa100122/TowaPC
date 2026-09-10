@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=51";
+} from "./site-data.js?v=52";
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -528,7 +528,7 @@ function reveal() {
   items.forEach((e, i) => {
     e.classList.remove("is-visible", "play-reveal");
     e.classList.add("reveal");
-    e.dataset.revealDelay = String((i % 4) * 55);
+    e.dataset.revealDelay = String((i % 4) * 42);
   });
   requestAnimationFrame(() => {
     if (observer === current) items.forEach((e) => current.observe(e));
