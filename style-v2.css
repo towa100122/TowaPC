@@ -915,6 +915,19 @@ p {
     sans-serif;
   letter-spacing: -0.06em;
 }
+.not-found-number:is(button) {
+  width: fit-content;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: default;
+}
+.not-found-number.shred-tap {
+  animation: shred-number-tap 0.24s ease;
+}
 .not-found-card p {
   color: var(--muted);
 }
@@ -2149,4 +2162,250 @@ footer,
   border-color: #755f2e;
   background: #3a311c;
   color: #f3dfaa;
+}
+
+.page-shredder {
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+body.shredding-page {
+  overflow: hidden;
+}
+body.shredding-page > .header,
+body.shredding-page > main,
+body.shredding-page > footer,
+body.shredding-page > .back-top {
+  transform-origin: center 42vh;
+  animation: page-into-shredder 1.35s cubic-bezier(0.7, 0, 0.84, 0) 0.22s both;
+}
+.shred-machine {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  width: min(560px, 88vw);
+  filter: drop-shadow(0 22px 38px #0009);
+  opacity: 0;
+  transform: translate(-50%, -80px) scale(0.9);
+  animation: shredder-arrive 0.62s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.shred-machine-top {
+  position: relative;
+  z-index: 2;
+  height: 86px;
+  border: 1px solid #ffffff99;
+  border-radius: 25px 25px 13px 13px;
+  background:
+    linear-gradient(100deg, #777 0 7%, transparent 7% 93%, #555 93%),
+    linear-gradient(180deg, #f8f9f6, #b8bdb7 48%, #707670 51%, #c8cdc7);
+  box-shadow:
+    0 10px 28px #0008,
+    0 0 0 3px #252a26 inset,
+    0 11px 12px #ffffff88 inset;
+}
+.shred-machine-top span {
+  position: absolute;
+  inset: 21px 0 auto;
+  color: #252925;
+  font:
+    700 12px "Google Sans",
+    sans-serif;
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-shadow: 0 1px #fff;
+}
+.shred-machine-top i {
+  position: absolute;
+  top: 34px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ff5454;
+  box-shadow: 0 0 12px #ff3535;
+}
+.shred-machine-top i:first-of-type {
+  left: 28px;
+}
+.shred-machine-top i:last-of-type {
+  right: 28px;
+  background: #55e68d;
+  box-shadow: 0 0 12px #28d56b;
+}
+.shred-slot {
+  position: relative;
+  z-index: 3;
+  width: 86%;
+  height: 14px;
+  margin: -9px auto 0;
+  border: 3px solid #363b37;
+  border-radius: 8px;
+  background: #050605;
+  box-shadow:
+    0 5px 10px #000b inset,
+    0 0 8px #fff6;
+}
+.shred-strips {
+  position: absolute;
+  z-index: 1;
+  top: 88px;
+  left: 9%;
+  right: 9%;
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 2px;
+  height: 52vh;
+}
+.shred-strips span {
+  width: 100%;
+  height: 0;
+  border-radius: 0 0 4px 4px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 18px, #878b8426 19px 20px),
+    linear-gradient(90deg, #f7f7f3, #dfe2dc);
+  box-shadow: 0 8px 13px #0004;
+  transform-origin: top;
+  animation: shred-strip-fall 1.55s cubic-bezier(0.18, 0.75, 0.22, 1)
+    calc(0.78s + var(--strip) * 0.026s) both;
+}
+.shred-strips span:nth-child(4n + 1) {
+  background: linear-gradient(90deg, #fffcae, #e7e696);
+}
+.shred-strips span:nth-child(4n + 2) {
+  background: linear-gradient(90deg, #f6e5f0, #dfc8d7);
+}
+.shred-strips span:nth-child(4n + 3) {
+  background: linear-gradient(90deg, #e8eef7, #ccd7e6);
+}
+.shred-complete {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 8vh;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  width: min(430px, 88vw);
+  padding: 19px 22px;
+  border: 1px solid #ffffff55;
+  border-radius: 20px;
+  background: #161916e8;
+  color: #fff;
+  box-shadow: 0 20px 55px #000a;
+  text-align: center;
+  opacity: 0;
+  transform: translate(-50%, 22px);
+  backdrop-filter: blur(15px);
+  animation: shred-complete-in 0.55s cubic-bezier(0.22, 0.8, 0.24, 1) 2.25s both;
+  pointer-events: none;
+}
+.shred-complete strong {
+  font-size: 17px;
+}
+.shred-complete small {
+  color: #abb0a8;
+  font-size: 10px;
+}
+.shred-complete button {
+  margin-top: 8px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 11px;
+  background: #f0f2ec;
+  color: #171a16;
+  font-size: 11px;
+  font-weight: 700;
+}
+@keyframes shred-number-tap {
+  50% {
+    transform: scale(0.93) rotate(-1deg);
+  }
+}
+@keyframes shredder-arrive {
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+@keyframes page-into-shredder {
+  55% {
+    filter: contrast(1.15) saturate(0.7);
+    opacity: 0.9;
+    transform: translateY(-28vh) scaleX(0.78) scaleY(0.42);
+  }
+  to {
+    filter: grayscale(1);
+    opacity: 0;
+    transform: translateY(-58vh) scaleX(0.7) scaleY(0.02);
+    visibility: hidden;
+  }
+}
+@keyframes shred-strip-fall {
+  0% {
+    height: 0;
+    opacity: 0;
+    transform: translateY(-5px) rotate(0);
+  }
+  18% {
+    opacity: 1;
+  }
+  72% {
+    height: var(--strip-length);
+    transform: translateY(0) rotate(var(--strip-turn));
+  }
+  to {
+    height: var(--strip-length);
+    opacity: 0.18;
+    transform: translate(var(--strip-x), 32vh) rotate(var(--strip-turn));
+  }
+}
+@keyframes shred-complete-in {
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+  }
+}
+@media (max-width: 720px) {
+  .shred-machine {
+    top: 34%;
+  }
+  .shred-machine-top {
+    height: 72px;
+  }
+  .shred-machine-top span {
+    top: 18px;
+    font-size: 9px;
+  }
+  .shred-machine-top i {
+    top: 28px;
+  }
+  .shred-slot {
+    margin-top: -8px;
+  }
+  .shred-strips {
+    top: 74px;
+  }
+  .shred-complete {
+    bottom: 7vh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.shredding-page > .header,
+  body.shredding-page > main,
+  body.shredding-page > footer,
+  body.shredding-page > .back-top {
+    visibility: hidden;
+  }
+  .shred-machine,
+  .shred-complete {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+  }
+  .shred-strips span {
+    height: 42vh;
+    opacity: 0.5;
+  }
 }
