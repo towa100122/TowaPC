@@ -5,7 +5,95 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=53";
+} from "./site-data.js?v=54";
+const APPEARANCE_KEY = "towapc-appearance-v1";
+const appearanceDefaults = {
+  theme: "system",
+  motion: "standard",
+  accent: "yellow",
+  corners: "soft",
+  density: "comfortable",
+  glass: true,
+  animationMode: false,
+  duration: 520,
+  stagger: 42,
+  travel: 42,
+  blur: 8,
+  startScale: 965,
+  uiScale: 100,
+};
+const appearanceOptions = {
+  theme: ["system", "light", "dark"],
+  motion: ["standard", "smooth", "snappy", "none", "custom"],
+  accent: ["yellow", "lavender", "mint", "peach"],
+  corners: ["soft", "round", "precise"],
+  density: ["comfortable", "compact"],
+};
+function loadAppearance() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(APPEARANCE_KEY) || "{}");
+    const settings = { ...appearanceDefaults };
+    Object.entries(appearanceOptions).forEach(([key, values]) => {
+      if (values.includes(stored[key])) settings[key] = stored[key];
+    });
+    if (typeof stored.glass === "boolean") settings.glass = stored.glass;
+    if (typeof stored.animationMode === "boolean")
+      settings.animationMode = stored.animationMode;
+    const ranges = {
+      duration: [200, 1200],
+      stagger: [0, 120],
+      travel: [0, 90],
+      blur: [0, 18],
+      startScale: [880, 1000],
+      uiScale: [90, 110],
+    };
+    Object.entries(ranges).forEach(([key, [minimum, maximum]]) => {
+      const value = Number(stored[key]);
+      if (Number.isFinite(value))
+        settings[key] = Math.min(maximum, Math.max(minimum, value));
+    });
+    return settings;
+  } catch {
+    return { ...appearanceDefaults };
+  }
+}
+let appearanceSettings = loadAppearance();
+function saveAppearance() {
+  try {
+    localStorage.setItem(APPEARANCE_KEY, JSON.stringify(appearanceSettings));
+  } catch {}
+}
+function resolvedTheme() {
+  if (appearanceSettings.theme !== "system") return appearanceSettings.theme;
+  return matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light";
+}
+function applyAppearance() {
+  const root = document.documentElement;
+  root.dataset.theme = resolvedTheme();
+  root.dataset.motion = appearanceSettings.motion;
+  root.dataset.accent = appearanceSettings.accent;
+  root.dataset.corners = appearanceSettings.corners;
+  root.dataset.density = appearanceSettings.density;
+  root.dataset.glass = appearanceSettings.glass ? "on" : "off";
+  root.style.setProperty(
+    "--reveal-duration",
+    `${appearanceSettings.duration}ms`,
+  );
+  root.style.setProperty("--reveal-travel", `${appearanceSettings.travel}px`);
+  root.style.setProperty("--reveal-blur", `${appearanceSettings.blur}px`);
+  root.style.setProperty(
+    "--reveal-start-scale",
+    String(appearanceSettings.startScale / 1000),
+  );
+  const uiScale = appearanceSettings.uiScale / 100;
+  root.style.setProperty("--ui-scale", String(uiScale));
+  root.style.setProperty("--body-font-size", `${14 * uiScale}px`);
+  root.style.setProperty("--content-width", `${1100 * uiScale}px`);
+  document.body?.classList.toggle(
+    "animation-mode",
+    appearanceSettings.animationMode,
+  );
+}
 const routes = [
   ["/", "Home"],
   ["/product", "Product"],
@@ -27,6 +115,12 @@ const iconNames = {
   people: "group",
   link: "link",
   mail: "mail",
+  palette: "palette",
+  motion: "animation",
+  corners: "rounded_corner",
+  density: "density_medium",
+  sparkle: "auto_awesome",
+  reset: "restart_alt",
 };
 const icon = (n) =>
   `<span class="material-symbols-rounded icon" aria-hidden="true">${iconNames[n] || iconNames.grid}</span>`;
@@ -133,6 +227,53 @@ function about() {
   ];
   return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><div class="about-heading"><button class="about-logo-trigger" type="button" aria-label="TowaPCロゴ" data-animation-trigger><img class="about-logo" src="${E(logo)}" alt="TowaPC"></button><h2>TowaPCについて</h2></div><p>${E(S.description)}</p><p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p><div class="about-links"><a class="soft-button" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a><a class="soft-button" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a><a class="soft-button" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
 }
+function settingChoices(key, label, choices) {
+  return `<div class="setting-field"><span class="setting-label">${label}</span><div class="setting-choices" role="group" aria-label="${label}">${choices.map(([value, title, copy]) => `<button type="button" data-setting="${key}" data-value="${value}" aria-pressed="${appearanceSettings[key] === value}"><strong>${title}</strong>${copy ? `<small>${copy}</small>` : ""}</button>`).join("")}</div></div>`;
+}
+function settingRange(key, label, minimum, maximum, step, unit) {
+  const value = appearanceSettings[key];
+  const shown = key === "startScale" ? (value / 10).toFixed(1) : value;
+  return `<label class="setting-range"><span><strong>${label}</strong><output data-setting-output="${key}">${shown}${unit}</output></span><input type="range" min="${minimum}" max="${maximum}" step="${step}" value="${value}" data-setting-range="${key}" aria-label="${label}">${key === "duration" ? '<span class="range-hints"><small>速い</small><small>ゆっくり</small></span>' : ""}</label>`;
+}
+function settingToggle(key, title, copy) {
+  return `<button class="setting-toggle" type="button" role="switch" aria-checked="${appearanceSettings[key]}" data-setting-toggle="${key}"><span><strong>${title}</strong><small>${copy}</small></span><i aria-hidden="true"></i></button>`;
+}
+function appearanceLab() {
+  return `${pageHero("Appearance Lab", "見つけた人だけの外観実験室", "appearance-hero")}<section class="section wrap appearance-lab"><div class="appearance-intro floating"><div><span class="egg-label">EASTER EGG 01</span><h2>見た目で遊ぶ。</h2><p>サイトの動き、色、形、大きさを好きなように調整できます。変更はこの端末に自動で保存されます。</p></div><div class="appearance-orbit" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i></div></div><div class="settings-grid"><section class="settings-card floating settings-motion"><div class="settings-heading">${icon("motion")}<div><h2>Motion</h2><p>カードが現れる動きを調整</p></div><button class="preview-button" type="button" data-play-preview>${icon("sparkle")}再生</button></div>${settingChoices(
+    "motion",
+    "プリセット",
+    [
+      ["standard", "標準", "軽く、素早く"],
+      ["smooth", "ゆったり", "今回の新しい動き"],
+      ["snappy", "きびきび", "短く小さく"],
+      ["none", "静止", "動かさない"],
+    ],
+  )}<div class="motion-preview" data-motion-preview><span></span><strong>Preview card</strong><small>設定した動きをここで確認</small></div><div class="range-grid">${settingRange("duration", "アニメーション速度", 200, 1200, 20, "ms")}${settingRange("stagger", "カード間隔", 0, 120, 2, "ms")}${settingRange("travel", "移動量", 0, 90, 2, "px")}${settingRange("blur", "ぼかし", 0, 18, 1, "px")}${settingRange("startScale", "開始時の大きさ", 880, 1000, 5, "%")}</div></section><section class="settings-card floating"> <div class="settings-heading">${icon("palette")}<div><h2>Theme</h2><p>明るさと差し色を選択</p></div></div>${settingChoices(
+    "theme",
+    "明るさ",
+    [
+      ["system", "自動", "端末に合わせる"],
+      ["light", "Light", "明るい表示"],
+      ["dark", "Dark", "暗い表示"],
+    ],
+  )}${settingChoices("accent", "カラーテーマ", [
+    ["yellow", "ひまわり", "TowaPC Yellow"],
+    ["lavender", "藤", "Lavender"],
+    ["mint", "若葉", "Mint"],
+    ["peach", "夕焼け", "Peach"],
+  ])}</section><section class="settings-card floating"><div class="settings-heading">${icon("corners")}<div><h2>Shape & Size</h2><p>形と画面の密度を調整</p></div></div>${settingChoices(
+    "corners",
+    "カードの角",
+    [
+      ["soft", "標準", "やわらかい"],
+      ["round", "まるい", "大きな丸み"],
+      ["precise", "かっちり", "小さな丸み"],
+    ],
+  )}${settingChoices("density", "余白", [
+    ["comfortable", "ゆったり", "広めの間隔"],
+    ["compact", "コンパクト", "情報を近く"],
+  ])}${settingRange("uiScale", "UIの大きさ", 90, 110, 1, "%")}${settingToggle("glass", "ガラス効果", "ヘッダーの透けとぼかし")}</section><section class="settings-card floating secret-settings"><div class="settings-heading">${icon("sparkle")}<div><h2>Secret</h2><p>ここへ移動した謎の機能</p></div></div>${settingToggle("animationMode", "謎のアニメーションモード", "光と浮遊がサイト全体を動き回ります")}</section></div><div class="settings-reset floating"><div><strong>最初の見た目へ戻す</strong><small>このページの設定だけをリセットします。</small></div><button type="button" data-reset-appearance>${icon("reset")}リセット</button></div></section>`;
+}
 function join() {
   const url = safeHttpUrl(S.joinUrl);
   const steps = [
@@ -219,7 +360,7 @@ function animationBurst() {
   setTimeout(() => burst.remove(), 1800);
 }
 
-function setupAnimationEgg() {
+function setupAppearanceEgg() {
   const trigger = document.querySelector("[data-animation-trigger]");
   if (!trigger) return;
   let clicks = 0;
@@ -234,10 +375,139 @@ function setupAnimationEgg() {
     if (clicks < 5) return;
     clicks = 0;
     clearTimeout(resetTimer);
-    const enabled = document.body.classList.toggle("animation-mode");
-    if (enabled) animationBurst();
-    showEggStatus(`ANIMATION MODE // ${enabled ? "ON" : "OFF"}`);
+    history.pushState(null, "", "/appearance/");
+    render();
+    animationBurst();
+    showEggStatus("EASTER EGG 01 // APPEARANCE LAB");
   });
+}
+
+const motionPresets = {
+  standard: {
+    duration: 520,
+    stagger: 42,
+    travel: 42,
+    blur: 8,
+    startScale: 965,
+  },
+  smooth: { duration: 680, stagger: 48, travel: 42, blur: 8, startScale: 965 },
+  snappy: { duration: 360, stagger: 28, travel: 24, blur: 4, startScale: 980 },
+  none: { duration: 200, stagger: 0, travel: 0, blur: 0, startScale: 1000 },
+};
+function syncThemeControls() {
+  const theme = resolvedTheme();
+  const switcher = document.querySelector(".theme-switch");
+  if (switcher) switcher.dataset.active = theme;
+  document.querySelectorAll("[data-theme-option]").forEach((button) => {
+    const active = button.dataset.themeOption === theme;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+function syncAppearanceControls() {
+  document.querySelectorAll("[data-setting]").forEach((button) => {
+    button.setAttribute(
+      "aria-pressed",
+      String(
+        appearanceSettings[button.dataset.setting] === button.dataset.value,
+      ),
+    );
+  });
+  document.querySelectorAll("[data-setting-toggle]").forEach((button) => {
+    button.setAttribute(
+      "aria-checked",
+      String(Boolean(appearanceSettings[button.dataset.settingToggle])),
+    );
+  });
+  syncThemeControls();
+}
+function playMotionPreview() {
+  const preview = document.querySelector("[data-motion-preview]");
+  if (!preview) return;
+  preview.classList.remove("preview-play");
+  void preview.offsetWidth;
+  preview.classList.add("preview-play");
+}
+function updateAppearance(setting, value) {
+  appearanceSettings[setting] = value;
+  saveAppearance();
+  applyAppearance();
+  syncAppearanceControls();
+}
+function setupAppearanceControls() {
+  if (!document.querySelector(".appearance-lab")) return;
+  document.querySelectorAll("[data-setting]").forEach((button) =>
+    button.addEventListener("click", () => {
+      const { setting, value } = button.dataset;
+      appearanceSettings[setting] = value;
+      if (setting === "motion")
+        Object.assign(appearanceSettings, motionPresets[value]);
+      saveAppearance();
+      applyAppearance();
+      syncAppearanceControls();
+      if (setting === "motion") {
+        document.querySelectorAll("[data-setting-range]").forEach((input) => {
+          const key = input.dataset.settingRange;
+          input.value = appearanceSettings[key];
+          const output = document.querySelector(
+            `[data-setting-output="${key}"]`,
+          );
+          if (!output) return;
+          const value = appearanceSettings[key];
+          const unit =
+            key === "uiScale" || key === "startScale"
+              ? "%"
+              : key === "travel" || key === "blur"
+                ? "px"
+                : "ms";
+          output.textContent = `${key === "startScale" ? (value / 10).toFixed(1) : value}${unit}`;
+        });
+        playMotionPreview();
+      }
+    }),
+  );
+  document.querySelectorAll("[data-setting-range]").forEach((input) =>
+    input.addEventListener("input", () => {
+      const key = input.dataset.settingRange;
+      const value = Number(input.value);
+      appearanceSettings[key] = value;
+      if (["duration", "stagger", "travel", "blur", "startScale"].includes(key))
+        appearanceSettings.motion = "custom";
+      const output = document.querySelector(`[data-setting-output="${key}"]`);
+      if (output) {
+        const unit =
+          key === "uiScale" || key === "startScale"
+            ? "%"
+            : key === "travel" || key === "blur"
+              ? "px"
+              : "ms";
+        output.textContent = `${key === "startScale" ? (value / 10).toFixed(1) : value}${unit}`;
+      }
+      saveAppearance();
+      applyAppearance();
+      syncAppearanceControls();
+    }),
+  );
+  document.querySelectorAll("[data-setting-toggle]").forEach((button) =>
+    button.addEventListener("click", () => {
+      const key = button.dataset.settingToggle;
+      updateAppearance(key, !appearanceSettings[key]);
+      if (key === "animationMode" && appearanceSettings[key]) animationBurst();
+    }),
+  );
+  document
+    .querySelector("[data-play-preview]")
+    ?.addEventListener("click", playMotionPreview);
+  document
+    .querySelector("[data-reset-appearance]")
+    ?.addEventListener("click", () => {
+      appearanceSettings = { ...appearanceDefaults };
+      saveAppearance();
+      applyAppearance();
+      render();
+      showEggStatus("APPEARANCE // RESET");
+    });
+  syncAppearanceControls();
 }
 
 function shredPage() {
@@ -300,6 +570,7 @@ function render() {
       product: products,
       information,
       about,
+      appearance: appearanceLab,
       join,
       cooperation: () => directory("cooperation"),
       members: () => directory("members"),
@@ -313,7 +584,7 @@ function render() {
     (route
       ? `<div class="page-home-link wrap"><a class="text-link" href="/">${icon("left")} ホームに戻る</a></div>`
       : "");
-  document.title = `TowaPC — ${routes.find(([p]) => p === `/${route}`)?.[1] || (route ? "Not found" : "Home")}`;
+  document.title = `TowaPC — ${route === "appearance" ? "Appearance Lab" : routes.find(([p]) => p === `/${route}`)?.[1] || (route ? "Not found" : "Home")}`;
   const logo = safeImageSource(S.logo) || "/assets/TowaPC.svg";
   document
     .querySelectorAll(".custom-logo")
@@ -407,7 +678,8 @@ function render() {
       reveal();
     }),
   );
-  setupAnimationEgg();
+  setupAppearanceEgg();
+  setupAppearanceControls();
   setupShredEgg();
   window.scrollTo({ top: 0, behavior: "instant" });
   reveal();
@@ -503,7 +775,17 @@ document.addEventListener("click", (e) => {
 let observer;
 function reveal() {
   if (observer) observer.disconnect();
-  if (matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  const items = [...document.querySelectorAll(".floating,.section-heading")];
+  if (
+    matchMedia("(prefers-reduced-motion:reduce)").matches ||
+    appearanceSettings.motion === "none"
+  ) {
+    items.forEach((element) => {
+      element.classList.add("reveal", "is-visible");
+      element.classList.remove("play-reveal");
+    });
+    return;
+  }
   const current = new IntersectionObserver(
     (es) =>
       es.forEach((entry) => {
@@ -524,11 +806,10 @@ function reveal() {
     { threshold: 0.08 },
   );
   observer = current;
-  const items = [...document.querySelectorAll(".floating,.section-heading")];
   items.forEach((e, i) => {
     e.classList.remove("is-visible", "play-reveal");
     e.classList.add("reveal");
-    e.dataset.revealDelay = String((i % 4) * 48);
+    e.dataset.revealDelay = String((i % 4) * appearanceSettings.stagger);
   });
   requestAnimationFrame(() => {
     if (observer === current) items.forEach((e) => current.observe(e));
@@ -553,29 +834,18 @@ function positionSelection() {
   requestAnimationFrame(() => nav.classList.add("nav-ready"));
 }
 function setupTheme() {
-  const switcher = document.querySelector(".theme-switch"),
-    buttons = document.querySelectorAll("[data-theme-option]");
-  const sync = () => {
-    const theme = document.documentElement.dataset.theme;
-    switcher.dataset.active = theme;
-    buttons.forEach((button) => {
-      const active = button.dataset.themeOption === theme;
-      button.classList.toggle("active", active);
-      button.setAttribute("aria-pressed", String(active));
-    });
-  };
-  buttons.forEach((button) =>
+  document.querySelectorAll("[data-theme-option]").forEach((button) =>
     button.addEventListener("click", () => {
-      document.documentElement.dataset.theme = button.dataset.themeOption;
-      sync();
+      updateAppearance("theme", button.dataset.themeOption);
     }),
   );
   const systemTheme = matchMedia("(prefers-color-scheme:dark)");
-  systemTheme.addEventListener("change", (event) => {
-    document.documentElement.dataset.theme = event.matches ? "dark" : "light";
-    sync();
+  systemTheme.addEventListener("change", () => {
+    if (appearanceSettings.theme !== "system") return;
+    applyAppearance();
+    syncThemeControls();
   });
-  sync();
+  syncThemeControls();
 }
 function migrate() {
   if (location.hash.startsWith("#/"))
@@ -596,11 +866,15 @@ document.addEventListener("keydown", (event) => {
     document.body.classList.contains("animation-mode") &&
     !document.querySelector("dialog[open]")
   ) {
-    document.body.classList.remove("animation-mode");
+    appearanceSettings.animationMode = false;
+    saveAppearance();
+    applyAppearance();
+    syncAppearanceControls();
     showEggStatus("ANIMATION MODE // OFF");
   }
 });
 document.fonts.ready.then(positionSelection);
+applyAppearance();
 setupTheme();
 migrate();
 start();

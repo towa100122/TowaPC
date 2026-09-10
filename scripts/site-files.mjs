@@ -6,6 +6,7 @@ export const basePageFiles = [
   "index.html",
   "404.html",
   "about/index.html",
+  "appearance/index.html",
   "contact/index.html",
   "cooperation/index.html",
   "join/index.html",
