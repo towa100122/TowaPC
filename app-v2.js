@@ -5,7 +5,7 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=55";
+} from "./site-data.js?v=56";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
   theme: "system",
@@ -390,16 +390,12 @@ function showEggStatus(message) {
   setTimeout(() => status.remove(), 2600);
 }
 
-function animationBurst() {
-  const burst = document.createElement("div");
-  burst.className = "animation-burst";
-  burst.setAttribute("aria-hidden", "true");
-  burst.innerHTML = Array.from(
-    { length: 18 },
-    (_, index) => `<span style="--i:${index}"></span>`,
-  ).join("");
-  document.body.append(burst);
-  setTimeout(() => burst.remove(), 1800);
+function animationSweep() {
+  const sweep = document.createElement("div");
+  sweep.className = "animation-sweep";
+  sweep.setAttribute("aria-hidden", "true");
+  document.body.append(sweep);
+  setTimeout(() => sweep.remove(), 1400);
 }
 
 function setupAppearanceEgg() {
@@ -549,7 +545,7 @@ function setupAppearanceControls() {
     button.addEventListener("click", () => {
       const key = button.dataset.settingToggle;
       updateAppearance(key, !appearanceSettings[key]);
-      if (key === "animationMode" && appearanceSettings[key]) animationBurst();
+      if (key === "animationMode" && appearanceSettings[key]) animationSweep();
     }),
   );
   document

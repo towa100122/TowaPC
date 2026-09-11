@@ -971,21 +971,15 @@ p {
   transform: translateX(-50%);
   animation: egg-status-in 0.4s cubic-bezier(0.22, 0.8, 0.24, 1) both;
 }
-.animation-burst {
+.animation-sweep {
   position: fixed;
   z-index: 90;
-  inset: 50% auto auto 50%;
+  inset: 0;
   pointer-events: none;
-}
-.animation-burst span {
-  --angle: calc(var(--i) * 20deg);
-  position: absolute;
-  width: 10px;
-  height: 34px;
-  border-radius: 8px;
-  background: hsl(calc(var(--i) * 31) 82% 62%);
-  animation: egg-burst 1.55s cubic-bezier(0.16, 0.78, 0.25, 1) both;
-  transform: rotate(var(--angle)) translateY(-20px);
+  background: #fff;
+  box-shadow: 0 -42px 84px #fff;
+  transform: translateY(100%);
+  animation: animation-sweep-up 1.2s cubic-bezier(0.76, 0, 0.24, 1) both;
 }
 body.animation-mode::before {
   content: "";
@@ -1718,14 +1712,18 @@ footer {
     transform: translate(-50%, 14px) scale(0.94);
   }
 }
-@keyframes egg-burst {
-  from {
-    opacity: 1;
-    transform: rotate(var(--angle)) translateY(-20px) scale(0.4);
+@keyframes animation-sweep-up {
+  0% {
+    transform: translateY(100%);
   }
-  to {
-    opacity: 0;
-    transform: rotate(var(--angle)) translateY(-44vmin) scale(1.2);
+  42% {
+    transform: translateY(0);
+  }
+  58% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
   }
 }
 @keyframes animation-aurora {
