@@ -5,12 +5,14 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=54";
+} from "./site-data.js?v=55";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
   theme: "system",
   motion: "standard",
-  accent: "yellow",
+  accent: "standard",
+  customColor: "#ffff99",
+  surface: "standard",
   corners: "soft",
   density: "comfortable",
   glass: true,
@@ -21,13 +23,19 @@ const appearanceDefaults = {
   blur: 8,
   startScale: 965,
   uiScale: 100,
+  headerTransparency: 42,
+  headerBlur: 14,
+  headerMotion: "slide",
+  headerDuration: 480,
 };
 const appearanceOptions = {
   theme: ["system", "light", "dark"],
   motion: ["standard", "smooth", "snappy", "none", "custom"],
-  accent: ["yellow", "lavender", "mint", "peach"],
+  accent: ["standard", "lavender", "mint", "peach", "custom"],
+  surface: ["standard", "material", "liquid", "paper"],
   corners: ["soft", "round", "precise"],
   density: ["comfortable", "compact"],
+  headerMotion: ["slide", "fade", "none"],
 };
 function loadAppearance() {
   try {
@@ -46,12 +54,17 @@ function loadAppearance() {
       blur: [0, 18],
       startScale: [880, 1000],
       uiScale: [90, 110],
+      headerTransparency: [0, 80],
+      headerBlur: [0, 30],
+      headerDuration: [200, 1200],
     };
     Object.entries(ranges).forEach(([key, [minimum, maximum]]) => {
       const value = Number(stored[key]);
       if (Number.isFinite(value))
         settings[key] = Math.min(maximum, Math.max(minimum, value));
     });
+    if (/^#[0-9a-f]{6}$/i.test(stored.customColor || ""))
+      settings.customColor = stored.customColor;
     return settings;
   } catch {
     return { ...appearanceDefaults };
@@ -72,9 +85,21 @@ function applyAppearance() {
   root.dataset.theme = resolvedTheme();
   root.dataset.motion = appearanceSettings.motion;
   root.dataset.accent = appearanceSettings.accent;
+  root.dataset.surface = appearanceSettings.surface;
   root.dataset.corners = appearanceSettings.corners;
   root.dataset.density = appearanceSettings.density;
   root.dataset.glass = appearanceSettings.glass ? "on" : "off";
+  root.dataset.headerMotion = appearanceSettings.headerMotion;
+  root.style.setProperty("--custom-accent", appearanceSettings.customColor);
+  root.style.setProperty(
+    "--header-opacity",
+    `${100 - appearanceSettings.headerTransparency}%`,
+  );
+  root.style.setProperty("--header-blur", `${appearanceSettings.headerBlur}px`);
+  root.style.setProperty(
+    "--header-duration",
+    `${appearanceSettings.headerDuration}ms`,
+  );
   root.style.setProperty(
     "--reveal-duration",
     `${appearanceSettings.duration}ms`,
@@ -121,6 +146,7 @@ const iconNames = {
   density: "density_medium",
   sparkle: "auto_awesome",
   reset: "restart_alt",
+  header: "web_asset",
 };
 const icon = (n) =>
   `<span class="material-symbols-rounded icon" aria-hidden="true">${iconNames[n] || iconNames.grid}</span>`;
@@ -238,8 +264,11 @@ function settingRange(key, label, minimum, maximum, step, unit) {
 function settingToggle(key, title, copy) {
   return `<button class="setting-toggle" type="button" role="switch" aria-checked="${appearanceSettings[key]}" data-setting-toggle="${key}"><span><strong>${title}</strong><small>${copy}</small></span><i aria-hidden="true"></i></button>`;
 }
+function colorPicker() {
+  return `<label class="color-picker${appearanceSettings.accent === "custom" ? " active" : ""}"><input type="color" value="${E(appearanceSettings.customColor)}" data-custom-color aria-label="自由な差し色"><span aria-hidden="true" style="--picked-color:${E(appearanceSettings.customColor)}"></span><div><strong>カラーパレット</strong><small>好きな色を選ぶ</small></div></label>`;
+}
 function appearanceLab() {
-  return `${pageHero("Appearance Lab", "見つけた人だけの外観実験室", "appearance-hero")}<section class="section wrap appearance-lab"><div class="appearance-intro floating"><div><span class="egg-label">EASTER EGG 01</span><h2>見た目で遊ぶ。</h2><p>サイトの動き、色、形、大きさを好きなように調整できます。変更はこの端末に自動で保存されます。</p></div><div class="appearance-orbit" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i></div></div><div class="settings-grid"><section class="settings-card floating settings-motion"><div class="settings-heading">${icon("motion")}<div><h2>Motion</h2><p>カードが現れる動きを調整</p></div><button class="preview-button" type="button" data-play-preview>${icon("sparkle")}再生</button></div>${settingChoices(
+  return `${pageHero("Appearance Lab", "見つけた人だけの外観実験室", "appearance-hero")}<section class="section wrap appearance-lab"><div class="appearance-intro floating"><div><h2>見た目で遊ぶ。</h2><p>サイトの動き、色、形、大きさを好きなように調整できます。変更はこの端末に自動で保存されます。</p></div><div class="appearance-orbit" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i></div></div><div class="settings-grid"><section class="settings-card floating settings-motion"><div class="settings-heading">${icon("motion")}<div><h2>Motion</h2><p>カードが現れる動きを調整</p></div><button class="preview-button" type="button" data-play-preview>${icon("sparkle")}再生</button></div>${settingChoices(
     "motion",
     "プリセット",
     [
@@ -248,7 +277,15 @@ function appearanceLab() {
       ["snappy", "きびきび", "短く小さく"],
       ["none", "静止", "動かさない"],
     ],
-  )}<div class="motion-preview" data-motion-preview><span></span><strong>Preview card</strong><small>設定した動きをここで確認</small></div><div class="range-grid">${settingRange("duration", "アニメーション速度", 200, 1200, 20, "ms")}${settingRange("stagger", "カード間隔", 0, 120, 2, "ms")}${settingRange("travel", "移動量", 0, 90, 2, "px")}${settingRange("blur", "ぼかし", 0, 18, 1, "px")}${settingRange("startScale", "開始時の大きさ", 880, 1000, 5, "%")}</div></section><section class="settings-card floating"> <div class="settings-heading">${icon("palette")}<div><h2>Theme</h2><p>明るさと差し色を選択</p></div></div>${settingChoices(
+  )}<div class="motion-preview" data-motion-preview><span></span><strong>Preview card</strong><small>設定した動きをここで確認</small></div><div class="range-grid">${settingRange("duration", "アニメーション速度", 200, 1200, 20, "ms")}${settingRange("stagger", "カード間隔", 0, 120, 2, "ms")}${settingRange("travel", "移動量", 0, 90, 2, "px")}${settingRange("blur", "ぼかし", 0, 18, 1, "px")}${settingRange("startScale", "開始時の大きさ", 880, 1000, 5, "%")}</div></section><section class="settings-card floating settings-header"><div class="settings-heading">${icon("header")}<div><h2>Header</h2><p>透け方、ぼかし、登場を調整</p></div><button class="preview-button" type="button" data-play-header>${icon("sparkle")}再生</button></div><div class="range-grid">${settingRange("headerTransparency", "透明度", 0, 80, 2, "%")}${settingRange("headerBlur", "背景のブラー", 0, 30, 1, "px")}${settingRange("headerDuration", "アニメーション時間", 200, 1200, 20, "ms")}</div>${settingChoices(
+    "headerMotion",
+    "ヘッダーのアニメーション",
+    [
+      ["slide", "スライド", "上からなめらかに"],
+      ["fade", "フェード", "その場で現れる"],
+      ["none", "静止", "動かさない"],
+    ],
+  )}${settingToggle("glass", "ガラス効果", "透けとブラーを有効にする")}</section><section class="settings-card floating"><div class="settings-heading">${icon("palette")}<div><h2>Theme</h2><p>色と質感を選択</p></div></div>${settingChoices(
     "theme",
     "明るさ",
     [
@@ -256,12 +293,17 @@ function appearanceLab() {
       ["light", "Light", "明るい表示"],
       ["dark", "Dark", "暗い表示"],
     ],
-  )}${settingChoices("accent", "カラーテーマ", [
-    ["yellow", "ひまわり", "TowaPC Yellow"],
+  )}${settingChoices("surface", "デザインテーマ", [
+    ["standard", "標準", "TowaPCの基本"],
+    ["material", "Material 3", "明快な面と輪郭"],
+    ["liquid", "Liquid Glass", "透明感と光"],
+    ["paper", "Paper", "影を抑えた紙面"],
+  ])}${settingChoices("accent", "カラーテーマ", [
+    ["standard", "標準", "TowaPC Yellow"],
     ["lavender", "藤", "Lavender"],
     ["mint", "若葉", "Mint"],
     ["peach", "夕焼け", "Peach"],
-  ])}</section><section class="settings-card floating"><div class="settings-heading">${icon("corners")}<div><h2>Shape & Size</h2><p>形と画面の密度を調整</p></div></div>${settingChoices(
+  ])}${colorPicker()}</section><section class="settings-card floating"><div class="settings-heading">${icon("corners")}<div><h2>Shape & Size</h2><p>形と画面の密度を調整</p></div></div>${settingChoices(
     "corners",
     "カードの角",
     [
@@ -272,7 +314,7 @@ function appearanceLab() {
   )}${settingChoices("density", "余白", [
     ["comfortable", "ゆったり", "広めの間隔"],
     ["compact", "コンパクト", "情報を近く"],
-  ])}${settingRange("uiScale", "UIの大きさ", 90, 110, 1, "%")}${settingToggle("glass", "ガラス効果", "ヘッダーの透けとぼかし")}</section><section class="settings-card floating secret-settings"><div class="settings-heading">${icon("sparkle")}<div><h2>Secret</h2><p>ここへ移動した謎の機能</p></div></div>${settingToggle("animationMode", "謎のアニメーションモード", "光と浮遊がサイト全体を動き回ります")}</section></div><div class="settings-reset floating"><div><strong>最初の見た目へ戻す</strong><small>このページの設定だけをリセットします。</small></div><button type="button" data-reset-appearance>${icon("reset")}リセット</button></div></section>`;
+  ])}${settingRange("uiScale", "UIの大きさ", 90, 110, 1, "%")}</section><section class="settings-card floating secret-settings"><div class="settings-heading">${icon("sparkle")}<div><h2>Secret</h2><p>ここへ移動した謎の機能</p></div></div>${settingToggle("animationMode", "謎のアニメーションモード", "光と浮遊がサイト全体を動き回ります")}</section></div><div class="settings-reset floating"><div><strong>最初の見た目へ戻す</strong><small>このページの設定だけをリセットします。</small></div><button type="button" data-reset-appearance>${icon("reset")}リセット</button></div></section>`;
 }
 function join() {
   const url = safeHttpUrl(S.joinUrl);
@@ -377,8 +419,6 @@ function setupAppearanceEgg() {
     clearTimeout(resetTimer);
     history.pushState(null, "", "/appearance/");
     render();
-    animationBurst();
-    showEggStatus("EASTER EGG 01 // APPEARANCE LAB");
   });
 }
 
@@ -419,6 +459,8 @@ function syncAppearanceControls() {
       String(Boolean(appearanceSettings[button.dataset.settingToggle])),
     );
   });
+  const picker = document.querySelector(".color-picker");
+  picker?.classList.toggle("active", appearanceSettings.accent === "custom");
   syncThemeControls();
 }
 function playMotionPreview() {
@@ -427,6 +469,18 @@ function playMotionPreview() {
   preview.classList.remove("preview-play");
   void preview.offsetWidth;
   preview.classList.add("preview-play");
+}
+function playHeaderPreview() {
+  const header = document.querySelector(".header");
+  if (!header) return;
+  header.classList.remove("header-replay");
+  void header.offsetWidth;
+  header.classList.add("header-replay");
+  header.addEventListener(
+    "animationend",
+    () => header.classList.remove("header-replay"),
+    { once: true },
+  );
 }
 function updateAppearance(setting, value) {
   appearanceSettings[setting] = value;
@@ -464,6 +518,7 @@ function setupAppearanceControls() {
         });
         playMotionPreview();
       }
+      if (setting === "headerMotion") playHeaderPreview();
     }),
   );
   document.querySelectorAll("[data-setting-range]").forEach((input) =>
@@ -476,9 +531,11 @@ function setupAppearanceControls() {
       const output = document.querySelector(`[data-setting-output="${key}"]`);
       if (output) {
         const unit =
-          key === "uiScale" || key === "startScale"
+          key === "uiScale" ||
+          key === "startScale" ||
+          key === "headerTransparency"
             ? "%"
-            : key === "travel" || key === "blur"
+            : key === "travel" || key === "blur" || key === "headerBlur"
               ? "px"
               : "ms";
         output.textContent = `${key === "startScale" ? (value / 10).toFixed(1) : value}${unit}`;
@@ -498,6 +555,23 @@ function setupAppearanceControls() {
   document
     .querySelector("[data-play-preview]")
     ?.addEventListener("click", playMotionPreview);
+  document
+    .querySelector("[data-play-header]")
+    ?.addEventListener("click", playHeaderPreview);
+  document
+    .querySelector("[data-custom-color]")
+    ?.addEventListener("input", (event) => {
+      const value = event.currentTarget.value;
+      if (!/^#[0-9a-f]{6}$/i.test(value)) return;
+      appearanceSettings.customColor = value;
+      appearanceSettings.accent = "custom";
+      saveAppearance();
+      applyAppearance();
+      const picker = event.currentTarget.closest(".color-picker");
+      picker?.classList.add("active");
+      picker?.querySelector("span")?.style.setProperty("--picked-color", value);
+      syncAppearanceControls();
+    });
   document
     .querySelector("[data-reset-appearance]")
     ?.addEventListener("click", () => {
