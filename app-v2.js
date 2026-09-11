@@ -5,9 +5,10 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=56";
+} from "./site-data.js?v=57";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
+  schema: 2,
   theme: "system",
   motion: "standard",
   accent: "standard",
@@ -23,7 +24,7 @@ const appearanceDefaults = {
   blur: 8,
   startScale: 965,
   uiScale: 100,
-  headerTransparency: 42,
+  headerTransparency: 75,
   headerBlur: 14,
   headerMotion: "slide",
   headerDuration: 480,
@@ -63,6 +64,8 @@ function loadAppearance() {
       if (Number.isFinite(value))
         settings[key] = Math.min(maximum, Math.max(minimum, value));
     });
+    if (stored.schema !== 2 && stored.headerTransparency === 42)
+      settings.headerTransparency = 75;
     if (/^#[0-9a-f]{6}$/i.test(stored.customColor || ""))
       settings.customColor = stored.customColor;
     return settings;
