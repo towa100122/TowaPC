@@ -21,7 +21,7 @@
   --accent: #ffff99;
   --accent-soft: #fffbd0;
   --custom-accent: #ffff99;
-  --header-opacity: 25%;
+  --header-opacity: 58%;
   --header-blur: 14px;
   --header-duration: 480ms;
 }
@@ -976,8 +976,8 @@ p {
   z-index: 90;
   inset: 0;
   pointer-events: none;
-  background: #fff;
-  box-shadow: 0 -42px 84px #fff;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 -42px 84px rgba(255, 255, 255, 0.25);
   transform: translateY(100%);
   animation: animation-sweep-up 1.2s cubic-bezier(0.76, 0, 0.24, 1) both;
 }
