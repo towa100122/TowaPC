@@ -5,8 +5,8 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=62";
-import { privacyContent, termsContent } from "./legal-content.js?v=62";
+} from "./site-data.js?v=63";
+import { privacyContent, termsContent } from "./legal-content.js?v=63";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
   theme: "system",
