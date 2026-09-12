@@ -5,8 +5,8 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=61";
-import { privacyContent, termsContent } from "./legal-content.js?v=61";
+} from "./site-data.js?v=62";
+import { privacyContent, termsContent } from "./legal-content.js?v=62";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
   theme: "system",
@@ -382,7 +382,7 @@ function legalPage(kind) {
   const title = privacy ? "Privacy Policy" : "Terms of Service";
   const subtitle = privacy ? "プライバシーポリシー" : "利用規約";
   const content = privacy ? privacyContent : termsContent;
-  return `${pageHero(title, subtitle)}<section class="section wrap"><article class="article legal-document floating"><header><span>TowaPC.com</span><h2>${subtitle}</h2></header>${content}</article></section>`;
+  return `${pageHero(title, subtitle)}<section class="section wrap"><article class="article legal-document floating"><header><h2>${subtitle}</h2></header>${content}</article></section>`;
 }
 function missing() {
   return `<section class="section wrap not-found"><div class="not-found-card floating"><button class="not-found-number" type="button" aria-label="404" data-shred-trigger>404</button><p class="not-found-label">Not found</p><p class="not-found-copy">お探しのページは迷子かもしれません。</p></div></section>`;
