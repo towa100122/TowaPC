@@ -5,8 +5,8 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=60";
-import { privacyContent, termsContent } from "./legal-content.js?v=60";
+} from "./site-data.js?v=61";
+import { privacyContent, termsContent } from "./legal-content.js?v=61";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
   theme: "system",
@@ -269,7 +269,7 @@ function colorPicker() {
   return `<label class="color-picker${appearanceSettings.accent === "custom" ? " active" : ""}"><input type="color" value="${E(appearanceSettings.customColor)}" data-custom-color aria-label="自由な差し色"><span aria-hidden="true" style="--picked-color:${E(appearanceSettings.customColor)}"></span><div><strong>カラーパレット</strong><small>好きな色を選ぶ</small></div></label>`;
 }
 function appearanceLab() {
-  return `${pageHero("Appearance Lab", "見つけた人だけの外観実験室", "appearance-hero")}<section class="section wrap appearance-lab"><div class="appearance-intro floating"><div><h2>見た目で遊ぶ。</h2><p>サイトの動き、色、形、大きさを好きなように調整できます。変更はこの端末に自動で保存されます。</p></div><div class="appearance-orbit" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i></div></div><div class="settings-grid"><section class="settings-card floating settings-motion"><div class="settings-heading">${icon("motion")}<div><h2>Motion</h2><p>カードが現れる動きを調整</p></div><button class="preview-button" type="button" data-play-preview>${icon("sparkle")}再生</button></div>${settingChoices(
+  return `${pageHero("Appearance Lab", "見つけた人だけの外観実験室", "appearance-hero")}<section class="section wrap appearance-lab"><div class="article floating appearance-intro"><div><h2>見た目で遊ぶ。</h2><p>サイトの動き、色、形、大きさを好きなように調整できます。変更はこの端末に自動で保存されます。</p></div><div class="appearance-orbit" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i></div></div><div class="settings-grid"><section class="settings-card floating settings-motion"><div class="settings-heading">${icon("motion")}<div><h2>Motion</h2><p>カードが現れる動きを調整</p></div><button class="preview-button" type="button" data-play-preview>${icon("sparkle")}再生</button></div>${settingChoices(
     "motion",
     "プリセット",
     [
@@ -382,7 +382,7 @@ function legalPage(kind) {
   const title = privacy ? "Privacy Policy" : "Terms of Service";
   const subtitle = privacy ? "プライバシーポリシー" : "利用規約";
   const content = privacy ? privacyContent : termsContent;
-  return `${pageHero(title, subtitle)}<section class="section wrap"><article class="legal-document floating"><header><span>TowaPC.com</span><h2>${subtitle}</h2></header>${content}</article></section>`;
+  return `${pageHero(title, subtitle)}<section class="section wrap"><article class="article legal-document floating"><header><span>TowaPC.com</span><h2>${subtitle}</h2></header>${content}</article></section>`;
 }
 function missing() {
   return `<section class="section wrap not-found"><div class="not-found-card floating"><button class="not-found-number" type="button" aria-label="404" data-shred-trigger>404</button><p class="not-found-label">Not found</p><p class="not-found-copy">お探しのページは迷子かもしれません。</p></div></section>`;
