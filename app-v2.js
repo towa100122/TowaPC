@@ -5,7 +5,8 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=58";
+} from "./site-data.js?v=59";
+import { privacyContent, termsContent } from "./legal-content.js?v=59";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
   theme: "system",
@@ -376,8 +377,56 @@ function detail(kind, id) {
   const copy = `<div class="detail-copy"><span class="category">${isProduct ? E(item.category) : `${E(item.date)} · ${E(item.tag)}`}</span><h2>${E(isProduct ? item.name : item.title)}</h2><p>${E(isProduct ? item.description : item.body)}</p>${itemUrl ? `<a class="cta item-url" href="${E(itemUrl)}" target="_blank" rel="noopener">${isProduct ? "Webサイトを見る" : "関連リンクを開く"} ${icon("right")}</a>` : ""}<a class="text-link back-link" href="/${kind}/">${icon("left")} 一覧に戻る</a></div>`;
   return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
+function legalPage(kind) {
+  const privacy = kind === "privacy";
+  const title = privacy ? "Privacy Policy" : "Terms of Service";
+  const subtitle = privacy ? "プライバシーポリシー" : "利用規約";
+  const content = privacy ? privacyContent : termsContent;
+  return `${pageHero(title, subtitle)}<section class="section wrap"><article class="legal-document floating"><header><span>TowaPC.com</span><h2>${subtitle}</h2></header>${content}</article></section>`;
+}
 function missing() {
   return `<section class="section wrap not-found"><div class="not-found-card floating"><button class="not-found-number" type="button" aria-label="404" data-shred-trigger>404</button><p class="not-found-label">Not found</p><p class="not-found-copy">お探しのページは迷子かもしれません。</p></div></section>`;
+}
+
+const COOKIE_CONSENT_KEY = "towapc-cookie-consent";
+function cookieConsent() {
+  try {
+    return localStorage.getItem(COOKIE_CONSENT_KEY);
+  } catch {
+    return null;
+  }
+}
+function saveCookieConsent(value) {
+  try {
+    localStorage.setItem(COOKIE_CONSENT_KEY, value);
+  } catch {}
+}
+function showCookieConsent() {
+  document.querySelector(".cookie-consent")?.remove();
+  const banner = document.createElement("aside");
+  banner.className = "cookie-consent";
+  banner.setAttribute("role", "dialog");
+  banner.setAttribute("aria-label", "Cookieの利用について");
+  banner.innerHTML = `<div><strong>Cookieの利用について</strong><p>サイト改善のため、同意後にGoogle Analyticsを使用します。拒否しても主要機能は利用できます。<a href="/privacy/">詳しく見る</a></p></div><div class="cookie-actions"><button type="button" data-cookie-reject>拒否する</button><button type="button" data-cookie-accept>同意する</button></div>`;
+  document.body.append(banner);
+  banner.querySelector("[data-cookie-accept]").addEventListener("click", () => {
+    saveCookieConsent("accepted");
+    window.enableTowaAnalytics?.();
+    banner.remove();
+  });
+  banner.querySelector("[data-cookie-reject]").addEventListener("click", () => {
+    saveCookieConsent("rejected");
+    window.disableTowaAnalytics?.();
+    banner.remove();
+  });
+}
+function setupCookieConsent() {
+  const consent = cookieConsent();
+  if (consent === "accepted") window.enableTowaAnalytics?.();
+  else if (consent !== "rejected") showCookieConsent();
+  document
+    .querySelector("[data-cookie-settings]")
+    ?.addEventListener("click", showCookieConsent);
 }
 
 function showEggStatus(message) {
@@ -645,6 +694,8 @@ function render() {
       cooperation: () => directory("cooperation"),
       members: () => directory("members"),
       contact,
+      terms: () => legalPage("terms"),
+      privacy: () => legalPage("privacy"),
     };
   const main = document.getElementById("main");
   const pageContent =
@@ -654,7 +705,12 @@ function render() {
     (route
       ? `<div class="page-home-link wrap"><a class="text-link" href="/">${icon("left")} ホームに戻る</a></div>`
       : "");
-  document.title = `TowaPC — ${route === "appearance" ? "Appearance Lab" : routes.find(([p]) => p === `/${route}`)?.[1] || (route ? "Not found" : "Home")}`;
+  const specialTitles = {
+    appearance: "Appearance Lab",
+    terms: "Terms of Service",
+    privacy: "Privacy Policy",
+  };
+  document.title = `TowaPC — ${specialTitles[route] || routes.find(([p]) => p === `/${route}`)?.[1] || (route ? "Not found" : "Home")}`;
   const logo = safeImageSource(S.logo) || "/assets/TowaPC.svg";
   document
     .querySelectorAll(".custom-logo")
@@ -946,5 +1002,6 @@ document.addEventListener("keydown", (event) => {
 document.fonts.ready.then(positionSelection);
 applyAppearance();
 setupTheme();
+setupCookieConsent();
 migrate();
 start();

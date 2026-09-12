@@ -13,6 +13,8 @@ export const basePageFiles = [
   "members/index.html",
   "product/index.html",
   "information/index.html",
+  "privacy/index.html",
+  "terms/index.html",
 ];
 
 export async function getPageFiles(root) {
