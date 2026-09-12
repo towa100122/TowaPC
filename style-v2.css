@@ -2268,6 +2268,9 @@ footer {
 .setting-range + .setting-toggle {
   margin-top: 24px;
 }
+.setting-toggle + .setting-field {
+  margin-top: 24px;
+}
 .setting-label {
   display: block;
   margin-bottom: 9px;

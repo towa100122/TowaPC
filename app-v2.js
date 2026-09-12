@@ -5,11 +5,12 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=63";
-import { privacyContent, termsContent } from "./legal-content.js?v=63";
+} from "./site-data.js?v=64";
+import { privacyContent, termsContent } from "./legal-content.js?v=64";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
-  theme: "system",
+  theme: "light",
+  themePinned: false,
   motion: "standard",
   accent: "standard",
   customColor: "#ffff99",
@@ -30,7 +31,7 @@ const appearanceDefaults = {
   headerDuration: 480,
 };
 const appearanceOptions = {
-  theme: ["system", "light", "dark"],
+  theme: ["light", "dark"],
   motion: ["standard", "smooth", "snappy", "none", "custom"],
   accent: ["standard", "lavender", "mint", "peach", "custom"],
   surface: ["standard", "material", "liquid", "paper"],
@@ -46,6 +47,8 @@ function loadAppearance() {
       if (values.includes(stored[key])) settings[key] = stored[key];
     });
     if (typeof stored.glass === "boolean") settings.glass = stored.glass;
+    if (typeof stored.themePinned === "boolean")
+      settings.themePinned = stored.themePinned;
     if (typeof stored.animationMode === "boolean")
       settings.animationMode = stored.animationMode;
     const ranges = {
@@ -78,12 +81,13 @@ function saveAppearance() {
   } catch {}
 }
 function resolvedTheme() {
-  if (appearanceSettings.theme !== "system") return appearanceSettings.theme;
+  if (appearanceSettings.themePinned) return appearanceSettings.theme;
   return matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light";
 }
 function applyAppearance() {
   const root = document.documentElement;
   root.dataset.theme = resolvedTheme();
+  root.dataset.themePinned = appearanceSettings.themePinned ? "on" : "off";
   root.dataset.motion = appearanceSettings.motion;
   root.dataset.accent = appearanceSettings.accent;
   root.dataset.surface = appearanceSettings.surface;
@@ -286,11 +290,10 @@ function appearanceLab() {
       ["fade", "フェード", "その場で現れる"],
       ["none", "静止", "動かさない"],
     ],
-  )}${settingToggle("glass", "ガラス効果", "透けとブラーを有効にする")}</section><section class="settings-card floating"><div class="settings-heading">${icon("palette")}<div><h2>Theme</h2><p>色と質感を選択</p></div></div>${settingChoices(
+  )}${settingToggle("glass", "ガラス効果", "透けとブラーを有効にする")}</section><section class="settings-card floating"><div class="settings-heading">${icon("palette")}<div><h2>Theme</h2><p>色と質感を選択</p></div></div>${settingToggle("themePinned", "テーマを任意で固定する", "オフなら端末の設定を優先")}${settingChoices(
     "theme",
-    "明るさ",
+    "固定する明るさ",
     [
-      ["system", "自動", "端末に合わせる"],
       ["light", "Light", "明るい表示"],
       ["dark", "Dark", "暗い表示"],
     ],
@@ -539,6 +542,7 @@ function setupAppearanceControls() {
     button.addEventListener("click", () => {
       const { setting, value } = button.dataset;
       appearanceSettings[setting] = value;
+      if (setting === "theme") appearanceSettings.themePinned = true;
       if (setting === "motion")
         Object.assign(appearanceSettings, motionPresets[value]);
       saveAppearance();
@@ -593,7 +597,10 @@ function setupAppearanceControls() {
   document.querySelectorAll("[data-setting-toggle]").forEach((button) =>
     button.addEventListener("click", () => {
       const key = button.dataset.settingToggle;
-      updateAppearance(key, !appearanceSettings[key]);
+      const nextValue = !appearanceSettings[key];
+      if (key === "themePinned" && nextValue)
+        appearanceSettings.theme = resolvedTheme();
+      updateAppearance(key, nextValue);
       if (key === "animationMode" && appearanceSettings[key]) animationSweep();
     }),
   );
@@ -962,12 +969,16 @@ function positionSelection() {
 function setupTheme() {
   document.querySelectorAll("[data-theme-option]").forEach((button) =>
     button.addEventListener("click", () => {
-      updateAppearance("theme", button.dataset.themeOption);
+      appearanceSettings.theme = button.dataset.themeOption;
+      appearanceSettings.themePinned = true;
+      saveAppearance();
+      applyAppearance();
+      syncAppearanceControls();
     }),
   );
   const systemTheme = matchMedia("(prefers-color-scheme:dark)");
   systemTheme.addEventListener("change", () => {
-    if (appearanceSettings.theme !== "system") return;
+    if (appearanceSettings.themePinned) return;
     applyAppearance();
     syncThemeControls();
   });
