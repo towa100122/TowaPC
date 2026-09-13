@@ -4,13 +4,13 @@
 
 ## リポジトリと公開
 
-- 作業リポジトリ: `C:\Users\towa\Documents\Codex\2026-09-06\k\work\TowaPC-repo`
+- 作業リポジトリ: `C:\Users\towa\towapc\TowaPC-repo`
 - 作業ブランチ: `update/towapc-site`
 - 公開先ブランチ: GitHubの `main`
 - 公開コマンド: `git push origin HEAD:main`
 - 公開URL: `https://towapc.com/`
-- 配布用フォルダー: `C:\Users\towa\Documents\Codex\2026-09-06\k\outputs\towapc`
-- 配布用ZIP: `C:\Users\towa\Documents\Codex\2026-09-06\k\outputs\TowaPC-Web.zip`
+- 配布用フォルダー: `C:\Users\towa\towapc\outputs\towapc`
+- 配布用ZIP: `C:\Users\towa\towapc\outputs\TowaPC-Web.zip`
 - 公開後は実サイトを開き、CSV読み込み完了後の表示件数とブラウザーエラーを確認する。
 
 ## 設計

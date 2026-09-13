@@ -132,7 +132,7 @@ example-app,Example App,アプリケーション,app,"製品の説明です。\n
 ### 1. 最新状態を取り込む
 
 ```powershell
-cd "C:\Users\towa\Documents\Codex\2026-09-06\k\work\TowaPC-repo"
+cd "C:\Users\towa\towapc\TowaPC-repo"
 git switch update/towapc-site
 git fetch origin
 git merge --ff-only origin/main
