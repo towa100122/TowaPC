@@ -5,8 +5,8 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=64";
-import { privacyContent, termsContent } from "./legal-content.js?v=64";
+} from "./site-data.js?v=65";
+import { privacyContent, termsContent } from "./legal-content.js?v=65";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
   theme: "light",
@@ -165,10 +165,10 @@ function art(p) {
   return `<div class="product-art ${E(p.color)}">${img(p.image, p.name, "product-image")}</div>`;
 }
 function cards(items) {
-  return `<div class="grid">${items.map((p) => `<a class="product floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${E(p.description)}</p><div class="product-bottom"><span>TowaPC.com</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
+  return `<div class="grid">${items.map((p) => `<a class="product floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${plainText(p.description)}</p><div class="product-bottom"><span>TowaPC.com</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
 }
 function productRows(items) {
-  return `<div class="product-list">${items.map((p) => `<a class="product-row floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${E(p.description)}</p><div class="product-bottom"><span>TowaPC.com</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
+  return `<div class="product-list">${items.map((p) => `<a class="product-row floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${plainText(p.description)}</p><div class="product-bottom"><span>TowaPC.com</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
 }
 function productView() {
   try {
@@ -182,11 +182,46 @@ function productView() {
 function productResults(items, view) {
   return view === "list" ? productRows(items) : cards(items);
 }
+const newsTagLabels = {
+  new: "NEW",
+  important: "重要",
+  release: "リリース",
+  update: "更新",
+};
+function newsBadge(item) {
+  const tag = String(item.tag || "").toLowerCase();
+  return `<span class="badge ${E(tag)}">${E(newsTagLabels[tag] || item.tag)}</span>`;
+}
+function plainText(value) {
+  return E(
+    String(value ?? "")
+      .replace(/\\n/g, " ")
+      .replace(/\s+/g, " "),
+  );
+}
+function textWithBreaks(value) {
+  return E(String(value ?? "").replace(/\\n/g, "\n")).replace(/\r?\n/g, "<br>");
+}
+function relatedLinks(value) {
+  return String(value || "")
+    .replace(/\\n/g, "\n")
+    .split(/;;|\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const separator = entry.indexOf("|");
+      if (separator < 1) return null;
+      const label = entry.slice(0, separator).trim();
+      const url = safeHttpUrl(entry.slice(separator + 1).trim());
+      return label && url ? { label, url } : null;
+    })
+    .filter(Boolean);
+}
 function rows(items) {
   return items
     .map(
       (n) =>
-        `<a class="news-row" href="/information/${E(n.id)}/"><time>${E(n.date)}</time><span class="badge ${E(String(n.tag || "").toLowerCase())}">${E(n.tag)}</span><span class="news-title">${E(n.title)}</span><span class="row-actions">${img(n.image, "", "news-thumb")}<span class="arrow">${icon("right")}</span></span></a>`,
+        `<a class="news-row" href="/information/${E(n.id)}/"><time>${E(n.date)}</time>${newsBadge(n)}<span class="news-title">${E(n.title)}</span><span class="row-actions">${img(n.image, "", "news-thumb")}<span class="arrow">${icon("right")}</span></span></a>`,
     )
     .join("");
 }
@@ -194,12 +229,12 @@ function informationRows(items) {
   return `<div class="information-list">${items
     .map(
       (n) =>
-        `<a class="information-row floating" href="/information/${E(n.id)}/"><div class="information-row-art">${n.image ? img(n.image, "", "information-row-image") : `<span>${icon("bell")}</span>`}</div><div class="information-row-copy"><div><time>${E(n.date)}</time><span class="badge ${E(String(n.tag || "").toLowerCase())}">${E(n.tag)}</span></div><h2>${E(n.title)}</h2><p>${E(n.body)}</p><span class="information-row-more">詳しく見る ${icon("right")}</span></div></a>`,
+        `<a class="information-row floating" href="/information/${E(n.id)}/"><div class="information-row-art">${n.image ? img(n.image, "", "information-row-image") : `<span>${icon("bell")}</span>`}</div><div class="information-row-copy"><div><time>${E(n.date)}</time>${newsBadge(n)}</div><h2>${E(n.title)}</h2><p>${plainText(n.body)}</p><span class="information-row-more">詳しく見る ${icon("right")}</span></div></a>`,
     )
     .join("")}</div>`;
 }
 function newsCards(items) {
-  return `<div class="news-grid">${items.map((n) => `<a class="news-card floating" href="/information/${E(n.id)}/"><div class="news-card-art">${n.image ? img(n.image, "", "news-card-image") : `<span>${icon("bell")}</span>`}</div><div class="news-card-copy"><div><time>${E(n.date)}</time><span class="badge ${E(String(n.tag || "").toLowerCase())}">${E(n.tag)}</span></div><h2>${E(n.title)}</h2><p>${E(n.body)}</p><span class="news-card-more">詳しく見る ${icon("right")}</span></div></a>`).join("")}</div>`;
+  return `<div class="news-grid">${items.map((n) => `<a class="news-card floating" href="/information/${E(n.id)}/"><div class="news-card-art">${n.image ? img(n.image, "", "news-card-image") : `<span>${icon("bell")}</span>`}</div><div class="news-card-copy"><div><time>${E(n.date)}</time>${newsBadge(n)}</div><h2>${E(n.title)}</h2><p>${plainText(n.body)}</p><span class="news-card-more">詳しく見る ${icon("right")}</span></div></a>`).join("")}</div>`;
 }
 function pageHero(title, jp, extra = "") {
   return `<section class="page-hero ${extra}"><div class="wrap"><div class="breadcrumbs"><a href="/">Home</a> / ${E(title)}</div><h1>${E(title)}</h1><p>${E(jp)}</p></div></section>`;
@@ -235,7 +270,7 @@ function newsView() {
 }
 function information() {
   const view = newsView();
-  return `${pageHero("Information", "TowaPCからのお知らせ")}<section class="section wrap"><div class="view-switch" role="group" aria-label="お知らせの表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div><div id="information-results" class="${view === "list" ? "info-list" : "news-results"}">${view === "list" ? informationRows(S.news) : newsCards(S.news)}</div></section>`;
+  return `${pageHero("Information", "TowaPCからのお知らせ")}<section class="section wrap"><div class="information-toolbar"><div class="view-switch" role="group" aria-label="お知らせの表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div></div><div id="information-results" class="${view === "list" ? "info-list" : "news-results"}">${view === "list" ? informationRows(S.news) : newsCards(S.news)}</div></section>`;
 }
 function about() {
   const logo = safeImageSource(S.logo) || "/assets/TowaPC.svg";
@@ -376,8 +411,14 @@ function detail(kind, id) {
   const isProduct = kind === "product",
     item = (isProduct ? S.products : S.news).find((x) => x.id === id);
   if (!item) return missing();
-  const itemUrl = safeHttpUrl(item.url);
-  const copy = `<div class="detail-copy"><span class="category">${isProduct ? E(item.category) : `${E(item.date)} · ${E(item.tag)}`}</span><h2>${E(isProduct ? item.name : item.title)}</h2><p>${E(isProduct ? item.description : item.body)}</p>${itemUrl ? `<a class="cta item-url" href="${E(itemUrl)}" target="_blank" rel="noopener">${isProduct ? "Webサイトを見る" : "関連リンクを開く"} ${icon("right")}</a>` : ""}<a class="text-link back-link" href="/${kind}/">${icon("left")} 一覧に戻る</a></div>`;
+  const links = relatedLinks(item.links);
+  const linkButtons = links.length
+    ? `<div class="related-links">${links.map(({ label, url }) => `<a class="cta item-url" href="${E(url)}" target="_blank" rel="noopener">${E(label)} ${icon("right")}</a>`).join("")}</div>`
+    : "";
+  const category = isProduct
+    ? E(item.category)
+    : `${E(item.date)} · ${newsBadge(item)}`;
+  const copy = `<div class="detail-copy"><span class="category detail-category">${category}</span><h2>${E(isProduct ? item.name : item.title)}</h2><p>${textWithBreaks(isProduct ? item.description : item.body)}</p><div class="detail-actions"><a class="text-link back-link" href="/${kind}/">${icon("left")} 一覧に戻る</a>${linkButtons}</div></div>`;
   return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
 }
 function legalPage(kind) {

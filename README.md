@@ -1,44 +1,19 @@
-# TowaPC Webサイト
+# TowaPC.com
 
-GitHub Pagesで公開する静的サイトです。ページの表示内容は `data` フォルダー内のCSVで管理します。
+TowaPCの公式Webサイトです。
 
-## 内容を更新する
+人々が抱える、永遠と思えるような難しい課題を、少しずつテクノロジーで解決できるように。少しの発見とのびのびとした発想で、暮らしを少し豊かに、便利にしていくためのものづくりを紹介しています。
 
-- `data/site.csv`: トップページ、ロゴ、参加先、連絡先、SNS
-- `data/products.csv`: 製品
-- `data/news.csv`: お知らせ
-- `data/partners.csv`: 協力関係
-- `data/members.csv`: メンバー
+## サイトの内容
 
-画像は `assets` フォルダーへ入れ、CSVの `image` 列に `/assets/ファイル名` と記入します。詳しい入力規則は [data/README.md](data/README.md) にあります。
+- TowaPCの製品と開発プロジェクト
+- TowaPCからのお知らせ
+- 団体の考え方、メンバー、協力関係
+- TowaPC Communityへの参加方法と公式連絡先
+- 利用規約とプライバシーポリシー
 
-製品またはお知らせのIDを追加・変更・削除した場合は、詳細ページを生成します。
+サイトは端末幅に応じてレイアウトが変わり、端末のライト・ダーク設定にも追従します。隠し外観設定では、色、質感、動き、形、大きさなどを調整できます。
 
-```powershell
-bun run sync-pages
-```
+公開先: [https://towapc.com/](https://towapc.com/)
 
-## 公開前に確認する
-
-次のコマンドで、CSVの列・必須項目・ID重複・日付・URL・画像・詳細ページ・JavaScriptをまとめて確認できます。
-
-```powershell
-bun run check
-```
-
-GitHubへ送信した際にも同じ検査が自動実行されます。
-
-## 構成
-
-- `app-v2.js`: ページ表示と画面操作
-- `site-data.js`: CSVの読み込み、入力値の安全な処理、読み込み失敗時の最小表示
-- `style-v2.css`: レイアウトと配色
-- `templates/page.html`: 全ページ共通のHTML
-- `scripts/sync-pages.mjs`: 共通HTMLと詳細ページの生成
-- `scripts/check-site.mjs`: 公開前の自動検査
-
-各ページのHTMLを個別に編集せず、共通部分は `templates/page.html` を編集してから `bun run sync-pages` を実行します。CSVの読み込みに失敗した場合は、古い予備データではなく読み込みエラーを表示します。
-
-## デザイン
-
-端末幅に応じてレイアウトが変わり、ライト・ダークテーマにも対応しています。端末で視覚効果を減らす設定にしている場合はアニメーションを無効にします。
+サイト内容の編集方法、CSVの全項目、画像の追加、確認、公開までの手順は [data/README.md](data/README.md) にまとめています。

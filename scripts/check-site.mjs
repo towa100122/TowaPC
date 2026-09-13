@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseCsv } from "./csv.mjs";
 import { getPageFiles } from "./site-files.mjs";
@@ -16,9 +16,9 @@ const schemas = {
     "description",
     "color",
     "image",
-    "url",
+    "links",
   ],
-  "news.csv": ["id", "date", "tag", "title", "body", "image", "url"],
+  "news.csv": ["id", "date", "tag", "title", "body", "image", "links"],
   "partners.csv": ["name", "role", "description", "image", "url"],
   "members.csv": ["name", "role", "description", "image", "url"],
 };
@@ -40,6 +40,29 @@ function isHttpUrl(value) {
   } catch {
     return false;
   }
+}
+
+function checkLinks(file, rowNumber, value) {
+  if (!value) return;
+  const entries = String(value)
+    .replace(/\\n/g, "\n")
+    .split(/;;|\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  entries.forEach((entry, index) => {
+    const separator = entry.indexOf("|");
+    const label = separator > 0 ? entry.slice(0, separator).trim() : "";
+    const url = separator > 0 ? entry.slice(separator + 1).trim() : "";
+    if (!label || !url) {
+      problem(
+        `${file} ${rowNumber}行目: linksの${index + 1}件目は「ボタン名|https://...」で指定してください。`,
+      );
+    } else if (!isHttpUrl(url)) {
+      problem(
+        `${file} ${rowNumber}行目: linksの${index + 1}件目のURLが正しいHTTP(S) URLではありません。`,
+      );
+    }
+  });
 }
 
 function checkImage(file, rowNumber, image) {
@@ -75,6 +98,7 @@ for (const [file, expectedHeaders] of Object.entries(schemas)) {
           `${file} ${rowNumber}行目: urlが正しいHTTP(S) URLではありません。`,
         );
       }
+      checkLinks(file, rowNumber, row.links);
     });
   } catch (error) {
     problem(`${file}: ${error.message}`);
@@ -111,10 +135,16 @@ for (const [index, product] of (csvData["products.csv"] || []).entries()) {
   }
 }
 
+const newsTags = new Set(["new", "important", "release", "update"]);
 for (const [index, news] of (csvData["news.csv"] || []).entries()) {
   if (!/^\d{4}\.\d{2}\.\d{2}$/.test(news.date)) {
     problem(
       `news.csv ${index + 2}行目: dateはYYYY.MM.DD形式で指定してください。`,
+    );
+  }
+  if (!newsTags.has(news.tag)) {
+    problem(
+      `news.csv ${index + 2}行目: tag「${news.tag}」は使用できません。new、important、release、updateから選んでください。`,
     );
   }
 }
@@ -195,12 +225,32 @@ try {
       );
     }
   }
+  const expectedPages = new Set(
+    pageFiles.map((page) => page.replaceAll("\\", "/")),
+  );
+  for (const section of ["product", "information"]) {
+    const entries = await readdir(resolve(root, section), {
+      withFileTypes: true,
+    });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const page = `${section}/${entry.name}/index.html`;
+      if (existsSync(resolve(root, page)) && !expectedPages.has(page)) {
+        problem(`${page}はCSVに存在しない古い詳細ページです。`);
+      }
+    }
+  }
 } catch (error) {
   problem(`共通ページ検査: ${error.message}`);
 }
 
 const transpiler = new Bun.Transpiler({ loader: "js" });
-for (const file of ["app-v2.js", "site-data.js", "content-v2.js"]) {
+for (const file of [
+  "app-v2.js",
+  "site-data.js",
+  "legal-content.js",
+  "content-v2.js",
+]) {
   try {
     const source = await readFile(resolve(root, file), "utf8");
     transpiler.transformSync(source);
