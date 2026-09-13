@@ -1922,6 +1922,9 @@ footer {
   -webkit-backdrop-filter: blur(14px) saturate(112%);
   animation: cookie-consent-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+body.cookie-consent-visible {
+  padding-bottom: var(--cookie-consent-height, 0px);
+}
 .cookie-consent strong {
   display: block;
   margin-bottom: 4px;
