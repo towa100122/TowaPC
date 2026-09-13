@@ -132,7 +132,10 @@ example-app,Example App,アプリケーション,app,"製品の説明です。\n
 ### 1. 最新状態を取り込む
 
 ```powershell
-git pull --ff-only origin main
+git switch update/towapc-site
+git fetch origin
+git merge --ff-only origin/main
+git status
 ```
 
 ### 2. CSVと画像を編集する
