@@ -26,7 +26,7 @@
 - CSVの全列、タグ、改行、複数リンク、画像、手動公開の正規手順は `data/README.md` に集約する。ルート `README.md` はサイト紹介だけを載せる。
 - 公開前に必ず `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` でも同じ検査を行う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js`・`legal-content.js` importを同じ番号にする。現在は `v67`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js`・`legal-content.js` importを同じ番号にする。現在は `v68`。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
 
@@ -115,8 +115,9 @@
 - ブラウザーの警告・エラーなし。
 - 変更を公開するときは、最終検査、コミット、`main`へのpush、配布ZIP更新、公開サイト確認までを一続きで行う。
 
-## v67 完了状態（2026-09-14）
+## v68 完了状態（2026-09-14）
 
+- v68ではCookie同意バーとフッターの間に隙間を作らず、バーのレイアウト上の高さを正確にページ末尾へ確保するよう修正した。
 - v67ではCookie同意バーの表示中に、その実測高さ分だけページ末尾へ余白を追加し、フッター最下部まで隠れずにスクロールできるようにした。同意・拒否後は余白を解除する。
 - v66ではMaterial 3を専用の面・輪郭・色・ボタン・elevationへ作り直し、後段のダークテーマ指定による上書きを解消した。
 - v65では製品・お知らせ本文の改行、名前付き複数リンク、4種類のお知らせタグ、詳細ページの操作位置、お知らせ一覧とホーム欄の位置ずれを整備した。更新方法は `data/README.md` に集約し、ルートREADMEはサイト紹介へ変更した。

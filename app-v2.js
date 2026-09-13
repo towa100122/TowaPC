@@ -5,8 +5,8 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=67";
-import { privacyContent, termsContent } from "./legal-content.js?v=67";
+} from "./site-data.js?v=68";
+import { privacyContent, termsContent } from "./legal-content.js?v=68";
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
   theme: "light",
@@ -465,7 +465,7 @@ function showCookieConsent() {
   const syncCookieSpace = () =>
     document.body.style.setProperty(
       "--cookie-consent-height",
-      `${Math.ceil(banner.getBoundingClientRect().height + 8)}px`,
+      `${banner.offsetHeight}px`,
     );
   syncCookieSpace();
   cookieConsentObserver = new ResizeObserver(syncCookieSpace);
