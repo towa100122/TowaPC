@@ -4,6 +4,10 @@
   "scripts": {
     "sync-pages": "bun scripts/sync-pages.mjs",
     "check": "bun scripts/check-site.mjs",
-    "format": "bunx prettier --write app-v2.js legal-content.js site-data.js style-v2.css scripts/*.mjs"
+    "format": "prettier --write app-v2.js cookie-consent.js csv.js legal-content.js site-data.js site-schema.js appearance.css style-v2.css scripts/*.mjs",
+    "format:check": "prettier --check app-v2.js cookie-consent.js csv.js legal-content.js site-data.js site-schema.js appearance.css style-v2.css scripts/*.mjs"
+  },
+  "devDependencies": {
+    "prettier": "3.9.6"
   }
 }

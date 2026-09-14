@@ -5,8 +5,12 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=68";
-import { privacyContent, termsContent } from "./legal-content.js?v=68";
+} from "./site-data.js?v=69";
+import { privacyContent, termsContent } from "./legal-content.js?v=69";
+import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=69";
+import { setupCookieConsent } from "./cookie-consent.js?v=69";
+
+// 保存可能な外観設定
 const APPEARANCE_KEY = "towapc-appearance-v1";
 const appearanceDefaults = {
   theme: "light",
@@ -134,6 +138,7 @@ const routes = [
   ["/members", "Members"],
   ["/contact", "Contact"],
 ];
+// 表示部品とページ本文
 const iconNames = {
   bell: "notifications",
   grid: "grid_view",
@@ -162,13 +167,29 @@ const img = (src, alt, cls = "") =>
     ? `<img class="${E(cls)}" src="${E(safeImageSource(src))}" alt="${E(alt)}" loading="lazy">`
     : "";
 function art(p) {
-  return `<div class="product-art ${E(p.color)}">${img(p.image, p.name, "product-image")}</div>`;
+  return `<div class="product-art ${E(p.color)}">
+    ${img(p.image, p.name, "product-image")}
+  </div>`;
+}
+function productCard(product, className) {
+  return `<a class="${className} floating" href="/product/${E(product.id)}/">
+    ${art(product)}
+    <div class="product-copy">
+      <span class="category">${E(product.category)}</span>
+      <h3>${E(product.name)}</h3>
+      <p>${plainText(product.description)}</p>
+      <div class="product-bottom">
+        <span>TowaPC.com</span>
+        <span>詳しく見る ${icon("right")}</span>
+      </div>
+    </div>
+  </a>`;
 }
 function cards(items) {
-  return `<div class="grid">${items.map((p) => `<a class="product floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${plainText(p.description)}</p><div class="product-bottom"><span>TowaPC.com</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
+  return `<div class="grid">${items.map((item) => productCard(item, "product")).join("")}</div>`;
 }
 function productRows(items) {
-  return `<div class="product-list">${items.map((p) => `<a class="product-row floating" href="/product/${E(p.id)}/">${art(p)}<div class="product-copy"><span class="category">${E(p.category)}</span><h3>${E(p.name)}</h3><p>${plainText(p.description)}</p><div class="product-bottom"><span>TowaPC.com</span><span>詳しく見る ${icon("right")}</span></div></div></a>`).join("")}</div>`;
+  return `<div class="product-list">${items.map((item) => productCard(item, "product-row")).join("")}</div>`;
 }
 function productView() {
   try {
@@ -182,12 +203,6 @@ function productView() {
 function productResults(items, view) {
   return view === "list" ? productRows(items) : cards(items);
 }
-const newsTagLabels = {
-  new: "NEW",
-  important: "重要",
-  release: "リリース",
-  update: "更新",
-};
 function newsBadge(item) {
   const tag = String(item.tag || "").toLowerCase();
   return `<span class="badge ${E(tag)}">${E(newsTagLabels[tag] || item.tag)}</span>`;
@@ -221,23 +236,63 @@ function rows(items) {
   return items
     .map(
       (n) =>
-        `<a class="news-row" href="/information/${E(n.id)}/"><time>${E(n.date)}</time>${newsBadge(n)}<span class="news-title">${E(n.title)}</span><span class="row-actions">${img(n.image, "", "news-thumb")}<span class="arrow">${icon("right")}</span></span></a>`,
+        `<a class="news-row" href="/information/${E(n.id)}/">
+          <time>${E(n.date)}</time>
+          ${newsBadge(n)}
+          <span class="news-title">${E(n.title)}</span>
+          <span class="row-actions">
+            ${img(n.image, "", "news-thumb")}
+            <span class="arrow">${icon("right")}</span>
+          </span>
+        </a>`,
     )
     .join("");
+}
+function newsArt(item, imageClass) {
+  return item.image
+    ? img(item.image, "", imageClass)
+    : `<span>${icon("bell")}</span>`;
 }
 function informationRows(items) {
   return `<div class="information-list">${items
     .map(
       (n) =>
-        `<a class="information-row floating" href="/information/${E(n.id)}/"><div class="information-row-art">${n.image ? img(n.image, "", "information-row-image") : `<span>${icon("bell")}</span>`}</div><div class="information-row-copy"><div><time>${E(n.date)}</time>${newsBadge(n)}</div><h2>${E(n.title)}</h2><p>${plainText(n.body)}</p><span class="information-row-more">詳しく見る ${icon("right")}</span></div></a>`,
+        `<a class="information-row floating" href="/information/${E(n.id)}/">
+          <div class="information-row-art">${newsArt(n, "information-row-image")}</div>
+          <div class="information-row-copy">
+            <div><time>${E(n.date)}</time>${newsBadge(n)}</div>
+            <h2>${E(n.title)}</h2>
+            <p>${plainText(n.body)}</p>
+            <span class="information-row-more">詳しく見る ${icon("right")}</span>
+          </div>
+        </a>`,
     )
     .join("")}</div>`;
 }
 function newsCards(items) {
-  return `<div class="news-grid">${items.map((n) => `<a class="news-card floating" href="/information/${E(n.id)}/"><div class="news-card-art">${n.image ? img(n.image, "", "news-card-image") : `<span>${icon("bell")}</span>`}</div><div class="news-card-copy"><div><time>${E(n.date)}</time>${newsBadge(n)}</div><h2>${E(n.title)}</h2><p>${plainText(n.body)}</p><span class="news-card-more">詳しく見る ${icon("right")}</span></div></a>`).join("")}</div>`;
+  const itemCards = items
+    .map(
+      (n) => `<a class="news-card floating" href="/information/${E(n.id)}/">
+        <div class="news-card-art">${newsArt(n, "news-card-image")}</div>
+        <div class="news-card-copy">
+          <div><time>${E(n.date)}</time>${newsBadge(n)}</div>
+          <h2>${E(n.title)}</h2>
+          <p>${plainText(n.body)}</p>
+          <span class="news-card-more">詳しく見る ${icon("right")}</span>
+        </div>
+      </a>`,
+    )
+    .join("");
+  return `<div class="news-grid">${itemCards}</div>`;
 }
 function pageHero(title, jp, extra = "") {
-  return `<section class="page-hero ${extra}"><div class="wrap"><div class="breadcrumbs"><a href="/">Home</a> / ${E(title)}</div><h1>${E(title)}</h1><p>${E(jp)}</p></div></section>`;
+  return `<section class="page-hero ${extra}">
+    <div class="wrap">
+      <div class="breadcrumbs"><a href="/">Home</a> / ${E(title)}</div>
+      <h1>${E(title)}</h1>
+      <p>${E(jp)}</p>
+    </div>
+  </section>`;
 }
 function home() {
   const quick = [
@@ -247,17 +302,64 @@ function home() {
     ["join", "Join", "私たちの一員になる", "cream", "join"],
   ];
   const heroSource = safeImageSource(S.hero);
-  return `<section class="hero">${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}<h1>${E(S.headline)}</h1></section><div class="wrap"><section class="intro floating"><h2>What’s “TowaPC”?</h2><p>${E(S.description)}</p><a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a></section><section class="news-strip floating"><div class="news-heading"><a class="news-label" href="/information/">${icon("bell")}Information</a><a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a></div><div class="news-list">${rows(S.news)}</div></section><section class="quick-links">${quick.map(([path, label, jp, color, type]) => `<a href="/${path}/" class="quick-link floating ${color}">${icon(type)}<div><strong>${label}</strong><small>${jp}</small></div><span class="arrow">${icon("right")}</span></a>`).join("")}</section><section class="section"><div class="section-heading"><h2>Our products</h2><a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a></div>${cards(S.products)}</section></div>`;
+  const quickLinks = quick
+    .map(
+      ([path, label, jp, color, type]) =>
+        `<a href="/${path}/" class="quick-link floating ${color}">
+          ${icon(type)}
+          <div><strong>${label}</strong><small>${jp}</small></div>
+          <span class="arrow">${icon("right")}</span>
+        </a>`,
+    )
+    .join("");
+
+  return `<section class="hero">
+    ${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}
+    <h1>${E(S.headline)}</h1>
+  </section>
+  <div class="wrap">
+    <section class="intro floating">
+      <h2>What’s “TowaPC”?</h2>
+      <p>${E(S.description)}</p>
+      <a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a>
+    </section>
+    <section class="news-strip floating">
+      <div class="news-heading">
+        <a class="news-label" href="/information/">${icon("bell")}Information</a>
+        <a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a>
+      </div>
+      <div class="news-list">${rows(S.news)}</div>
+    </section>
+    <section class="quick-links">${quickLinks}</section>
+    <section class="section">
+      <div class="section-heading">
+        <h2>Our products</h2>
+        <a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a>
+      </div>
+      ${cards(S.products)}
+    </section>
+  </div>`;
 }
 function products() {
-  const filters = [
-      ["all", "すべて"],
-      ["app", "アプリケーション"],
-      ["web", "Webサービス"],
-      ["project", "開発プロジェクト"],
-    ],
+  const filters = [["all", "すべて"], ...Object.entries(productTypeLabels)],
     view = productView();
-  return `${pageHero("Product", "私たちの製品の紹介")}<section class="section wrap"><div class="product-toolbar"><div class="filters">${filters.map(([v, t]) => `<button class="filter ${v === "all" ? "active" : ""}" data-filter="${v}" aria-pressed="${v === "all"}">${t}</button>`).join("")}</div><div class="view-switch" role="group" aria-label="製品の表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-product-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-product-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div></div><div id="product-results">${productResults(S.products, view)}</div></section>`;
+  const filterButtons = filters
+    .map(
+      ([value, label]) =>
+        `<button class="filter ${value === "all" ? "active" : ""}" data-filter="${value}" aria-pressed="${value === "all"}">${label}</button>`,
+    )
+    .join("");
+  return `${pageHero("Product", "私たちの製品の紹介")}
+    <section class="section wrap">
+      <div class="product-toolbar">
+        <div class="filters">${filterButtons}</div>
+        <div class="view-switch" role="group" aria-label="製品の表示形式">
+          <button class="view-button ${view === "grid" ? "active" : ""}" data-product-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button>
+          <button class="view-button ${view === "list" ? "active" : ""}" data-product-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button>
+        </div>
+      </div>
+      <div id="product-results">${productResults(S.products, view)}</div>
+    </section>`;
 }
 function newsView() {
   try {
@@ -270,7 +372,17 @@ function newsView() {
 }
 function information() {
   const view = newsView();
-  return `${pageHero("Information", "TowaPCからのお知らせ")}<section class="section wrap"><div class="information-toolbar"><div class="view-switch" role="group" aria-label="お知らせの表示形式"><button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button><button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button></div></div><div id="information-results" class="${view === "list" ? "info-list" : "news-results"}">${view === "list" ? informationRows(S.news) : newsCards(S.news)}</div></section>`;
+  const results = view === "list" ? informationRows(S.news) : newsCards(S.news);
+  return `${pageHero("Information", "TowaPCからのお知らせ")}
+    <section class="section wrap">
+      <div class="information-toolbar">
+        <div class="view-switch" role="group" aria-label="お知らせの表示形式">
+          <button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button>
+          <button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button>
+        </div>
+      </div>
+      <div id="information-results" class="${view === "list" ? "info-list" : "news-results"}">${results}</div>
+    </section>`;
 }
 function about() {
   const logo = safeImageSource(S.logo) || "/assets/TowaPC.svg";
@@ -291,69 +403,208 @@ function about() {
       "cream",
     ],
   ];
-  return `${pageHero("About", "TowaPCについて")}<section class="section wrap"><div class="article floating about-summary"><div class="about-heading"><button class="about-logo-trigger" type="button" aria-label="TowaPCロゴ" data-animation-trigger><img class="about-logo" src="${E(logo)}" alt="TowaPC"></button><h2>TowaPCについて</h2></div><p>${E(S.description)}</p><p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p><div class="about-links"><a class="soft-button" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a><a class="soft-button" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a><a class="soft-button" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a></div></div><div class="values">${values.map(([h, p, c]) => `<div class="value floating ${c}"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
+  const valueCards = values
+    .map(
+      ([heading, copy, color]) =>
+        `<div class="value floating ${color}"><h3>${heading}</h3><p>${copy}</p></div>`,
+    )
+    .join("");
+  return `${pageHero("About", "TowaPCについて")}
+    <section class="section wrap">
+      <div class="article floating about-summary">
+        <div class="about-heading">
+          <button class="about-logo-trigger" type="button" aria-label="TowaPCロゴ" data-animation-trigger>
+            <img class="about-logo" src="${E(logo)}" alt="TowaPC">
+          </button>
+          <h2>TowaPCについて</h2>
+        </div>
+        <p>${E(S.description)}</p>
+        <p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p>
+        <div class="about-links">
+          <a class="soft-button" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a>
+          <a class="soft-button" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a>
+          <a class="soft-button" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a>
+        </div>
+      </div>
+      <div class="values">${valueCards}</div>
+    </section>`;
 }
 function settingChoices(key, label, choices) {
-  return `<div class="setting-field"><span class="setting-label">${label}</span><div class="setting-choices" role="group" aria-label="${label}">${choices.map(([value, title, copy]) => `<button type="button" data-setting="${key}" data-value="${value}" aria-pressed="${appearanceSettings[key] === value}"><strong>${title}</strong>${copy ? `<small>${copy}</small>` : ""}</button>`).join("")}</div></div>`;
+  const buttons = choices
+    .map(
+      ([value, title, copy]) =>
+        `<button type="button" data-setting="${key}" data-value="${value}" aria-pressed="${appearanceSettings[key] === value}">
+          <strong>${title}</strong>
+          ${copy ? `<small>${copy}</small>` : ""}
+        </button>`,
+    )
+    .join("");
+  return `<div class="setting-field">
+    <span class="setting-label">${label}</span>
+    <div class="setting-choices" role="group" aria-label="${label}">${buttons}</div>
+  </div>`;
 }
 function settingRange(key, label, minimum, maximum, step, unit) {
   const value = appearanceSettings[key];
   const shown = key === "startScale" ? (value / 10).toFixed(1) : value;
-  return `<label class="setting-range"><span><strong>${label}</strong><output data-setting-output="${key}">${shown}${unit}</output></span><input type="range" min="${minimum}" max="${maximum}" step="${step}" value="${value}" data-setting-range="${key}" aria-label="${label}">${key === "duration" ? '<span class="range-hints"><small>速い</small><small>ゆっくり</small></span>' : ""}</label>`;
+  const rangeHints =
+    key === "duration"
+      ? '<span class="range-hints"><small>速い</small><small>ゆっくり</small></span>'
+      : "";
+  return `<label class="setting-range">
+    <span>
+      <strong>${label}</strong>
+      <output data-setting-output="${key}">${shown}${unit}</output>
+    </span>
+    <input type="range" min="${minimum}" max="${maximum}" step="${step}" value="${value}" data-setting-range="${key}" aria-label="${label}">
+    ${rangeHints}
+  </label>`;
 }
 function settingToggle(key, title, copy) {
-  return `<button class="setting-toggle" type="button" role="switch" aria-checked="${appearanceSettings[key]}" data-setting-toggle="${key}"><span><strong>${title}</strong><small>${copy}</small></span><i aria-hidden="true"></i></button>`;
+  return `<button class="setting-toggle" type="button" role="switch" aria-checked="${appearanceSettings[key]}" data-setting-toggle="${key}">
+    <span><strong>${title}</strong><small>${copy}</small></span>
+    <i aria-hidden="true"></i>
+  </button>`;
 }
 function colorPicker() {
-  return `<label class="color-picker${appearanceSettings.accent === "custom" ? " active" : ""}"><input type="color" value="${E(appearanceSettings.customColor)}" data-custom-color aria-label="自由な差し色"><span aria-hidden="true" style="--picked-color:${E(appearanceSettings.customColor)}"></span><div><strong>カラーパレット</strong><small>好きな色を選ぶ</small></div></label>`;
+  return `<label class="color-picker${appearanceSettings.accent === "custom" ? " active" : ""}">
+    <input type="color" value="${E(appearanceSettings.customColor)}" data-custom-color aria-label="自由な差し色">
+    <span aria-hidden="true" style="--picked-color:${E(appearanceSettings.customColor)}"></span>
+    <div><strong>カラーパレット</strong><small>好きな色を選ぶ</small></div>
+  </label>`;
 }
-function appearanceLab() {
-  return `${pageHero("Appearance Lab", "見つけた人だけの外観実験室", "appearance-hero")}<section class="section wrap appearance-lab"><div class="article floating appearance-intro"><div><h2>見た目で遊ぶ。</h2><p>サイトの動き、色、形、大きさを好きなように調整できます。変更はこの端末に自動で保存されます。</p></div><div class="appearance-orbit" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i></div></div><div class="settings-grid"><section class="settings-card floating settings-motion"><div class="settings-heading">${icon("motion")}<div><h2>Motion</h2><p>カードが現れる動きを調整</p></div><button class="preview-button" type="button" data-play-preview>${icon("sparkle")}再生</button></div>${settingChoices(
-    "motion",
-    "プリセット",
-    [
-      ["standard", "標準", "軽く、素早く"],
-      ["smooth", "ゆったり", "今回の新しい動き"],
-      ["snappy", "きびきび", "短く小さく"],
-      ["none", "静止", "動かさない"],
-    ],
-  )}<div class="motion-preview" data-motion-preview><span></span><strong>Preview card</strong><small>設定した動きをここで確認</small></div><div class="range-grid">${settingRange("duration", "アニメーション速度", 200, 1200, 20, "ms")}${settingRange("stagger", "カード間隔", 0, 120, 2, "ms")}${settingRange("travel", "移動量", 0, 90, 2, "px")}${settingRange("blur", "ぼかし", 0, 18, 1, "px")}${settingRange("startScale", "開始時の大きさ", 880, 1000, 5, "%")}</div></section><section class="settings-card floating settings-header"><div class="settings-heading">${icon("header")}<div><h2>Header</h2><p>透け方、ぼかし、登場を調整</p></div><button class="preview-button" type="button" data-play-header>${icon("sparkle")}再生</button></div><div class="range-grid">${settingRange("headerTransparency", "透明度", 0, 80, 2, "%")}${settingRange("headerBlur", "背景のブラー", 0, 30, 1, "px")}${settingRange("headerDuration", "アニメーション時間", 200, 1200, 20, "ms")}</div>${settingChoices(
-    "headerMotion",
-    "ヘッダーのアニメーション",
-    [
-      ["slide", "スライド", "上からなめらかに"],
-      ["fade", "フェード", "その場で現れる"],
-      ["none", "静止", "動かさない"],
-    ],
-  )}${settingToggle("glass", "ガラス効果", "透けとブラーを有効にする")}</section><section class="settings-card floating"><div class="settings-heading">${icon("palette")}<div><h2>Theme</h2><p>色と質感を選択</p></div></div>${settingToggle("themePinned", "テーマを任意で固定する", "オフなら端末の設定を優先")}${settingChoices(
-    "theme",
-    "固定する明るさ",
-    [
-      ["light", "Light", "明るい表示"],
-      ["dark", "Dark", "暗い表示"],
-    ],
-  )}${settingChoices("surface", "デザインテーマ", [
+function motionSettings() {
+  const choices = [
+    ["standard", "標準", "軽く、素早く"],
+    ["smooth", "ゆったり", "今回の新しい動き"],
+    ["snappy", "きびきび", "短く小さく"],
+    ["none", "静止", "動かさない"],
+  ];
+  return `<section class="settings-card floating settings-motion">
+    <div class="settings-heading">
+      ${icon("motion")}
+      <div><h2>Motion</h2><p>カードが現れる動きを調整</p></div>
+      <button class="preview-button" type="button" data-play-preview>${icon("sparkle")}再生</button>
+    </div>
+    ${settingChoices("motion", "プリセット", choices)}
+    <div class="motion-preview" data-motion-preview>
+      <span></span><strong>Preview card</strong><small>設定した動きをここで確認</small>
+    </div>
+    <div class="range-grid">
+      ${settingRange("duration", "アニメーション速度", 200, 1200, 20, "ms")}
+      ${settingRange("stagger", "カード間隔", 0, 120, 2, "ms")}
+      ${settingRange("travel", "移動量", 0, 90, 2, "px")}
+      ${settingRange("blur", "ぼかし", 0, 18, 1, "px")}
+      ${settingRange("startScale", "開始時の大きさ", 880, 1000, 5, "%")}
+    </div>
+  </section>`;
+}
+function headerSettings() {
+  const choices = [
+    ["slide", "スライド", "上からなめらかに"],
+    ["fade", "フェード", "その場で現れる"],
+    ["none", "静止", "動かさない"],
+  ];
+  return `<section class="settings-card floating settings-header">
+    <div class="settings-heading">
+      ${icon("header")}
+      <div><h2>Header</h2><p>透け方、ぼかし、登場を調整</p></div>
+      <button class="preview-button" type="button" data-play-header>${icon("sparkle")}再生</button>
+    </div>
+    <div class="range-grid">
+      ${settingRange("headerTransparency", "透明度", 0, 80, 2, "%")}
+      ${settingRange("headerBlur", "背景のブラー", 0, 30, 1, "px")}
+      ${settingRange("headerDuration", "アニメーション時間", 200, 1200, 20, "ms")}
+    </div>
+    ${settingChoices("headerMotion", "ヘッダーのアニメーション", choices)}
+    ${settingToggle("glass", "ガラス効果", "透けとブラーを有効にする")}
+  </section>`;
+}
+function themeSettings() {
+  const themes = [
+    ["light", "Light", "明るい表示"],
+    ["dark", "Dark", "暗い表示"],
+  ];
+  const surfaces = [
     ["standard", "標準", "TowaPCの基本"],
     ["material", "Material 3", "明快な面と輪郭"],
     ["liquid", "Liquid Glass", "透明感と光"],
     ["paper", "Paper", "影を抑えた紙面"],
-  ])}${settingChoices("accent", "カラーテーマ", [
+  ];
+  const accents = [
     ["standard", "標準", "TowaPC Yellow"],
     ["lavender", "藤", "Lavender"],
     ["mint", "若葉", "Mint"],
     ["peach", "夕焼け", "Peach"],
-  ])}${colorPicker()}</section><section class="settings-card floating"><div class="settings-heading">${icon("corners")}<div><h2>Shape & Size</h2><p>形と画面の密度を調整</p></div></div>${settingChoices(
-    "corners",
-    "カードの角",
-    [
-      ["soft", "標準", "やわらかい"],
-      ["round", "まるい", "大きな丸み"],
-      ["precise", "かっちり", "小さな丸み"],
-    ],
-  )}${settingChoices("density", "余白", [
+  ];
+  return `<section class="settings-card floating">
+    <div class="settings-heading">
+      ${icon("palette")}
+      <div><h2>Theme</h2><p>色と質感を選択</p></div>
+    </div>
+    ${settingToggle("themePinned", "テーマを任意で固定する", "オフなら端末の設定を優先")}
+    ${settingChoices("theme", "固定する明るさ", themes)}
+    ${settingChoices("surface", "デザインテーマ", surfaces)}
+    ${settingChoices("accent", "カラーテーマ", accents)}
+    ${colorPicker()}
+  </section>`;
+}
+function shapeSettings() {
+  const corners = [
+    ["soft", "標準", "やわらかい"],
+    ["round", "まるい", "大きな丸み"],
+    ["precise", "かっちり", "小さな丸み"],
+  ];
+  const densities = [
     ["comfortable", "ゆったり", "広めの間隔"],
     ["compact", "コンパクト", "情報を近く"],
-  ])}${settingRange("uiScale", "UIの大きさ", 90, 110, 1, "%")}</section><section class="settings-card floating secret-settings"><div class="settings-heading">${icon("sparkle")}<div><h2>Secret</h2><p>ここへ移動した謎の機能</p></div></div>${settingToggle("animationMode", "謎のアニメーションモード", "光と浮遊がサイト全体を動き回ります")}</section></div><div class="settings-reset floating"><div><strong>最初の見た目へ戻す</strong><small>このページの設定だけをリセットします。</small></div><button type="button" data-reset-appearance>${icon("reset")}リセット</button></div></section>`;
+  ];
+  return `<section class="settings-card floating">
+    <div class="settings-heading">
+      ${icon("corners")}
+      <div><h2>Shape & Size</h2><p>形と画面の密度を調整</p></div>
+    </div>
+    ${settingChoices("corners", "カードの角", corners)}
+    ${settingChoices("density", "余白", densities)}
+    ${settingRange("uiScale", "UIの大きさ", 90, 110, 1, "%")}
+  </section>`;
+}
+function secretSettings() {
+  return `<section class="settings-card floating secret-settings">
+    <div class="settings-heading">
+      ${icon("sparkle")}
+      <div><h2>Secret</h2><p>ここへ移動した謎の機能</p></div>
+    </div>
+    ${settingToggle("animationMode", "謎のアニメーションモード", "光と浮遊がサイト全体を動き回ります")}
+  </section>`;
+}
+function appearanceLab() {
+  return `${pageHero("Appearance Lab", "見つけた人だけの外観実験室", "appearance-hero")}
+    <section class="section wrap appearance-lab">
+      <div class="article floating appearance-intro">
+        <div>
+          <h2>見た目で遊ぶ。</h2>
+          <p>サイトの動き、色、形、大きさを好きなように調整できます。変更はこの端末に自動で保存されます。</p>
+        </div>
+        <div class="appearance-orbit" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><i></i>
+        </div>
+      </div>
+      <div class="settings-grid">
+        ${motionSettings()}
+        ${headerSettings()}
+        ${themeSettings()}
+        ${shapeSettings()}
+        ${secretSettings()}
+      </div>
+      <div class="settings-reset floating">
+        <div>
+          <strong>最初の見た目へ戻す</strong>
+          <small>このページの設定だけをリセットします。</small>
+        </div>
+        <button type="button" data-reset-appearance>${icon("reset")}リセット</button>
+      </div>
+    </section>`;
 }
 function join() {
   const url = safeHttpUrl(S.joinUrl);
@@ -371,23 +622,56 @@ function join() {
       "Discordの招待リンクから参加し、興味のあることを共有できます。",
     ],
   ];
-  return `${pageHero("Join", "私たちの一員になる")}<section class="section wrap join-section"><div class="join-box floating"><h2>あなたの「つくりたい」を、<br>ここから。</h2><p>プログラミング、デザイン、アイデア。<br>それぞれの得意や好奇心を持ち寄って、一緒に新しいものづくりをはじめませんか。</p>${url ? `<a class="cta" href="${E(url)}" target="_blank" rel="noopener">TowaPC Communityに参加する ${icon("right")}</a>` : '<span class="status">参加方法は、ただいま準備中です</span>'}</div><div class="values">${steps.map(([h, p]) => `<div class="value floating join-value"><h3>${h}</h3><p>${p}</p></div>`).join("")}</div></section>`;
+  const stepCards = steps
+    .map(
+      ([heading, copy]) =>
+        `<div class="value floating join-value"><h3>${heading}</h3><p>${copy}</p></div>`,
+    )
+    .join("");
+  const joinAction = url
+    ? `<a class="cta" href="${E(url)}" target="_blank" rel="noopener">TowaPC Communityに参加する ${icon("right")}</a>`
+    : '<span class="status">参加方法は、ただいま準備中です</span>';
+  return `${pageHero("Join", "私たちの一員になる")}
+    <section class="section wrap join-section">
+      <div class="join-box floating">
+        <h2>あなたの「つくりたい」を、<br>ここから。</h2>
+        <p>プログラミング、デザイン、アイデア。<br>それぞれの得意や好奇心を持ち寄って、一緒に新しいものづくりをはじめませんか。</p>
+        ${joinAction}
+      </div>
+      <div class="values">${stepCards}</div>
+    </section>`;
 }
 function directory(kind) {
-  const cooperation = kind === "cooperation",
-    list = cooperation ? S.partners : S.members,
-    title = cooperation ? "Cooperation" : "Members",
-    jp = cooperation ? "協力関係がある団体・個人" : "TowaPCのメンバー",
-    imageClass = cooperation
-      ? "directory-image company-logo"
-      : "directory-image member-image";
+  const cooperation = kind === "cooperation";
+  const list = cooperation ? S.partners : S.members;
+  const title = cooperation ? "Cooperation" : "Members";
+  const jp = cooperation ? "協力関係がある団体・個人" : "TowaPCのメンバー";
+  const imageClass = cooperation
+    ? "directory-image company-logo"
+    : "directory-image member-image";
   const entries = list
     .map((item) => {
       const url = safeHttpUrl(item.url);
-      return `<article class="directory-card floating">${img(item.image, item.name, imageClass)}<div><span class="category">${E(item.role || "")}</span><h2>${E(item.name)}</h2><p>${E(item.description || "")}</p>${url ? `<a class="text-link" href="${E(url)}" target="_blank" rel="noopener">Webサイト ${icon("right")}</a>` : ""}</div></article>`;
+      return `<article class="directory-card floating">
+        ${img(item.image, item.name, imageClass)}
+        <div>
+          <span class="category">${E(item.role || "")}</span>
+          <h2>${E(item.name)}</h2>
+          <p>${E(item.description || "")}</p>
+          ${url ? `<a class="text-link" href="${E(url)}" target="_blank" rel="noopener">Webサイト ${icon("right")}</a>` : ""}
+        </div>
+      </article>`;
     })
     .join("");
-  return `${pageHero(title, jp)}<section class="section wrap"><div class="directory-grid">${entries || `<div class="empty-state floating">${icon(cooperation ? "link" : "people")}<p>${cooperation ? "掲載する団体・個人" : "メンバー情報"}を準備しています。</p><small>dataフォルダーのCSVから追加できます。</small></div>`}</div></section>`;
+  const emptyState = `<div class="empty-state floating">
+    ${icon(cooperation ? "link" : "people")}
+    <p>${cooperation ? "掲載する団体・個人" : "メンバー情報"}を準備しています。</p>
+    <small>dataフォルダーのCSVから追加できます。</small>
+  </div>`;
+  return `${pageHero(title, jp)}
+    <section class="section wrap">
+      <div class="directory-grid">${entries || emptyState}</div>
+    </section>`;
 }
 function contact() {
   const contacts = [
@@ -399,97 +683,90 @@ function contact() {
   const cards = contacts
     .map(([type, label, value, detail]) => {
       const url = type === "mail" ? safeContactUrl(value) : safeHttpUrl(value);
-      return url
-        ? `<a id="${type}" class="contact-card floating" href="${E(url)}"${type === "mail" ? "" : ' target="_blank" rel="noopener"'}>${type === "mail" ? icon(type) : brandIcon(type)}<div><h2>${label}</h2><p>${E(detail || "公式ページ")}</p></div>${icon("right")}</a>`
-        : `<button id="${type}" class="contact-card floating pending" type="button" aria-label="${label}：URL準備中">${type === "mail" ? icon(type) : brandIcon(type)}<div><h2>${label}</h2><p>URL準備中</p></div>${icon("right")}</button>`;
+      const contactIcon = type === "mail" ? icon(type) : brandIcon(type);
+      if (!url) {
+        return `<button id="${type}" class="contact-card floating pending" type="button" aria-label="${label}：URL準備中">
+          ${contactIcon}
+          <div><h2>${label}</h2><p>URL準備中</p></div>
+          ${icon("right")}
+        </button>`;
+      }
+      const externalAttributes =
+        type === "mail" ? "" : ' target="_blank" rel="noopener"';
+      return `<a id="${type}" class="contact-card floating" href="${E(url)}"${externalAttributes}>
+        ${contactIcon}
+        <div><h2>${label}</h2><p>${E(detail || "公式ページ")}</p></div>
+        ${icon("right")}
+      </a>`;
     })
     .join("");
-  return `${pageHero("Contact", "お問い合わせ・公式リンク")}<section class="section wrap"><div class="contact-grid">${cards}</div></section>`;
+  return `${pageHero("Contact", "お問い合わせ・公式リンク")}
+    <section class="section wrap">
+      <div class="contact-grid">${cards}</div>
+    </section>`;
 }
 function detail(kind, id) {
   if (!["product", "information"].includes(kind)) return missing();
-  const isProduct = kind === "product",
-    item = (isProduct ? S.products : S.news).find((x) => x.id === id);
+  const isProduct = kind === "product";
+  const item = (isProduct ? S.products : S.news).find(
+    (entry) => entry.id === id,
+  );
   if (!item) return missing();
   const links = relatedLinks(item.links);
   const linkButtons = links.length
-    ? `<div class="related-links">${links.map(({ label, url }) => `<a class="cta item-url" href="${E(url)}" target="_blank" rel="noopener">${E(label)} ${icon("right")}</a>`).join("")}</div>`
+    ? `<div class="related-links">${links
+        .map(
+          ({ label, url }) =>
+            `<a class="cta item-url" href="${E(url)}" target="_blank" rel="noopener">${E(label)} ${icon("right")}</a>`,
+        )
+        .join("")}</div>`
     : "";
   const category = isProduct
     ? E(item.category)
     : `${E(item.date)} · ${newsBadge(item)}`;
-  const copy = `<div class="detail-copy"><span class="category detail-category">${category}</span><h2>${E(isProduct ? item.name : item.title)}</h2><p>${textWithBreaks(isProduct ? item.description : item.body)}</p><div class="detail-actions"><a class="text-link back-link" href="/${kind}/">${icon("left")} 一覧に戻る</a>${linkButtons}</div></div>`;
-  return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}<section class="section wrap"><article class="article floating ${isProduct ? "product-detail" : ""}">${isProduct ? `${art(item)}${copy}` : `${img(item.image, item.title, "article-image")}${copy}`}</article></section>`;
+  const title = isProduct ? item.name : item.title;
+  const body = isProduct ? item.description : item.body;
+  const copy = `<div class="detail-copy">
+    <span class="category detail-category">${category}</span>
+    <h2>${E(title)}</h2>
+    <p>${textWithBreaks(body)}</p>
+    <div class="detail-actions">
+      <a class="text-link back-link" href="/${kind}/">${icon("left")} 一覧に戻る</a>
+      ${linkButtons}
+    </div>
+  </div>`;
+  const content = isProduct
+    ? `${art(item)}${copy}`
+    : `${img(item.image, item.title, "article-image")}${copy}`;
+  return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}
+    <section class="section wrap">
+      <article class="article floating ${isProduct ? "product-detail" : ""}">${content}</article>
+    </section>`;
 }
 function legalPage(kind) {
   const privacy = kind === "privacy";
   const title = privacy ? "Privacy Policy" : "Terms of Service";
   const subtitle = privacy ? "プライバシーポリシー" : "利用規約";
   const content = privacy ? privacyContent : termsContent;
-  return `${pageHero(title, subtitle)}<section class="section wrap"><article class="article legal-document floating"><header><h2>${subtitle}</h2></header>${content}</article></section>`;
+  return `${pageHero(title, subtitle)}
+    <section class="section wrap">
+      <article class="article legal-document floating">
+        <header><h2>${subtitle}</h2></header>
+        ${content}
+      </article>
+    </section>`;
 }
 function missing() {
-  return `<section class="section wrap not-found"><div class="not-found-card floating"><button class="not-found-number" type="button" aria-label="404" data-shred-trigger>404</button><p class="not-found-label">Not found</p><p class="not-found-copy">お探しのページは迷子かもしれません。</p></div></section>`;
+  return `<section class="section wrap not-found">
+    <div class="not-found-card floating">
+      <button class="not-found-number" type="button" aria-label="404" data-shred-trigger>404</button>
+      <p class="not-found-label">Not found</p>
+      <p class="not-found-copy">お探しのページは迷子かもしれません。</p>
+    </div>
+  </section>`;
 }
 
-const COOKIE_CONSENT_KEY = "towapc-cookie-consent";
-let cookieConsentObserver;
-function cookieConsent() {
-  try {
-    return localStorage.getItem(COOKIE_CONSENT_KEY);
-  } catch {
-    return null;
-  }
-}
-function saveCookieConsent(value) {
-  try {
-    localStorage.setItem(COOKIE_CONSENT_KEY, value);
-  } catch {}
-}
-function hideCookieConsent(banner) {
-  cookieConsentObserver?.disconnect();
-  cookieConsentObserver = null;
-  banner?.remove();
-  document.body.classList.remove("cookie-consent-visible");
-  document.body.style.removeProperty("--cookie-consent-height");
-}
-function showCookieConsent() {
-  hideCookieConsent(document.querySelector(".cookie-consent"));
-  const banner = document.createElement("aside");
-  banner.className = "cookie-consent";
-  banner.setAttribute("role", "dialog");
-  banner.setAttribute("aria-label", "Cookieの利用について");
-  banner.innerHTML = `<div><strong>Cookieの利用について</strong><p>サイト改善のため、同意後にGoogle Analyticsを使用します。拒否しても主要機能は利用できます。<a href="/privacy/">詳しく見る</a></p></div><div class="cookie-actions"><button type="button" data-cookie-reject>拒否する</button><button type="button" data-cookie-accept>同意する</button></div>`;
-  document.body.append(banner);
-  document.body.classList.add("cookie-consent-visible");
-  const syncCookieSpace = () =>
-    document.body.style.setProperty(
-      "--cookie-consent-height",
-      `${banner.offsetHeight}px`,
-    );
-  syncCookieSpace();
-  cookieConsentObserver = new ResizeObserver(syncCookieSpace);
-  cookieConsentObserver.observe(banner);
-  banner.querySelector("[data-cookie-accept]").addEventListener("click", () => {
-    saveCookieConsent("accepted");
-    window.enableTowaAnalytics?.();
-    hideCookieConsent(banner);
-  });
-  banner.querySelector("[data-cookie-reject]").addEventListener("click", () => {
-    saveCookieConsent("rejected");
-    window.disableTowaAnalytics?.();
-    hideCookieConsent(banner);
-  });
-}
-function setupCookieConsent() {
-  const consent = cookieConsent();
-  if (consent === "accepted") window.enableTowaAnalytics?.();
-  else if (consent !== "rejected") showCookieConsent();
-  document
-    .querySelector("[data-cookie-settings]")
-    ?.addEventListener("click", showCookieConsent);
-}
-
+// 隠し機能とAppearance Labの操作
 function showEggStatus(message) {
   document.querySelector(".egg-status")?.remove();
   const status = document.createElement("div");
@@ -706,7 +983,18 @@ function shredPage() {
     const length = 25 + ((index * 7) % 6);
     return `<span style="--strip:${index};--strip-x:${offset}px;--strip-turn:${turn}deg;--strip-length:${length}vh"></span>`;
   }).join("");
-  shredder.innerHTML = `<div class="shred-machine" aria-hidden="true"><div class="shred-machine-top"><span>404 PAGE SHREDDER</span><i></i><i></i></div><div class="shred-slot"></div><div class="shred-strips">${strips}</div></div><div class="shred-complete"><strong>404は細断されました。</strong><small>ページの残り容量：0 byte</small><button type="button" data-shred-restore>ページを再構成する</button></div>`;
+  shredder.innerHTML = `<div class="shred-machine" aria-hidden="true">
+    <div class="shred-machine-top">
+      <span>404 PAGE SHREDDER</span><i></i><i></i>
+    </div>
+    <div class="shred-slot"></div>
+    <div class="shred-strips">${strips}</div>
+  </div>
+  <div class="shred-complete">
+    <strong>404は細断されました。</strong>
+    <small>ページの残り容量：0 byte</small>
+    <button type="button" data-shred-restore>ページを再構成する</button>
+  </div>`;
   document.body.append(shredder);
   document.body.classList.add("shredding-page");
   shredder
@@ -736,6 +1024,7 @@ function setupShredEgg() {
   });
 }
 
+// ページ描画と共通操作
 function headerNav(route) {
   const items = [
     ["", "Home"],

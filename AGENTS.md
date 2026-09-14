@@ -2,6 +2,16 @@
 
 このファイルは、会話のコンテキストが切り替わってもサイトの設計と作業方法を維持するための記録です。
 
+## 最優先の保守性ルール
+
+- Gitにはサイトのソース、正本データ、必要な画像、生成・検査スクリプトだけを含める。キャッシュ、ログ、ローカルサーバーの一時物、OS・エディター固有ファイル、配布ZIPは `.gitignore` で除外する。
+- データ、表示、スタイル、ページ生成、検査の責務を分け、同じ処理や値を複数箇所へ重複させない。
+- 依存関係と処理の流れを上から追える構造にし、暗黙の副作用や用途不明の互換コードを増やさない。
+- 更新箇所と確認方法を `data/README.md` と各スクリプト名から判断できる状態に保つ。
+- 新しいCSV列・ページ・テーマを追加しやすくし、追加時は同じ定義から読み込み・検査・生成へ反映できる構造を優先する。
+- 関数名・変数名・ファイル名は役割が分かる語を使い、不要な略語、過剰なコメント、機械的に長い処理を避ける。
+- 公開前に未追跡ファイル、無視対象、生成ページ、リンク、構文、レスポンシブ表示を確認し、長期運用で壊れにくい状態を維持する。
+
 ## リポジトリと公開
 
 - 作業リポジトリ: `C:\Users\towa\towapc\TowaPC-repo`
@@ -16,17 +26,22 @@
 ## 設計
 
 - 表示内容の正本は `data` フォルダー内のCSV。実際の紹介文をJavaScriptへ重複させない。
+- `csv.js` がブラウザー表示と検査で共用するCSV解析を担当する。CSV解析を別の場所へ複製しない。
+- `site-schema.js` がCSVの列、必須項目、タグ、製品種別、色、読み込み対象を一元管理する。仕様追加時はここを正本にする。
 - `site-data.js` がCSVの読み込み、URL検証、画像パス検証、HTMLエスケープを担当する。
+- `cookie-consent.js` がCookie設定の保存、同意バー、アクセス解析の許可・拒否操作を担当する。
 - `app-v2.js` がページ表示と画面操作を担当するES Module。
-- `style-v2.css` がレイアウトと配色を担当する。
+- `style-v2.css` が通常ページの基礎レイアウトと配色を担当する。`appearance.css` がAppearance Labとユーザー選択テーマによる上書きを担当し、基礎CSSの後に読み込む。
 - 全ページ共通のHTMLは `templates/page.html` だけを直接編集する。
 - HTML更新後や製品・お知らせのID変更後は `bun run sync-pages` を実行する。
 - `bun run sync-pages` はCSVに存在する製品・お知らせの詳細ページを生成し、CSVに存在しない古い詳細ページを削除する。`product/*/index.html` と `information/*/index.html` を手作業で追加しない。
-- `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、共通HTML、JavaScriptを検査する。
+- `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、固定表示資産、共通HTML、JavaScript、Git管理対象を検査する。
 - CSVの全列、タグ、改行、複数リンク、画像、手動公開の正規手順は `data/README.md` に集約する。ルート `README.md` はサイト紹介だけを載せる。
-- 公開前に必ず `bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
-- GitHub Actionsの `.github/workflows/check-site.yml` でも同じ検査を行う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js` の `site-data.js`・`legal-content.js` importを同じ番号にする。現在は `v68`。
+- 公開前に必ず `bun run format`、`bun run format:check`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
+- GitHub Actionsの `.github/workflows/check-site.yml` は固定済み依存関係を導入し、整形とサイト構造を検査する。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js`・`site-data.js` 内のimportを同じ番号にする。現在は `v69`。
+- `.gitignore` は依存関係、キャッシュ、出力、ログ、環境変数、OS・エディター固有ファイル、ZIPを除外する。`bun run check` は除外対象が誤ってGit追跡されていないかも検査する。
+- `.gitattributes` でテキストの改行をLFへ統一し、WindowsとGitHub間で内容と無関係な差分を作らない。画像はバイナリとして扱う。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
 
@@ -115,8 +130,9 @@
 - ブラウザーの警告・エラーなし。
 - 変更を公開するときは、最終検査、コミット、`main`へのpush、配布ZIP更新、公開サイト確認までを一続きで行う。
 
-## v68 完了状態（2026-09-14）
+## v69 完了状態（2026-09-14）
 
+- v69では保守性監査を行い、`.gitignore`、`.gitattributes`、Git追跡検査を追加した。ブラウザーと検査で重複していたCSV解析、CSV列・タグ・色・種別の定義を共通化し、Cookie同意処理を専用モジュールへ分離し、Prettier 3.9.6と依存関係を固定した。Appearance Labとユーザー選択テーマのCSSは `appearance.css` へ分離し、未参照だったサンプル・旧ヘッダー・小型favicon画像を削除した。HTML生成はカード・ページ・設定区画ごとの関数へ分け、最長行を1091文字から161文字へ短縮した。
 - v68ではCookie同意バーとフッターの間に隙間を作らず、バーのレイアウト上の高さを正確にページ末尾へ確保するよう修正した。
 - v67ではCookie同意バーの表示中に、その実測高さ分だけページ末尾へ余白を追加し、フッター最下部まで隠れずにスクロールできるようにした。同意・拒否後は余白を解除する。
 - v66ではMaterial 3を専用の面・輪郭・色・ボタン・elevationへ作り直し、後段のダークテーマ指定による上書きを解消した。

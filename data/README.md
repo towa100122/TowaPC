@@ -136,8 +136,11 @@ cd "C:\Users\towa\towapc\TowaPC-repo"
 git switch update/towapc-site
 git fetch origin
 git merge --ff-only origin/main
+bun install --frozen-lockfile
 git status
 ```
+
+`bun install --frozen-lockfile` は、サイトが使う整形ツールを決められたバージョンでそろえます。初回だけでなく、`package.json` や `bun.lock` が更新されたときにも実行します。
 
 ### 2. CSVと画像を編集する
 
@@ -149,12 +152,13 @@ git status
 
 ```powershell
 bun run format
+bun run format:check
 bun run sync-pages
 bun run check
 git diff --check
 ```
 
-`サイトの構成・CSV・画像・リンクに問題はありません。` と表示されれば検査成功です。エラーが出た場合は、表示されたCSV名・行番号・内容を修正して、同じ4つを再実行します。
+`All matched files use Prettier code style!` と `サイトの構成・CSV・画像・リンクに問題はありません。` が表示されれば検査成功です。エラーが出た場合は、表示されたファイル名・CSV名・行番号・内容を修正して、同じ5つを再実行します。
 
 ### 4. 変更内容を確認する
 
@@ -182,3 +186,23 @@ push後、GitHub Actionsの検査とPages公開が完了するまで待ち、[ht
 - 各ページの `index.html` は共通テンプレートから生成されるため、個別に編集しません。
 - 共通HTMLを変える場合は `templates/page.html` だけを編集し、`bun run sync-pages` を実行します。
 - 製品・お知らせの表示内容をJavaScriptへ直接書かず、CSVを正本にします。
+
+## サイトの仕組み
+
+普段の内容更新では `data` と `assets` だけを編集します。仕組み自体を変更するときは、次の役割分担を崩さないようにします。
+
+| 場所 | 役割 |
+| --- | --- |
+| `data/*.csv` | 掲載内容の正本 |
+| `csv.js` | ブラウザーと検査で共用するCSV解析 |
+| `site-schema.js` | CSVの列、必須項目、タグ、製品分類、色の共通定義 |
+| `site-data.js` | CSVの読み込みと安全なURL・画像・文字列処理 |
+| `app-v2.js` | ページ本文の組み立てと画面操作 |
+| `cookie-consent.js` | Cookie同意表示とアクセス解析の許可・拒否 |
+| `style-v2.css` | 通常ページの基礎デザイン |
+| `appearance.css` | Appearance Labと選択テーマによる上書き |
+| `templates/page.html` | 全ページ共通のHTML |
+| `scripts/sync-pages.mjs` | 共通HTMLから各ページを生成 |
+| `scripts/check-site.mjs` | CSV、画像、固定表示資産、リンク、生成ページ、JavaScript、Git管理対象を検査 |
+
+データの流れは `data/*.csv` → `site-data.js` → `app-v2.js` → ブラウザー表示です。ページの器は `templates/page.html` → `scripts/sync-pages.mjs` → 各 `index.html` の順で生成されます。CSV仕様を増やす場合は `site-schema.js` を起点に変更し、表示、CSS、`data/README.md` の入力規則も同じ変更内で更新します。

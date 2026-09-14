@@ -1,37 +1,72 @@
 import { existsSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
-import { parseCsv } from "./csv.mjs";
+import { parseCsv } from "../csv.js";
+import {
+  csvSchemas,
+  newsTagLabels,
+  nonEmptySiteKeys,
+  productColors,
+  productTypes,
+  requiredFields,
+  requiredSiteKeys,
+} from "../site-schema.js";
 import { getPageFiles } from "./site-files.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const problems = [];
-const schemas = {
-  "site.csv": ["key", "value"],
-  "products.csv": [
-    "id",
-    "name",
-    "category",
-    "type",
-    "description",
-    "color",
-    "image",
-    "links",
-  ],
-  "news.csv": ["id", "date", "tag", "title", "body", "image", "links"],
-  "partners.csv": ["name", "role", "description", "image", "url"],
-  "members.csv": ["name", "role", "description", "image", "url"],
-};
-const requiredFields = {
-  "products.csv": ["id", "name", "category", "type", "description"],
-  "news.csv": ["id", "date", "tag", "title", "body"],
-  "partners.csv": ["name", "role", "description"],
-  "members.csv": ["name", "role", "description"],
-};
 const csvData = {};
+
+const ignoredTrackedPatterns = [
+  /(^|\/)node_modules\//,
+  /(^|\/)(?:\.bun|\.cache|dist|coverage|tmp|temp|outputs)\//,
+  /(^|\/)\.env(?:\.|$)/,
+  /\.(?:log|pid|tmp|bak|swp|swo|tsbuildinfo|zip)$/i,
+  /(^|\/)\.eslintcache$/,
+  /(^|\/)(?:\.DS_Store|Thumbs\.db|Desktop\.ini)$/i,
+  /(^|\/)(?:\.idea|\.vscode|\.history)\//,
+];
 
 function problem(message) {
   problems.push(message);
+}
+
+try {
+  const tracked = Bun.spawnSync(["git", "ls-files", "-z"], {
+    cwd: root,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  if (tracked.exitCode !== 0) throw new Error(tracked.stderr.toString().trim());
+  for (const file of tracked.stdout.toString().split("\0").filter(Boolean)) {
+    if (ignoredTrackedPatterns.some((pattern) => pattern.test(file))) {
+      problem(`${file}: Gitへ含めない種類のファイルが追跡されています。`);
+    }
+  }
+} catch (error) {
+  problem(`Git管理対象の検査: ${error.message}`);
+}
+
+const requiredClientFiles = [
+  "app-v2.js",
+  "appearance.css",
+  "cookie-consent.js",
+  "csv.js",
+  "legal-content.js",
+  "site-data.js",
+  "site-schema.js",
+  "style-v2.css",
+  "apple-touch-icon.png",
+  "favicon.png",
+  "assets/TowaPC.svg",
+  "assets/social-discord.svg",
+  "assets/social-x.svg",
+  "assets/social-youtube.svg",
+];
+for (const file of requiredClientFiles) {
+  if (!existsSync(resolve(root, file))) {
+    problem(`${file}: サイト表示に必要な固定ファイルがありません。`);
+  }
 }
 
 function isHttpUrl(value) {
@@ -76,7 +111,7 @@ function checkImage(file, rowNumber, image) {
   }
 }
 
-for (const [file, expectedHeaders] of Object.entries(schemas)) {
+for (const [file, expectedHeaders] of Object.entries(csvSchemas)) {
   try {
     const text = await readFile(resolve(root, "data", file), "utf8");
     const parsed = parseCsv(text);
@@ -120,22 +155,22 @@ for (const file of ["products.csv", "news.csv"]) {
   }
 }
 
-const productTypes = new Set(["app", "web", "project"]);
-const productColors = new Set(["pink", "lavender", "mint", "cream", "peach"]);
+const allowedProductTypes = new Set(productTypes);
+const allowedProductColors = new Set(productColors);
 for (const [index, product] of (csvData["products.csv"] || []).entries()) {
-  if (!productTypes.has(product.type)) {
+  if (!allowedProductTypes.has(product.type)) {
     problem(
       `products.csv ${index + 2}行目: type「${product.type}」は使用できません。`,
     );
   }
-  if (product.color && !productColors.has(product.color)) {
+  if (product.color && !allowedProductColors.has(product.color)) {
     problem(
       `products.csv ${index + 2}行目: color「${product.color}」は使用できません。`,
     );
   }
 }
 
-const newsTags = new Set(["new", "important", "release", "update"]);
+const newsTags = new Set(Object.keys(newsTagLabels));
 for (const [index, news] of (csvData["news.csv"] || []).entries()) {
   if (!/^\d{4}\.\d{2}\.\d{2}$/.test(news.date)) {
     problem(
@@ -157,38 +192,10 @@ siteRows.forEach(({ key }, index) => {
     problem(`site.csv ${index + 2}行目: key「${key}」が重複しています。`);
   siteKeys.add(key);
 });
-const requiredSiteKeys = [
-  "logo",
-  "hero",
-  "headline",
-  "description",
-  "joinUrl",
-  "contactUrl",
-  "socials.youtube",
-  "socials.x",
-  "socials.discord",
-  "labels.youtube",
-  "labels.x",
-  "labels.discord",
-  "labels.contact",
-];
 for (const key of requiredSiteKeys) {
   if (!(key in site)) problem(`site.csv: ${key}の行がありません。`);
 }
-for (const key of [
-  "logo",
-  "hero",
-  "headline",
-  "description",
-  "contactUrl",
-  "socials.youtube",
-  "socials.x",
-  "socials.discord",
-  "labels.youtube",
-  "labels.x",
-  "labels.discord",
-  "labels.contact",
-]) {
+for (const key of nonEmptySiteKeys) {
   if (key in site && !site[key])
     problem(`site.csv: ${key}を空欄にできません。`);
 }
@@ -247,7 +254,10 @@ try {
 const transpiler = new Bun.Transpiler({ loader: "js" });
 for (const file of [
   "app-v2.js",
+  "cookie-consent.js",
+  "csv.js",
   "site-data.js",
+  "site-schema.js",
   "legal-content.js",
   "content-v2.js",
 ]) {

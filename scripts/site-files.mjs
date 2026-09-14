@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { parseCsv } from "./csv.mjs";
+import { parseCsv } from "../csv.js";
 
 export const basePageFiles = [
   "index.html",
