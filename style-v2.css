@@ -230,9 +230,9 @@ p {
   isolation: isolate;
   overflow: hidden;
   margin-top: calc(-1 * var(--header-height));
-  height: calc(100vw / 1.94 + var(--header-height));
-  min-height: 420px;
-  max-height: 850px;
+  height: clamp(440px, 38vw, 600px);
+  min-height: 440px;
+  max-height: 600px;
   padding-top: var(--header-height);
   display: grid;
   place-items: center;

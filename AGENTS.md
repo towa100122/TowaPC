@@ -39,7 +39,7 @@
 - CSVの全列、タグ、改行、複数リンク、画像、手動公開の正規手順は `data/README.md` に集約する。ルート `README.md` はサイト紹介だけを載せる。
 - 公開前に必ず `bun run format`、`bun run format:check`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` は固定済み依存関係を導入し、整形とサイト構造を検査する。リポジトリ取得はNode.js 24対応の `actions/checkout@v7` を使う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js`・`site-data.js` 内のimportを同じ番号にする。現在は `v69`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js`・`site-data.js` 内のimportを同じ番号にする。現在は `v70`。
 - `.gitignore` は依存関係、キャッシュ、出力、ログ、環境変数、OS・エディター固有ファイル、ZIPを除外する。`bun run check` は除外対象が誤ってGit追跡されていないかも検査する。
 - `.gitattributes` でテキストの改行をLFへ統一し、WindowsとGitHub間で内容と無関係な差分を作らない。画像はバイナリとして扱う。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
@@ -130,8 +130,9 @@
 - ブラウザーの警告・エラーなし。
 - 変更を公開するときは、最終検査、コミット、`main`へのpush、配布ZIP更新、公開サイト確認までを一続きで行う。
 
-## v69 完了状態（2026-09-14）
+## v70 完了状態（2026-09-14）
 
+- v70ではPC版トップのヒーロー画像を `clamp(440px, 38vw, 600px)` に変更し、横長画面でも縦へ伸びすぎないようにした。720px以下のスマートフォンは従来の高さを維持する。
 - v69では保守性監査を行い、`.gitignore`、`.gitattributes`、Git追跡検査を追加した。ブラウザーと検査で重複していたCSV解析、CSV列・タグ・色・種別の定義を共通化し、Cookie同意処理を専用モジュールへ分離し、Prettier 3.9.6と依存関係を固定した。Appearance Labとユーザー選択テーマのCSSは `appearance.css` へ分離し、未参照だったサンプル・旧ヘッダー・小型favicon画像を削除した。HTML生成はカード・ページ・設定区画ごとの関数へ分け、最長行を1091文字から161文字へ短縮した。
 - v68ではCookie同意バーとフッターの間に隙間を作らず、バーのレイアウト上の高さを正確にページ末尾へ確保するよう修正した。
 - v67ではCookie同意バーの表示中に、その実測高さ分だけページ末尾へ余白を追加し、フッター最下部まで隠れずにスクロールできるようにした。同意・拒否後は余白を解除する。

@@ -5,10 +5,10 @@ import {
   safeHttpUrl,
   safeImageSource,
   site as S,
-} from "./site-data.js?v=69";
-import { privacyContent, termsContent } from "./legal-content.js?v=69";
-import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=69";
-import { setupCookieConsent } from "./cookie-consent.js?v=69";
+} from "./site-data.js?v=70";
+import { privacyContent, termsContent } from "./legal-content.js?v=70";
+import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=70";
+import { setupCookieConsent } from "./cookie-consent.js?v=70";
 
 // 保存可能な外観設定
 const APPEARANCE_KEY = "towapc-appearance-v1";
