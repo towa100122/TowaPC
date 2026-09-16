@@ -1,5 +1,5 @@
-import { escapeHtml } from "./site-data.js?v=72";
-import { icon } from "./ui.js?v=72";
+import { escapeHtml } from "./site-data.js?v=73";
+import { icon } from "./ui.js?v=73";
 
 const STORAGE_KEY = "towapc-appearance-v1";
 
@@ -30,7 +30,14 @@ const choices = {
   theme: ["light", "dark"],
   motion: ["standard", "smooth", "snappy", "none", "custom"],
   accent: ["standard", "lavender", "mint", "peach", "custom"],
-  surface: ["standard", "material", "liquid", "paper", "monochrome"],
+  surface: [
+    "standard",
+    "material",
+    "liquid",
+    "paper",
+    "shadowless",
+    "monochrome",
+  ],
   corners: ["soft", "round", "precise"],
   density: ["comfortable", "compact"],
   headerMotion: ["slide", "fade", "none"],
@@ -280,6 +287,7 @@ function themeSettings() {
     ["material", "Material 3", "明快な面と輪郭"],
     ["liquid", "Liquid Glass", "透明感と光"],
     ["paper", "Paper", "影を抑えた紙面"],
+    ["shadowless", "Shadowless", "標準から影だけをなくす"],
     ["monochrome", "Monochrome", "線と白黒、影なし"],
   ];
   const accents = [
@@ -369,7 +377,7 @@ function importSettings() {
         <p><code>version</code>は1、設定値は<code>settings</code>の中へ書きます。記載しない項目は現在の設定を維持します。</p>
         <ul>
           <li><code>theme</code>: light / dark</li>
-          <li><code>surface</code>: standard / material / liquid / paper / monochrome</li>
+          <li><code>surface</code>: standard / material / liquid / paper / shadowless / monochrome</li>
           <li><code>accent</code>: standard / lavender / mint / peach / custom</li>
           <li><code>customColor</code>: #から始まる6桁のカラーコード</li>
           <li><code>corners</code>: soft / round / precise</li>

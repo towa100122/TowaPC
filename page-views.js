@@ -4,10 +4,10 @@ import {
   safeHttpUrl,
   safeImageSource,
   site,
-} from "./site-data.js?v=72";
-import { renderLegalMarkdown } from "./legal-markdown.js?v=72";
-import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=72";
-import { brandIcon, icon, image, textWithBreaks } from "./ui.js?v=72";
+} from "./site-data.js?v=73";
+import { renderLegalMarkdown } from "./legal-markdown.js?v=73";
+import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=73";
+import { brandIcon, icon, image, textWithBreaks } from "./ui.js?v=73";
 
 export const routes = [
   ["/", "Home"],
@@ -49,8 +49,10 @@ function productCard(product, className) {
       <span class="product-copy">
         <h3>${escapeHtml(product.name)}</h3>
         <span class="category">${escapeHtml(product.category)}</span>
-        <span class="product-description">${plainText(product.description)}</span>
-        <span class="product-bottom"><span>詳しい紹介を見る</span>${icon("right")}</span>
+        <span class="product-preview">
+          <span class="product-description">${plainText(product.description)}</span>
+          <span class="product-bottom"><span>詳細</span>${icon("popup")}</span>
+        </span>
       </span>
     </button>
     ${action}
@@ -80,7 +82,25 @@ export function productView() {
 }
 
 export function productResults(items, view) {
+  if (!items.length)
+    return '<div class="empty-state">該当する製品はありません。</div>';
   return view === "list" ? productRows(items) : productCards(items);
+}
+
+export function newsView() {
+  try {
+    return localStorage.getItem("towapc-news-view") === "list"
+      ? "list"
+      : "grid";
+  } catch {
+    return "grid";
+  }
+}
+
+export function informationResults(items, view) {
+  if (!items.length)
+    return '<div class="empty-state">該当するお知らせはありません。</div>';
+  return view === "list" ? informationRows(items) : newsCards(items);
 }
 
 function newsBadge(item) {
@@ -239,35 +259,23 @@ function products() {
 }
 
 function information() {
-  const [featured, ...remaining] = site.news;
-  const feature = featured
-    ? `<a class="information-feature floating" href="/information/${escapeHtml(featured.id)}/">
-        <div class="information-feature-art">${newsArt(featured, "information-feature-image")}</div>
-        <div class="information-feature-copy">
-          <h2>${escapeHtml(featured.title)}</h2>
-          <div class="news-meta"><time>${escapeHtml(featured.date)}</time>${newsBadge(featured)}</div>
-          <p>${plainText(featured.body)}</p>
-          <span>詳しく見る ${icon("right")}</span>
-        </div>
-      </a>`
-    : '<div class="empty-state">お知らせはまだありません。</div>';
-  const listItems = (remaining.length ? remaining : site.news)
+  const view = newsView();
+  const filters = [["all", "すべて"], ...Object.entries(newsTagLabels)]
     .map(
-      (
-        item,
-      ) => `<a class="information-side-item" href="/information/${escapeHtml(item.id)}/">
-        <h3>${escapeHtml(item.title)}</h3>
-        <div class="news-meta"><time>${escapeHtml(item.date)}</time>${newsBadge(item)}</div>
-        <span>${icon("right")}</span>
-      </a>`,
+      ([value, label]) =>
+        `<button class="filter ${value === "all" ? "active" : ""}" data-news-filter="${escapeHtml(value)}" aria-pressed="${value === "all"}">${escapeHtml(label)}</button>`,
     )
     .join("");
   return `${pageHero("Information", "TowaPCからのお知らせ")}
     <section class="section wrap">
-      <div class="information-layout">
-        ${feature}
-        <aside class="information-side-list" aria-label="お知らせ一覧">${listItems}</aside>
+      <div class="information-toolbar">
+        <div class="filters">${filters}</div>
+        <div class="view-switch" role="group" aria-label="お知らせの表示形式">
+          <button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button>
+          <button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button>
+        </div>
       </div>
+      <div id="information-results">${informationResults(site.news, view)}</div>
     </section>`;
 }
 
@@ -307,14 +315,14 @@ function about() {
         <a class="soft-button floating" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a>
       </nav>
       <section class="about-section history-section">
-        <div class="section-heading"><h2>History</h2><p>これまでの歩み</p></div>
+        <div class="section-heading"><h2>History</h2></div>
         <div class="history-timeline">${historyCards()}</div>
       </section>
       <section class="about-section origin-section">
-        <article class="article floating origin-card">
+        <div class="origin-content">
           <h2>${escapeHtml(site.about.originTitle || "名前の由来")}</h2>
           <p>${textWithBreaks(site.about.originBody || "ここに名前の由来を書きます。")}</p>
-        </article>
+        </div>
       </section>
     </section>`;
 }
@@ -343,25 +351,24 @@ function directory(kind) {
     : "TowaPCのメンバー";
   const entries = list
     .map((item, index) => {
-      const url = safeHttpUrl(item.url);
       if (cooperation) {
-        return `<article class="directory-card partner-card floating">
+        return `<button class="directory-card partner-card floating" type="button" data-partner-index="${index}" aria-label="${escapeHtml(item.name)}の詳細を表示">
           ${image(item.image, item.name, "directory-image company-logo")}
-          <div>
+          <div class="directory-copy">
             <h2>${escapeHtml(item.name)}</h2>
             <span class="category">${escapeHtml(item.role || "")}</span>
             <p>${escapeHtml(item.description || "")}</p>
-            ${url ? `<a class="text-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">Webサイト ${icon("right")}</a>` : ""}
+            <span class="directory-more">詳細 ${icon("popup")}</span>
           </div>
-        </article>`;
+        </button>`;
       }
       return `<button class="directory-card member-card floating" type="button" data-member-index="${index}" aria-label="${escapeHtml(item.name)}の詳細を表示">
         ${image(item.image, item.name, "directory-image member-image")}
-        <div>
+        <div class="directory-copy">
           <h2>${escapeHtml(item.name)}</h2>
           <span class="category">${escapeHtml(item.role || "")}</span>
           <p>${escapeHtml(item.description || "")}</p>
-          <span class="member-more">詳しく見る ${icon("right")}</span>
+          <span class="directory-more">詳細 ${icon("popup")}</span>
         </div>
       </button>`;
     })
@@ -442,14 +449,29 @@ function detail(kind, id) {
     <span class="category detail-category">${meta}</span>
     <p>${textWithBreaks(body)}</p>
     <div class="detail-actions">
-      <a class="text-link back-link" href="/information/">${icon("left")} 一覧に戻る</a>
       ${linkButtons}
+      <a class="text-link back-link" href="/information/">${icon("left")} 一覧に戻る</a>
     </div>
   </div>`;
   const content = `${image(item.image, item.title, "article-image")}${copy}`;
+  const otherNews = site.news.filter((entry) => entry.id !== id);
+  const sidebar = otherNews.length
+    ? `<aside class="article-sidebar" aria-label="ほかのお知らせ">
+        <h2>ほかのお知らせ</h2>
+        ${otherNews
+          .map(
+            (entry) => `<a href="/information/${escapeHtml(entry.id)}/">
+              <strong>${escapeHtml(entry.title)}</strong>
+              <span>${escapeHtml(entry.date)} ${newsBadge(entry)}</span>
+            </a>`,
+          )
+          .join("")}
+      </aside>`
+    : "";
   return `${pageHero("Information", "お知らせ")}
-    <section class="section wrap">
-      <article class="article floating">${content}</article>
+    <section class="section wrap detail-layout">
+      <article class="article floating information-article">${content}</article>
+      ${sidebar}
     </section>`;
 }
 
@@ -463,7 +485,7 @@ function legalPage(kind) {
   return `${pageHero(title, subtitle)}
     <section class="section wrap">
       <article class="article legal-document floating">
-        <header><h2>${subtitle}</h2></header>${content}
+        ${content}
       </article>
     </section>`;
 }
@@ -516,7 +538,7 @@ export function renderFooterContacts() {
     .filter(([, , url]) => url)
     .map(([type, label, url]) => {
       const contactIcon = type === "mail" ? icon("mail") : brandIcon(type);
-      return `<a class="footer-contact-icon" href="${escapeHtml(url)}"${externalAttributes(url)} aria-label="${label}">${contactIcon}<span>${label}</span></a>`;
+      return `<a class="footer-contact-icon footer-contact-${type}" href="${escapeHtml(url)}"${externalAttributes(url)} aria-label="${label}">${contactIcon}</a>`;
     })
     .join("");
   const additional = site.contacts

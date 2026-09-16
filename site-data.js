@@ -1,5 +1,5 @@
-import { parseCsv } from "./csv.js?v=72";
-import { dataFiles, directSiteKeys } from "./site-schema.js?v=72";
+import { parseCsv } from "./csv.js?v=73";
+import { dataFiles, directSiteKeys } from "./site-schema.js?v=73";
 
 export const site = {
   logo: "/assets/TowaPC.svg",

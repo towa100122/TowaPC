@@ -75,6 +75,7 @@ const stylesheets = [
   "styles/appearance-lab.css",
   "styles/ui-polish.css",
   "styles/features.css",
+  "styles/shadowless-theme.css",
   "styles/material-theme.css",
   "styles/monochrome-theme.css",
   "styles/easter-eggs.css",

@@ -6,27 +6,29 @@ import {
   setupAppearanceControls,
   setupAppearanceEgg,
   setupTheme,
-} from "./appearance-settings.js?v=72";
-import { setupCookieConsent } from "./cookie-consent.js?v=72";
-import { setupShredEgg } from "./easter-eggs.js?v=72";
+} from "./appearance-settings.js?v=73";
+import { setupCookieConsent } from "./cookie-consent.js?v=73";
+import { setupShredEgg } from "./easter-eggs.js?v=73";
 import {
   handleMemberDialogEscape,
   setupMemberDialogs,
-} from "./member-dialog.js?v=72";
+} from "./member-dialog.js?v=73";
 import {
+  informationResults,
+  newsView,
   productResults,
   productView,
   renderFooterContacts,
   renderFooterLinks,
   renderPage,
   routes,
-} from "./page-views.js?v=72";
+} from "./page-views.js?v=73";
 import {
   handleProjectDialogEscape,
   setupProjectDialogs,
-} from "./project-dialog.js?v=72";
-import { loadSiteData, safeImageSource, site } from "./site-data.js?v=72";
-import { icon } from "./ui.js?v=72";
+} from "./project-dialog.js?v=73";
+import { loadSiteData, safeImageSource, site } from "./site-data.js?v=73";
+import { icon } from "./ui.js?v=73";
 
 const headerRoutes = [
   ["", "Home"],
@@ -127,12 +129,55 @@ function switchProductView(button) {
   reveal();
 }
 
+function filteredNews() {
+  const filter =
+    document.querySelector("[data-news-filter].active")?.dataset.newsFilter ||
+    "all";
+  return site.news.filter((item) => filter === "all" || item.tag === filter);
+}
+
+function renderNewsResults(view = newsView()) {
+  document.getElementById("information-results").innerHTML = informationResults(
+    filteredNews(),
+    view,
+  );
+  reveal();
+}
+
+function filterNews(button) {
+  document.querySelectorAll("[data-news-filter]").forEach((candidate) => {
+    candidate.classList.toggle("active", candidate === button);
+    candidate.setAttribute("aria-pressed", String(candidate === button));
+  });
+  const view =
+    document.querySelector("[data-news-view].active")?.dataset.newsView ||
+    newsView();
+  renderNewsResults(view);
+}
+
+function switchNewsView(button) {
+  document.querySelectorAll("[data-news-view]").forEach((candidate) => {
+    candidate.classList.toggle("active", candidate === button);
+    candidate.setAttribute("aria-pressed", String(candidate === button));
+  });
+  try {
+    localStorage.setItem("towapc-news-view", button.dataset.newsView);
+  } catch {}
+  renderNewsResults(button.dataset.newsView);
+}
+
 function setupPageControls() {
   document.querySelectorAll("[data-filter]").forEach((button) => {
     button.addEventListener("click", () => filterProducts(button));
   });
   document.querySelectorAll("[data-product-view]").forEach((button) => {
     button.addEventListener("click", () => switchProductView(button));
+  });
+  document.querySelectorAll("[data-news-filter]").forEach((button) => {
+    button.addEventListener("click", () => filterNews(button));
+  });
+  document.querySelectorAll("[data-news-view]").forEach((button) => {
+    button.addEventListener("click", () => switchNewsView(button));
   });
   setupMemberDialogs();
   setupProjectDialogs();

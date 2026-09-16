@@ -1,4 +1,4 @@
-import { escapeHtml, safeImageSource } from "./site-data.js?v=72";
+import { escapeHtml, safeImageSource } from "./site-data.js?v=73";
 
 const iconNames = {
   bell: "notifications",
@@ -20,6 +20,7 @@ const iconNames = {
   header: "web_asset",
   upload: "upload_file",
   close: "close",
+  popup: "open_in_new",
 };
 
 export function icon(name) {

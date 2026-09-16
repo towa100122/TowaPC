@@ -1,0 +1,10 @@
+/* Standard colors and shapes with every decorative shadow removed */
+:root[data-surface="shadowless"] main *,
+:root[data-surface="shadowless"] .header,
+:root[data-surface="shadowless"] footer,
+:root[data-surface="shadowless"] .cookie-consent,
+:root[data-surface="shadowless"] .nav-selection,
+:root[data-surface="shadowless"] .back-top {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}

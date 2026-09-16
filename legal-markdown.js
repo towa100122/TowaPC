@@ -1,4 +1,4 @@
-import { escapeHtml } from "./site-data.js?v=72";
+import { escapeHtml } from "./site-data.js?v=73";
 
 function inline(text) {
   const pattern = /\[([^\]]+)\]\(([^)]+)\)/g;
