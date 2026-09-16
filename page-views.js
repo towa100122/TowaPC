@@ -4,10 +4,10 @@ import {
   safeHttpUrl,
   safeImageSource,
   site,
-} from "./site-data.js?v=71";
-import { renderLegalMarkdown } from "./legal-markdown.js?v=71";
-import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=71";
-import { brandIcon, icon, image, textWithBreaks } from "./ui.js?v=71";
+} from "./site-data.js?v=72";
+import { renderLegalMarkdown } from "./legal-markdown.js?v=72";
+import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=72";
+import { brandIcon, icon, image, textWithBreaks } from "./ui.js?v=72";
 
 export const routes = [
   ["/", "Home"],

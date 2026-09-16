@@ -1,4 +1,4 @@
-import { escapeHtml, safeImageSource } from "./site-data.js?v=71";
+import { escapeHtml, safeImageSource } from "./site-data.js?v=72";
 
 const iconNames = {
   bell: "notifications",

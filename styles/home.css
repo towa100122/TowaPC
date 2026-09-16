@@ -128,6 +128,9 @@
   padding: 6px 0;
   font-size: 12px;
 }
+.news-list .news-row + .news-row {
+  border-top: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+}
 .news-row time {
   flex: 0 0 72px;
   font-family: "Google Sans", sans-serif;

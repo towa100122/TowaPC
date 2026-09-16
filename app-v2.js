@@ -6,13 +6,13 @@ import {
   setupAppearanceControls,
   setupAppearanceEgg,
   setupTheme,
-} from "./appearance-settings.js?v=71";
-import { setupCookieConsent } from "./cookie-consent.js?v=71";
-import { setupShredEgg } from "./easter-eggs.js?v=71";
+} from "./appearance-settings.js?v=72";
+import { setupCookieConsent } from "./cookie-consent.js?v=72";
+import { setupShredEgg } from "./easter-eggs.js?v=72";
 import {
   handleMemberDialogEscape,
   setupMemberDialogs,
-} from "./member-dialog.js?v=71";
+} from "./member-dialog.js?v=72";
 import {
   productResults,
   productView,
@@ -20,13 +20,13 @@ import {
   renderFooterLinks,
   renderPage,
   routes,
-} from "./page-views.js?v=71";
+} from "./page-views.js?v=72";
 import {
   handleProjectDialogEscape,
   setupProjectDialogs,
-} from "./project-dialog.js?v=71";
-import { loadSiteData, safeImageSource, site } from "./site-data.js?v=71";
-import { icon } from "./ui.js?v=71";
+} from "./project-dialog.js?v=72";
+import { loadSiteData, safeImageSource, site } from "./site-data.js?v=72";
+import { icon } from "./ui.js?v=72";
 
 const headerRoutes = [
   ["", "Home"],

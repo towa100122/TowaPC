@@ -1,5 +1,5 @@
-import { escapeHtml } from "./site-data.js?v=71";
-import { icon } from "./ui.js?v=71";
+import { escapeHtml } from "./site-data.js?v=72";
+import { icon } from "./ui.js?v=72";
 
 const STORAGE_KEY = "towapc-appearance-v1";
 

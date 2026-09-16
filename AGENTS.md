@@ -41,7 +41,7 @@
 - CSVの全列、タグ、改行、複数リンク、画像、手動公開の正規手順は `data/README.md` に集約する。ルート `README.md` はサイト紹介だけを載せる。
 - 公開前に必ず `bun run format`、`bun run format:check`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` は固定済み依存関係を導入し、整形とサイト構造を検査する。リポジトリ取得はNode.js 24対応の `actions/checkout@v7` を使う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、各ES Module内のimportを同じ番号にする。現在は `v71`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、各ES Module内のimportを同じ番号にする。現在は `v72`。
 - `.gitignore` は依存関係、キャッシュ、出力、ログ、環境変数、OS・エディター固有ファイル、ZIPを除外する。`bun run check` は除外対象が誤ってGit追跡されていないかも検査する。
 - `.gitattributes` でテキストの改行をLFへ統一し、WindowsとGitHub間で内容と無関係な差分を作らない。画像はバイナリとして扱う。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。

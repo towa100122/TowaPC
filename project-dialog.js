@@ -3,8 +3,8 @@ import {
   safeHttpUrl,
   safeImageSource,
   site,
-} from "./site-data.js?v=71";
-import { icon, textWithBreaks } from "./ui.js?v=71";
+} from "./site-data.js?v=72";
+import { icon, textWithBreaks } from "./ui.js?v=72";
 
 let previousFocus;
 
