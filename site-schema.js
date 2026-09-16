@@ -4,6 +4,8 @@ export const dataFiles = [
   ["news", "/data/news.csv"],
   ["partners", "/data/partners.csv"],
   ["members", "/data/members.csv"],
+  ["history", "/data/history.csv"],
+  ["contacts", "/data/contacts.csv"],
 ];
 
 export const csvSchemas = {
@@ -21,6 +23,15 @@ export const csvSchemas = {
   "news.csv": ["id", "date", "tag", "title", "body", "image", "links"],
   "partners.csv": ["name", "role", "description", "image", "url"],
   "members.csv": ["name", "role", "description", "image", "url"],
+  "history.csv": [
+    "date",
+    "title",
+    "description",
+    "colored",
+    "color",
+    "textColor",
+  ],
+  "contacts.csv": ["label", "url", "description"],
 };
 
 export const requiredFields = {
@@ -28,6 +39,8 @@ export const requiredFields = {
   "news.csv": ["id", "date", "tag", "title", "body"],
   "partners.csv": ["name", "role", "description"],
   "members.csv": ["name", "role", "description"],
+  "history.csv": ["date", "title", "description", "colored", "textColor"],
+  "contacts.csv": ["label", "url"],
 };
 
 export const productTypeLabels = {
@@ -41,7 +54,7 @@ export const productColors = ["pink", "lavender", "mint", "cream", "peach"];
 
 export const newsTagLabels = {
   new: "NEW",
-  important: "重要",
+  important: "Important",
   release: "リリース",
   update: "更新",
 };
@@ -64,6 +77,8 @@ export const requiredSiteKeys = [
   "labels.x",
   "labels.discord",
   "labels.contact",
+  "about.originTitle",
+  "about.originBody",
 ];
 
 export const nonEmptySiteKeys = requiredSiteKeys.filter(

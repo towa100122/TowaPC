@@ -1,0 +1,531 @@
+import {
+  escapeHtml,
+  safeContactUrl,
+  safeHttpUrl,
+  safeImageSource,
+  site,
+} from "./site-data.js?v=71";
+import { renderLegalMarkdown } from "./legal-markdown.js?v=71";
+import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=71";
+import { brandIcon, icon, image, textWithBreaks } from "./ui.js?v=71";
+
+export const routes = [
+  ["/", "Home"],
+  ["/product", "Product"],
+  ["/information", "Information"],
+  ["/about", "About"],
+  ["/cooperation", "Cooperation"],
+  ["/members", "Members"],
+  ["/contact", "Contact"],
+  ["/join", "Join"],
+];
+
+function plainText(value) {
+  return escapeHtml(
+    String(value ?? "")
+      .replace(/\\n/g, " ")
+      .replace(/\s+/g, " "),
+  );
+}
+
+function externalAttributes(url) {
+  return /^https?:/i.test(url) ? ' target="_blank" rel="noopener"' : "";
+}
+
+function productArt(product) {
+  return `<div class="product-art ${escapeHtml(product.color)}">
+    ${image(product.image, product.name, "product-image")}
+  </div>`;
+}
+
+function productCard(product, className) {
+  const destination = parseRelatedLinks(product.links)[0]?.url;
+  const action = destination
+    ? `<a class="project-move" href="${escapeHtml(destination)}" target="_blank" rel="noopener">プロジェクトに移動 ${icon("right")}</a>`
+    : `<span class="project-move is-disabled">リンク準備中</span>`;
+  return `<article class="${className} floating">
+    <button class="product-details-trigger" type="button" data-project-id="${escapeHtml(product.id)}" aria-label="${escapeHtml(product.name)}の詳細を表示">
+      ${productArt(product)}
+      <span class="product-copy">
+        <h3>${escapeHtml(product.name)}</h3>
+        <span class="category">${escapeHtml(product.category)}</span>
+        <span class="product-description">${plainText(product.description)}</span>
+        <span class="product-bottom"><span>詳しい紹介を見る</span>${icon("right")}</span>
+      </span>
+    </button>
+    ${action}
+  </article>`;
+}
+
+function productCards(items) {
+  return `<div class="grid">${items
+    .map((item) => productCard(item, "product"))
+    .join("")}</div>`;
+}
+
+function productRows(items) {
+  return `<div class="product-list">${items
+    .map((item) => productCard(item, "product-row"))
+    .join("")}</div>`;
+}
+
+export function productView() {
+  try {
+    return localStorage.getItem("towapc-product-view") === "list"
+      ? "list"
+      : "grid";
+  } catch {
+    return "grid";
+  }
+}
+
+export function productResults(items, view) {
+  return view === "list" ? productRows(items) : productCards(items);
+}
+
+function newsBadge(item) {
+  const tag = String(item.tag || "").toLowerCase();
+  return `<span class="badge ${escapeHtml(tag)}">${escapeHtml(newsTagLabels[tag] || item.tag)}</span>`;
+}
+
+function parseRelatedLinks(value) {
+  return String(value || "")
+    .replace(/\\n/g, "\n")
+    .split(/;;|\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const separator = entry.indexOf("|");
+      if (separator < 1) return null;
+      const label = entry.slice(0, separator).trim();
+      const url = safeHttpUrl(entry.slice(separator + 1).trim());
+      return label && url ? { label, url } : null;
+    })
+    .filter(Boolean);
+}
+
+function compactNewsRows(items) {
+  return items
+    .map(
+      (item) =>
+        `<a class="news-row" href="/information/${escapeHtml(item.id)}/">
+          <span class="news-title">${escapeHtml(item.title)}</span>
+          <span class="news-meta"><time>${escapeHtml(item.date)}</time>${newsBadge(item)}</span>
+          <span class="row-actions">
+            ${image(item.image, "", "news-thumb")}
+            <span class="arrow">${icon("right")}</span>
+          </span>
+        </a>`,
+    )
+    .join("");
+}
+
+function newsArt(item, imageClass) {
+  return item.image
+    ? image(item.image, "", imageClass)
+    : `<span>${icon("bell")}</span>`;
+}
+
+export function informationRows(items) {
+  return `<div class="information-list">${items
+    .map(
+      (item) =>
+        `<a class="information-row floating" href="/information/${escapeHtml(item.id)}/">
+          <div class="information-row-art">${newsArt(item, "information-row-image")}</div>
+          <div class="information-row-copy">
+            <h2>${escapeHtml(item.title)}</h2>
+            <div class="news-meta"><time>${escapeHtml(item.date)}</time>${newsBadge(item)}</div>
+            <p>${plainText(item.body)}</p>
+            <span class="information-row-more">詳しく見る ${icon("right")}</span>
+          </div>
+        </a>`,
+    )
+    .join("")}</div>`;
+}
+
+export function newsCards(items) {
+  const cards = items
+    .map(
+      (
+        item,
+      ) => `<a class="news-card floating" href="/information/${escapeHtml(item.id)}/">
+        <div class="news-card-art">${newsArt(item, "news-card-image")}</div>
+        <div class="news-card-copy">
+          <h2>${escapeHtml(item.title)}</h2>
+          <div class="news-meta"><time>${escapeHtml(item.date)}</time>${newsBadge(item)}</div>
+          <p>${plainText(item.body)}</p>
+          <span class="news-card-more">詳しく見る ${icon("right")}</span>
+        </div>
+      </a>`,
+    )
+    .join("");
+  return `<div class="news-grid">${cards}</div>`;
+}
+
+export function pageHero(title, subtitle, extraClass = "") {
+  return `<section class="page-hero ${extraClass}">
+    <div class="wrap">
+      <div class="breadcrumbs"><a href="/">Home</a> / ${escapeHtml(title)}</div>
+      <h1>${escapeHtml(title)}</h1>
+      <p>${escapeHtml(subtitle)}</p>
+    </div>
+  </section>`;
+}
+
+function home() {
+  const quickLinks = [
+    ["product", "Product", "私たちの製品の紹介", "lavender", "grid"],
+    ["about", "About", "TowaPCについて", "mint", "about"],
+    ["contact", "Contact", "お問い合わせ", "pink", "mail"],
+    ["join", "Join", "私たちの一員になる", "cream", "join"],
+  ]
+    .map(
+      ([path, label, subtitle, color, type]) =>
+        `<a href="/${path}/" class="quick-link floating ${color}">
+          ${icon(type)}
+          <div><strong>${label}</strong><small>${subtitle}</small></div>
+          <span class="arrow">${icon("right")}</span>
+        </a>`,
+    )
+    .join("");
+  const heroSource = safeImageSource(site.hero);
+  return `<section class="hero">
+    ${heroSource ? `<img class="hero-background" src="${escapeHtml(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}
+    <h1>${escapeHtml(site.headline)}</h1>
+  </section>
+  <div class="wrap">
+    <section class="intro floating">
+      <h2>What’s “TowaPC”?</h2>
+      <p>${escapeHtml(site.description)}</p>
+      <a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a>
+    </section>
+    <section class="news-strip floating">
+      <div class="news-heading">
+        <a class="news-label" href="/information/">${icon("bell")}Information</a>
+        <a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a>
+      </div>
+      <div class="news-list">${compactNewsRows(site.news)}</div>
+    </section>
+    <section class="quick-links">${quickLinks}</section>
+    <section class="section">
+      <div class="section-heading">
+        <h2>Our products</h2>
+        <a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a>
+      </div>
+      ${productCards(site.products)}
+    </section>
+  </div>`;
+}
+
+function products() {
+  const view = productView();
+  const filters = [["all", "すべて"], ...Object.entries(productTypeLabels)]
+    .map(
+      ([value, label]) =>
+        `<button class="filter ${value === "all" ? "active" : ""}" data-filter="${value}" aria-pressed="${value === "all"}">${label}</button>`,
+    )
+    .join("");
+  return `${pageHero("Product", "私たちの製品の紹介")}
+    <section class="section wrap">
+      <div class="product-toolbar">
+        <div class="filters">${filters}</div>
+        <div class="view-switch" role="group" aria-label="製品の表示形式">
+          <button class="view-button ${view === "grid" ? "active" : ""}" data-product-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button>
+          <button class="view-button ${view === "list" ? "active" : ""}" data-product-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button>
+        </div>
+      </div>
+      <div id="product-results">${productResults(site.products, view)}</div>
+    </section>`;
+}
+
+function information() {
+  const [featured, ...remaining] = site.news;
+  const feature = featured
+    ? `<a class="information-feature floating" href="/information/${escapeHtml(featured.id)}/">
+        <div class="information-feature-art">${newsArt(featured, "information-feature-image")}</div>
+        <div class="information-feature-copy">
+          <h2>${escapeHtml(featured.title)}</h2>
+          <div class="news-meta"><time>${escapeHtml(featured.date)}</time>${newsBadge(featured)}</div>
+          <p>${plainText(featured.body)}</p>
+          <span>詳しく見る ${icon("right")}</span>
+        </div>
+      </a>`
+    : '<div class="empty-state">お知らせはまだありません。</div>';
+  const listItems = (remaining.length ? remaining : site.news)
+    .map(
+      (
+        item,
+      ) => `<a class="information-side-item" href="/information/${escapeHtml(item.id)}/">
+        <h3>${escapeHtml(item.title)}</h3>
+        <div class="news-meta"><time>${escapeHtml(item.date)}</time>${newsBadge(item)}</div>
+        <span>${icon("right")}</span>
+      </a>`,
+    )
+    .join("");
+  return `${pageHero("Information", "TowaPCからのお知らせ")}
+    <section class="section wrap">
+      <div class="information-layout">
+        ${feature}
+        <aside class="information-side-list" aria-label="お知らせ一覧">${listItems}</aside>
+      </div>
+    </section>`;
+}
+
+function historyCards() {
+  return site.history
+    .map((event) => {
+      const colored =
+        event.colored === "y" && /^#[0-9a-f]{6}$/i.test(event.color);
+      const textColor = event.textColor === "white" ? "#fff" : "#171916";
+      const style = colored
+        ? ` style="--history-background:${escapeHtml(event.color)};--history-text:${textColor}"`
+        : "";
+      return `<article class="history-card floating${colored ? " is-colored" : ""}"${style}>
+        <time>${textWithBreaks(event.date)}</time>
+        <div><h3>${escapeHtml(event.title)}</h3><p>${textWithBreaks(event.description)}</p></div>
+      </article>`;
+    })
+    .join("");
+}
+
+function about() {
+  const logo = safeImageSource(site.logo) || "/assets/TowaPC.svg";
+  return `${pageHero("About", "TowaPCについて")}
+    <section class="section wrap about-page">
+      <div class="article floating about-summary">
+        <div class="about-heading">
+          <button class="about-logo-trigger" type="button" aria-label="TowaPCロゴ" data-animation-trigger>
+            <img class="about-logo" src="${escapeHtml(logo)}" alt="TowaPC">
+          </button>
+        </div>
+        <p>${escapeHtml(site.description)}</p>
+        <p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p>
+      </div>
+      <nav class="about-links about-actions" aria-label="TowaPCについてのリンク">
+        <a class="soft-button floating" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a>
+        <a class="soft-button floating" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a>
+        <a class="soft-button floating" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a>
+      </nav>
+      <section class="about-section history-section">
+        <div class="section-heading"><h2>History</h2><p>これまでの歩み</p></div>
+        <div class="history-timeline">${historyCards()}</div>
+      </section>
+      <section class="about-section origin-section">
+        <article class="article floating origin-card">
+          <h2>${escapeHtml(site.about.originTitle || "名前の由来")}</h2>
+          <p>${textWithBreaks(site.about.originBody || "ここに名前の由来を書きます。")}</p>
+        </article>
+      </section>
+    </section>`;
+}
+
+function join() {
+  const url = safeHttpUrl(site.joinUrl);
+  const action = url
+    ? `<a class="cta" href="${escapeHtml(url)}" target="_blank" rel="noopener">Discordサーバーに参加する ${icon("right")}</a>`
+    : '<span class="status">参加リンクは、ただいま準備中です</span>';
+  return `${pageHero("Join", "私たちの一員になる")}
+    <section class="section wrap join-section">
+      <div class="join-box floating">
+        <h2>TowaPCのメンバーになる</h2>
+        <p>TowaPCのメンバーになるには、以下のリンクから私たちのDiscordサーバーに参加してください。</p>
+        ${action}
+      </div>
+    </section>`;
+}
+
+function directory(kind) {
+  const cooperation = kind === "cooperation";
+  const list = cooperation ? site.partners : site.members;
+  const title = cooperation ? "Cooperation" : "Members";
+  const subtitle = cooperation
+    ? "協力関係がある団体・個人"
+    : "TowaPCのメンバー";
+  const entries = list
+    .map((item, index) => {
+      const url = safeHttpUrl(item.url);
+      if (cooperation) {
+        return `<article class="directory-card partner-card floating">
+          ${image(item.image, item.name, "directory-image company-logo")}
+          <div>
+            <h2>${escapeHtml(item.name)}</h2>
+            <span class="category">${escapeHtml(item.role || "")}</span>
+            <p>${escapeHtml(item.description || "")}</p>
+            ${url ? `<a class="text-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">Webサイト ${icon("right")}</a>` : ""}
+          </div>
+        </article>`;
+      }
+      return `<button class="directory-card member-card floating" type="button" data-member-index="${index}" aria-label="${escapeHtml(item.name)}の詳細を表示">
+        ${image(item.image, item.name, "directory-image member-image")}
+        <div>
+          <h2>${escapeHtml(item.name)}</h2>
+          <span class="category">${escapeHtml(item.role || "")}</span>
+          <p>${escapeHtml(item.description || "")}</p>
+          <span class="member-more">詳しく見る ${icon("right")}</span>
+        </div>
+      </button>`;
+    })
+    .join("");
+  const emptyState = `<div class="empty-state floating">
+    ${icon(cooperation ? "link" : "people")}
+    <p>${cooperation ? "掲載する団体・個人" : "メンバー情報"}を準備しています。</p>
+    <small>dataフォルダーのCSVから追加できます。</small>
+  </div>`;
+  return `${pageHero(title, subtitle)}
+    <section class="section wrap">
+      <div class="directory-grid ${cooperation ? "partner-grid" : "member-grid"}">${entries || emptyState}</div>
+    </section>`;
+}
+
+function coreContactCards() {
+  const contacts = [
+    ["youtube", "YouTube", site.socials.youtube, site.labels.youtube],
+    ["x", "X", site.socials.x, site.labels.x],
+    ["discord", "Discord", site.socials.discord, site.labels.discord],
+    ["mail", "Email", site.contactUrl, site.labels.contact],
+  ];
+  return contacts
+    .map(([type, label, value, detail]) => {
+      const url = type === "mail" ? safeContactUrl(value) : safeHttpUrl(value);
+      const contactIcon = type === "mail" ? icon(type) : brandIcon(type);
+      if (!url) {
+        return `<button id="${type}" class="contact-card floating pending" type="button" aria-label="${label}：URL準備中">
+          ${contactIcon}<div><h2>${label}</h2><p>URL準備中</p></div>${icon("right")}
+        </button>`;
+      }
+      return `<a id="${type}" class="contact-card floating" href="${escapeHtml(url)}"${externalAttributes(url)}>
+        ${contactIcon}<div><h2>${label}</h2><p>${escapeHtml(detail || "公式ページ")}</p></div>${icon("right")}
+      </a>`;
+    })
+    .join("");
+}
+
+function additionalContactCards() {
+  return site.contacts
+    .map((contact) => {
+      const url = safeContactUrl(contact.url);
+      if (!url) return "";
+      return `<a class="contact-card contact-card-extra floating" href="${escapeHtml(url)}"${externalAttributes(url)}>
+        ${icon("link")}
+        <div><h2>${escapeHtml(contact.label)}</h2><p>${escapeHtml(contact.description || contact.url)}</p></div>
+        ${icon("right")}
+      </a>`;
+    })
+    .join("");
+}
+
+function contact() {
+  return `${pageHero("Contact", "お問い合わせ・公式リンク")}
+    <section class="section wrap">
+      <div class="contact-grid">${coreContactCards()}${additionalContactCards()}</div>
+    </section>`;
+}
+
+function detail(kind, id) {
+  if (kind !== "information") return missing();
+  const item = site.news.find((entry) => entry.id === id);
+  if (!item) return missing();
+  const links = parseRelatedLinks(item.links);
+  const linkButtons = links.length
+    ? `<div class="related-links">${links
+        .map(
+          ({ label, url }) =>
+            `<a class="cta item-url" href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(label)} ${icon("right")}</a>`,
+        )
+        .join("")}</div>`
+    : "";
+  const title = item.title;
+  const body = item.body;
+  const meta = `${escapeHtml(item.date)} · ${newsBadge(item)}`;
+  const copy = `<div class="detail-copy">
+    <h2>${escapeHtml(title)}</h2>
+    <span class="category detail-category">${meta}</span>
+    <p>${textWithBreaks(body)}</p>
+    <div class="detail-actions">
+      <a class="text-link back-link" href="/information/">${icon("left")} 一覧に戻る</a>
+      ${linkButtons}
+    </div>
+  </div>`;
+  const content = `${image(item.image, item.title, "article-image")}${copy}`;
+  return `${pageHero("Information", "お知らせ")}
+    <section class="section wrap">
+      <article class="article floating">${content}</article>
+    </section>`;
+}
+
+function legalPage(kind) {
+  const privacy = kind === "privacy";
+  const title = privacy ? "Privacy Policy" : "Terms of Service";
+  const subtitle = privacy ? "プライバシーポリシー" : "利用規約";
+  const content = renderLegalMarkdown(
+    privacy ? site.legal.privacy : site.legal.terms,
+  );
+  return `${pageHero(title, subtitle)}
+    <section class="section wrap">
+      <article class="article legal-document floating">
+        <header><h2>${subtitle}</h2></header>${content}
+      </article>
+    </section>`;
+}
+
+export function missing() {
+  return `<section class="section wrap not-found">
+    <div class="not-found-card floating">
+      <button class="not-found-number" type="button" aria-label="404" data-shred-trigger>404</button>
+      <p class="not-found-label">Not found</p>
+      <p class="not-found-copy">お探しのページは迷子かもしれません。</p>
+    </div>
+  </section>`;
+}
+
+export function renderPage(route, id, appearanceView) {
+  if (id) return detail(route, id);
+  const pages = {
+    "": home,
+    product: products,
+    information,
+    about,
+    appearance: appearanceView,
+    join,
+    cooperation: () => directory("cooperation"),
+    members: () => directory("members"),
+    contact,
+    terms: () => legalPage("terms"),
+    privacy: () => legalPage("privacy"),
+  };
+  return (pages[route] || missing)();
+}
+
+export function renderFooterLinks() {
+  return routes
+    .filter(([path]) => path !== "/contact")
+    .map(
+      ([path, title]) =>
+        `<a href="${path === "/" ? "/" : `${path}/`}">${title}</a>`,
+    )
+    .join("");
+}
+
+export function renderFooterContacts() {
+  const core = [
+    ["youtube", "YouTube", safeHttpUrl(site.socials.youtube)],
+    ["x", "X", safeHttpUrl(site.socials.x)],
+    ["discord", "Discord", safeHttpUrl(site.socials.discord)],
+    ["mail", "Email", safeContactUrl(site.contactUrl) || "/contact/"],
+  ]
+    .filter(([, , url]) => url)
+    .map(([type, label, url]) => {
+      const contactIcon = type === "mail" ? icon("mail") : brandIcon(type);
+      return `<a class="footer-contact-icon" href="${escapeHtml(url)}"${externalAttributes(url)} aria-label="${label}">${contactIcon}<span>${label}</span></a>`;
+    })
+    .join("");
+  const additional = site.contacts
+    .map((contact) => {
+      const url = safeContactUrl(contact.url);
+      return url
+        ? `<a href="${escapeHtml(url)}"${externalAttributes(url)}>${escapeHtml(contact.label)}</a>`
+        : "";
+    })
+    .join("");
+  return `<div class="footer-contact-icons">${core}</div>${additional}`;
+}

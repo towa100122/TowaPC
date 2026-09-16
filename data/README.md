@@ -31,7 +31,7 @@ TowaPC.comの文章や掲載項目は、この `data` フォルダー内のCSV�
 | CSVへ書く値 | サイトでの表示 | 用途 |
 | --- | --- | --- |
 | `new` | NEW | 新しい告知 |
-| `important` | 重要 | 特に確認してほしい告知 |
+| `important` | Important | 特に確認してほしい告知 |
 | `release` | リリース | 公開・提供開始 |
 | `update` | 更新 | 更新・変更のお知らせ |
 
@@ -53,7 +53,7 @@ privacy-policy-added,2026.09.13,new,利用規約などを追加しました,"1�
 | `description` | 製品説明 | 必須。`\n` と `\n\n` で改行可能 |
 | `color` | 画像がない部分などの背景色 | `pink`、`lavender`、`mint`、`cream`、`peach` のいずれか |
 | `image` | 製品画像 | `/assets/product-example.png`。不要なら空欄 |
-| `links` | 詳細下部のリンク | `ボタン名|URL`。複数指定も可能 |
+| `links` | プロジェクトの移動先 | `ボタン名|URL`。先頭のURLを「プロジェクトに移動」ボタンに使用 |
 
 入力例:
 
@@ -97,6 +97,57 @@ example-app,Example App,アプリケーション,app,"製品の説明です。\n
 | `labels.x` | Contactに表示するX名 |
 | `labels.discord` | Contactに表示するDiscord名 |
 | `labels.contact` | Contactに表示する連絡先 |
+| `about.originTitle` | Aboutの「名前の由来」セクション見出し |
+| `about.originBody` | 名前の由来の本文。`\n`で改行可能 |
+
+## Aboutの歴史を編集する `history.csv`
+
+1行が歴史セクションのミニカード1枚になります。行の順番が、そのまま上からの表示順です。
+
+| 列 | 内容 | 入力例・規則 |
+| --- | --- | --- |
+| `date` | 日付・年代 | `2024年\n4月1日`。`\n`で改行可能 |
+| `title` | 出来事の見出し | 必須 |
+| `description` | 詳細 | 必須。`\n`で改行可能 |
+| `colored` | カードを着色するか | `y` または `n` |
+| `color` | 背景色 | `colored` が `y` の場合だけ、`#ffff99`のような6桁カラーコードを指定 |
+| `textColor` | 文字色 | `black` または `white` |
+
+入力例:
+
+```csv
+date,title,description,colored,color,textColor
+2024年\n4月1日,TowaPC始動,ここに出来事の詳細を書きます。,y,#ffff99,black
+2025年,新しい出来事,通常の白いカードとして表示します。,n,,black
+```
+
+## Contactへリンクを追加する `contacts.csv`
+
+YouTube、X、Discord、Emailは `site.csv` で管理します。それ以外のリンクは `contacts.csv` へ追加します。Contactページではカード、フッターでは通常の文字リンクとして表示されます。
+
+| 列 | 内容 | 入力例・規則 |
+| --- | --- | --- |
+| `label` | リンク名 | 必須 |
+| `url` | リンク先 | `https://`、`http://`、`mailto:`のいずれか |
+| `description` | Contactカードの補足 | 空欄ならURLを表示 |
+
+入力例:
+
+```csv
+label,url,description
+GitHub,https://github.com/example,開発中のプロジェクト
+```
+
+## 利用規約とプライバシーポリシーを編集する
+
+- 利用規約は `terms.md`、プライバシーポリシーは `privacy.md` を編集します。
+- 普通の文章は、そのまま1行に書きます。段落を分ける場所には空行を入れます。
+- 見出しは行の先頭へ `## ` を付けます。例: `## 禁止事項`
+- 箇条書きは行の先頭へ `- ` を付けます。
+- リンクは `[表示名](URL)` と書きます。例: `[Contactページ](/contact/)`
+- 文末の `---` より下は制定日、最終更新日、団体名です。団体名の `**TowaPC**` は太字として表示されます。
+
+本文を変更するときは、元の段落や意味を意図せず変えていないか差分で確認します。ページのHTMLやJavaScriptを編集する必要はありません。
 
 ## 協力関係を編集する `partners.csv`
 
@@ -117,6 +168,8 @@ example-app,Example App,アプリケーション,app,"製品の説明です。\n
 | `description` | 紹介文 |
 | `image` | `/assets/` から始まる正方形画像 |
 | `url` | 紹介先。不要なら空欄 |
+
+メンバー一覧では説明が3行を超えると省略されます。カードを押すと、画像と全文を載せた詳細カードが開きます。
 
 ## 画像を追加する
 
@@ -144,9 +197,9 @@ git status
 
 ### 2. CSVと画像を編集する
 
-この `data` フォルダーのCSVを編集します。画像が必要なら `assets` フォルダーへ追加します。
+この `data` フォルダーのCSVや規約のMarkdownを編集します。画像が必要なら `assets` フォルダーへ追加します。
 
-製品やお知らせの `id` を追加・変更・削除した場合も、次の手順で詳細ページが自動生成されます。`product` や `information` 内のHTMLを直接作る必要はありません。
+お知らせの `id` を追加・変更・削除すると、次の手順で詳細ページが自動生成されます。`information` 内のHTMLを直接作る必要はありません。製品は詳細ページを生成せず、一覧のカードを押すと詳しい紹介がポップアップで開きます。
 
 ### 3. 表示用ページを生成して検査する
 
@@ -197,12 +250,16 @@ push後、GitHub Actionsの検査とPages公開が完了するまで待ち、[ht
 | `csv.js` | ブラウザーと検査で共用するCSV解析 |
 | `site-schema.js` | CSVの列、必須項目、タグ、製品分類、色の共通定義 |
 | `site-data.js` | CSVの読み込みと安全なURL・画像・文字列処理 |
-| `app-v2.js` | ページ本文の組み立てと画面操作 |
+| `app-v2.js` | 画面遷移、ナビゲーション、各機能の起動 |
+| `page-views.js` | Home、About、Contactなどのページ本文 |
+| `appearance-settings.js` | Appearance Lab、テーマ保存、外部テーマ読込 |
+| `member-dialog.js` | メンバー詳細カード |
+| `easter-eggs.js` | 404シュレッダー |
+| `ui.js` | アイコン、画像、改行表示の共通部品 |
 | `cookie-consent.js` | Cookie同意表示とアクセス解析の許可・拒否 |
-| `style-v2.css` | 通常ページの基礎デザイン |
-| `appearance.css` | Appearance Labと選択テーマによる上書き |
+| `styles/*.css` | 基礎、各ページ、レスポンシブ、テーマごとに分けたデザイン |
 | `templates/page.html` | 全ページ共通のHTML |
 | `scripts/sync-pages.mjs` | 共通HTMLから各ページを生成 |
 | `scripts/check-site.mjs` | CSV、画像、固定表示資産、リンク、生成ページ、JavaScript、Git管理対象を検査 |
 
-データの流れは `data/*.csv` → `site-data.js` → `app-v2.js` → ブラウザー表示です。ページの器は `templates/page.html` → `scripts/sync-pages.mjs` → 各 `index.html` の順で生成されます。CSV仕様を増やす場合は `site-schema.js` を起点に変更し、表示、CSS、`data/README.md` の入力規則も同じ変更内で更新します。
+データの流れは `data/*.csv` → `site-data.js` → `page-views.js` → `app-v2.js` → ブラウザー表示です。ページの器は `templates/page.html` → `scripts/sync-pages.mjs` → 各 `index.html` の順で生成されます。CSV仕様を増やす場合は `site-schema.js` を起点に変更し、表示、CSS、`data/README.md` の入力規則も同じ変更内で更新します。

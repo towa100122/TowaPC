@@ -1,1166 +1,163 @@
 import {
-  escapeHtml as E,
-  loadSiteData,
-  safeContactUrl,
-  safeHttpUrl,
-  safeImageSource,
-  site as S,
-} from "./site-data.js?v=70";
-import { privacyContent, termsContent } from "./legal-content.js?v=70";
-import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=70";
-import { setupCookieConsent } from "./cookie-consent.js?v=70";
+  appearanceSettings,
+  applyAppearance,
+  disableAnimationMode,
+  renderAppearanceLab,
+  setupAppearanceControls,
+  setupAppearanceEgg,
+  setupTheme,
+} from "./appearance-settings.js?v=71";
+import { setupCookieConsent } from "./cookie-consent.js?v=71";
+import { setupShredEgg } from "./easter-eggs.js?v=71";
+import {
+  handleMemberDialogEscape,
+  setupMemberDialogs,
+} from "./member-dialog.js?v=71";
+import {
+  productResults,
+  productView,
+  renderFooterContacts,
+  renderFooterLinks,
+  renderPage,
+  routes,
+} from "./page-views.js?v=71";
+import {
+  handleProjectDialogEscape,
+  setupProjectDialogs,
+} from "./project-dialog.js?v=71";
+import { loadSiteData, safeImageSource, site } from "./site-data.js?v=71";
+import { icon } from "./ui.js?v=71";
 
-// 保存可能な外観設定
-const APPEARANCE_KEY = "towapc-appearance-v1";
-const appearanceDefaults = {
-  theme: "light",
-  themePinned: false,
-  motion: "standard",
-  accent: "standard",
-  customColor: "#ffff99",
-  surface: "standard",
-  corners: "soft",
-  density: "comfortable",
-  glass: true,
-  animationMode: false,
-  duration: 520,
-  stagger: 42,
-  travel: 42,
-  blur: 8,
-  startScale: 965,
-  uiScale: 100,
-  headerTransparency: 42,
-  headerBlur: 14,
-  headerMotion: "slide",
-  headerDuration: 480,
-};
-const appearanceOptions = {
-  theme: ["light", "dark"],
-  motion: ["standard", "smooth", "snappy", "none", "custom"],
-  accent: ["standard", "lavender", "mint", "peach", "custom"],
-  surface: ["standard", "material", "liquid", "paper"],
-  corners: ["soft", "round", "precise"],
-  density: ["comfortable", "compact"],
-  headerMotion: ["slide", "fade", "none"],
-};
-function loadAppearance() {
-  try {
-    const stored = JSON.parse(localStorage.getItem(APPEARANCE_KEY) || "{}");
-    const settings = { ...appearanceDefaults };
-    Object.entries(appearanceOptions).forEach(([key, values]) => {
-      if (values.includes(stored[key])) settings[key] = stored[key];
-    });
-    if (typeof stored.glass === "boolean") settings.glass = stored.glass;
-    if (typeof stored.themePinned === "boolean")
-      settings.themePinned = stored.themePinned;
-    if (typeof stored.animationMode === "boolean")
-      settings.animationMode = stored.animationMode;
-    const ranges = {
-      duration: [200, 1200],
-      stagger: [0, 120],
-      travel: [0, 90],
-      blur: [0, 18],
-      startScale: [880, 1000],
-      uiScale: [90, 110],
-      headerTransparency: [0, 80],
-      headerBlur: [0, 30],
-      headerDuration: [200, 1200],
-    };
-    Object.entries(ranges).forEach(([key, [minimum, maximum]]) => {
-      const value = Number(stored[key]);
-      if (Number.isFinite(value))
-        settings[key] = Math.min(maximum, Math.max(minimum, value));
-    });
-    if (/^#[0-9a-f]{6}$/i.test(stored.customColor || ""))
-      settings.customColor = stored.customColor;
-    return settings;
-  } catch {
-    return { ...appearanceDefaults };
-  }
-}
-let appearanceSettings = loadAppearance();
-function saveAppearance() {
-  try {
-    localStorage.setItem(APPEARANCE_KEY, JSON.stringify(appearanceSettings));
-  } catch {}
-}
-function resolvedTheme() {
-  if (appearanceSettings.themePinned) return appearanceSettings.theme;
-  return matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light";
-}
-function applyAppearance() {
-  const root = document.documentElement;
-  root.dataset.theme = resolvedTheme();
-  root.dataset.themePinned = appearanceSettings.themePinned ? "on" : "off";
-  root.dataset.motion = appearanceSettings.motion;
-  root.dataset.accent = appearanceSettings.accent;
-  root.dataset.surface = appearanceSettings.surface;
-  root.dataset.corners = appearanceSettings.corners;
-  root.dataset.density = appearanceSettings.density;
-  root.dataset.glass = appearanceSettings.glass ? "on" : "off";
-  root.dataset.headerMotion = appearanceSettings.headerMotion;
-  root.style.setProperty("--custom-accent", appearanceSettings.customColor);
-  root.style.setProperty(
-    "--header-opacity",
-    `${100 - appearanceSettings.headerTransparency}%`,
-  );
-  root.style.setProperty("--header-blur", `${appearanceSettings.headerBlur}px`);
-  root.style.setProperty(
-    "--header-duration",
-    `${appearanceSettings.headerDuration}ms`,
-  );
-  root.style.setProperty(
-    "--reveal-duration",
-    `${appearanceSettings.duration}ms`,
-  );
-  root.style.setProperty("--reveal-travel", `${appearanceSettings.travel}px`);
-  root.style.setProperty("--reveal-blur", `${appearanceSettings.blur}px`);
-  root.style.setProperty(
-    "--reveal-start-scale",
-    String(appearanceSettings.startScale / 1000),
-  );
-  const uiScale = appearanceSettings.uiScale / 100;
-  root.style.setProperty("--ui-scale", String(uiScale));
-  root.style.setProperty("--body-font-size", `${14 * uiScale}px`);
-  root.style.setProperty("--content-width", `${1100 * uiScale}px`);
-  document.body?.classList.toggle(
-    "animation-mode",
-    appearanceSettings.animationMode,
-  );
-}
-const routes = [
-  ["/", "Home"],
-  ["/product", "Product"],
-  ["/information", "Information"],
-  ["/about", "About"],
-  ["/join", "Join"],
-  ["/cooperation", "Cooperation"],
-  ["/members", "Members"],
-  ["/contact", "Contact"],
+const headerRoutes = [
+  ["", "Home"],
+  ["product", "Product"],
+  ["information", "Information"],
+  ["about", "About"],
+  ["contact", "Contact"],
 ];
-// 表示部品とページ本文
-const iconNames = {
-  bell: "notifications",
-  grid: "grid_view",
-  list: "view_list",
-  about: "info",
-  join: "person_add",
-  right: "arrow_forward",
-  left: "arrow_back",
-  people: "group",
-  link: "link",
-  mail: "mail",
-  palette: "palette",
-  motion: "animation",
-  corners: "rounded_corner",
-  density: "density_medium",
-  sparkle: "auto_awesome",
-  reset: "restart_alt",
-  header: "web_asset",
-};
-const icon = (n) =>
-  `<span class="material-symbols-rounded icon" aria-hidden="true">${iconNames[n] || iconNames.grid}</span>`;
-const brandIcon = (n) =>
-  `<img class="brand-icon brand-${E(n)}" src="/assets/social-${E(n)}.svg" alt="" aria-hidden="true">`;
-const img = (src, alt, cls = "") =>
-  safeImageSource(src)
-    ? `<img class="${E(cls)}" src="${E(safeImageSource(src))}" alt="${E(alt)}" loading="lazy">`
-    : "";
-function art(p) {
-  return `<div class="product-art ${E(p.color)}">
-    ${img(p.image, p.name, "product-image")}
-  </div>`;
-}
-function productCard(product, className) {
-  return `<a class="${className} floating" href="/product/${E(product.id)}/">
-    ${art(product)}
-    <div class="product-copy">
-      <span class="category">${E(product.category)}</span>
-      <h3>${E(product.name)}</h3>
-      <p>${plainText(product.description)}</p>
-      <div class="product-bottom">
-        <span>TowaPC.com</span>
-        <span>詳しく見る ${icon("right")}</span>
-      </div>
-    </div>
-  </a>`;
-}
-function cards(items) {
-  return `<div class="grid">${items.map((item) => productCard(item, "product")).join("")}</div>`;
-}
-function productRows(items) {
-  return `<div class="product-list">${items.map((item) => productCard(item, "product-row")).join("")}</div>`;
-}
-function productView() {
-  try {
-    return localStorage.getItem("towapc-product-view") === "list"
-      ? "list"
-      : "grid";
-  } catch {
-    return "grid";
-  }
-}
-function productResults(items, view) {
-  return view === "list" ? productRows(items) : cards(items);
-}
-function newsBadge(item) {
-  const tag = String(item.tag || "").toLowerCase();
-  return `<span class="badge ${E(tag)}">${E(newsTagLabels[tag] || item.tag)}</span>`;
-}
-function plainText(value) {
-  return E(
-    String(value ?? "")
-      .replace(/\\n/g, " ")
-      .replace(/\s+/g, " "),
-  );
-}
-function textWithBreaks(value) {
-  return E(String(value ?? "").replace(/\\n/g, "\n")).replace(/\r?\n/g, "<br>");
-}
-function relatedLinks(value) {
-  return String(value || "")
-    .replace(/\\n/g, "\n")
-    .split(/;;|\r?\n/)
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map((entry) => {
-      const separator = entry.indexOf("|");
-      if (separator < 1) return null;
-      const label = entry.slice(0, separator).trim();
-      const url = safeHttpUrl(entry.slice(separator + 1).trim());
-      return label && url ? { label, url } : null;
-    })
-    .filter(Boolean);
-}
-function rows(items) {
-  return items
+
+function headerNavigation() {
+  const links = headerRoutes
     .map(
-      (n) =>
-        `<a class="news-row" href="/information/${E(n.id)}/">
-          <time>${E(n.date)}</time>
-          ${newsBadge(n)}
-          <span class="news-title">${E(n.title)}</span>
-          <span class="row-actions">
-            ${img(n.image, "", "news-thumb")}
-            <span class="arrow">${icon("right")}</span>
-          </span>
-        </a>`,
+      ([path, label]) =>
+        `<a href="/${path ? `${path}/` : ""}" data-route="${path}">${label}</a>`,
     )
     .join("");
-}
-function newsArt(item, imageClass) {
-  return item.image
-    ? img(item.image, "", imageClass)
-    : `<span>${icon("bell")}</span>`;
-}
-function informationRows(items) {
-  return `<div class="information-list">${items
-    .map(
-      (n) =>
-        `<a class="information-row floating" href="/information/${E(n.id)}/">
-          <div class="information-row-art">${newsArt(n, "information-row-image")}</div>
-          <div class="information-row-copy">
-            <div><time>${E(n.date)}</time>${newsBadge(n)}</div>
-            <h2>${E(n.title)}</h2>
-            <p>${plainText(n.body)}</p>
-            <span class="information-row-more">詳しく見る ${icon("right")}</span>
-          </div>
-        </a>`,
-    )
-    .join("")}</div>`;
-}
-function newsCards(items) {
-  const itemCards = items
-    .map(
-      (n) => `<a class="news-card floating" href="/information/${E(n.id)}/">
-        <div class="news-card-art">${newsArt(n, "news-card-image")}</div>
-        <div class="news-card-copy">
-          <div><time>${E(n.date)}</time>${newsBadge(n)}</div>
-          <h2>${E(n.title)}</h2>
-          <p>${plainText(n.body)}</p>
-          <span class="news-card-more">詳しく見る ${icon("right")}</span>
-        </div>
-      </a>`,
-    )
-    .join("");
-  return `<div class="news-grid">${itemCards}</div>`;
-}
-function pageHero(title, jp, extra = "") {
-  return `<section class="page-hero ${extra}">
-    <div class="wrap">
-      <div class="breadcrumbs"><a href="/">Home</a> / ${E(title)}</div>
-      <h1>${E(title)}</h1>
-      <p>${E(jp)}</p>
-    </div>
-  </section>`;
-}
-function home() {
-  const quick = [
-    ["product", "Product", "私たちの製品の紹介", "lavender", "grid"],
-    ["about", "About", "TowaPCについて", "mint", "about"],
-    ["contact", "Contact", "お問い合わせ", "pink", "mail"],
-    ["join", "Join", "私たちの一員になる", "cream", "join"],
-  ];
-  const heroSource = safeImageSource(S.hero);
-  const quickLinks = quick
-    .map(
-      ([path, label, jp, color, type]) =>
-        `<a href="/${path}/" class="quick-link floating ${color}">
-          ${icon(type)}
-          <div><strong>${label}</strong><small>${jp}</small></div>
-          <span class="arrow">${icon("right")}</span>
-        </a>`,
-    )
-    .join("");
-
-  return `<section class="hero">
-    ${heroSource ? `<img class="hero-background" src="${E(heroSource)}" alt="夕焼けに染まる街並み" fetchpriority="high">` : ""}
-    <h1>${E(S.headline)}</h1>
-  </section>
-  <div class="wrap">
-    <section class="intro floating">
-      <h2>What’s “TowaPC”?</h2>
-      <p>${E(S.description)}</p>
-      <a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a>
-    </section>
-    <section class="news-strip floating">
-      <div class="news-heading">
-        <a class="news-label" href="/information/">${icon("bell")}Information</a>
-        <a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a>
-      </div>
-      <div class="news-list">${rows(S.news)}</div>
-    </section>
-    <section class="quick-links">${quickLinks}</section>
-    <section class="section">
-      <div class="section-heading">
-        <h2>Our products</h2>
-        <a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a>
-      </div>
-      ${cards(S.products)}
-    </section>
-  </div>`;
-}
-function products() {
-  const filters = [["all", "すべて"], ...Object.entries(productTypeLabels)],
-    view = productView();
-  const filterButtons = filters
-    .map(
-      ([value, label]) =>
-        `<button class="filter ${value === "all" ? "active" : ""}" data-filter="${value}" aria-pressed="${value === "all"}">${label}</button>`,
-    )
-    .join("");
-  return `${pageHero("Product", "私たちの製品の紹介")}
-    <section class="section wrap">
-      <div class="product-toolbar">
-        <div class="filters">${filterButtons}</div>
-        <div class="view-switch" role="group" aria-label="製品の表示形式">
-          <button class="view-button ${view === "grid" ? "active" : ""}" data-product-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button>
-          <button class="view-button ${view === "list" ? "active" : ""}" data-product-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button>
-        </div>
-      </div>
-      <div id="product-results">${productResults(S.products, view)}</div>
-    </section>`;
-}
-function newsView() {
-  try {
-    return localStorage.getItem("towapc-news-view") === "list"
-      ? "list"
-      : "grid";
-  } catch {
-    return "grid";
-  }
-}
-function information() {
-  const view = newsView();
-  const results = view === "list" ? informationRows(S.news) : newsCards(S.news);
-  return `${pageHero("Information", "TowaPCからのお知らせ")}
-    <section class="section wrap">
-      <div class="information-toolbar">
-        <div class="view-switch" role="group" aria-label="お知らせの表示形式">
-          <button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button>
-          <button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button>
-        </div>
-      </div>
-      <div id="information-results" class="${view === "list" ? "info-list" : "news-results"}">${results}</div>
-    </section>`;
-}
-function about() {
-  const logo = safeImageSource(S.logo) || "/assets/TowaPC.svg";
-  const values = [
-    [
-      "小さな不便を見つける。",
-      "日常の細やかな部分に目を向け、改善できることを探します。",
-      "lavender",
-    ],
-    [
-      "確実に便利にする。",
-      "派手さよりも使いやすさを大切に、役立つものをつくります。",
-      "mint",
-    ],
-    [
-      "少しずつ、育てる。",
-      "試して、調整して、長く安心して使える形へ育てていきます。",
-      "cream",
-    ],
-  ];
-  const valueCards = values
-    .map(
-      ([heading, copy, color]) =>
-        `<div class="value floating ${color}"><h3>${heading}</h3><p>${copy}</p></div>`,
-    )
-    .join("");
-  return `${pageHero("About", "TowaPCについて")}
-    <section class="section wrap">
-      <div class="article floating about-summary">
-        <div class="about-heading">
-          <button class="about-logo-trigger" type="button" aria-label="TowaPCロゴ" data-animation-trigger>
-            <img class="about-logo" src="${E(logo)}" alt="TowaPC">
-          </button>
-          <h2>TowaPCについて</h2>
-        </div>
-        <p>${E(S.description)}</p>
-        <p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p>
-        <div class="about-links">
-          <a class="soft-button" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a>
-          <a class="soft-button" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a>
-          <a class="soft-button" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a>
-        </div>
-      </div>
-      <div class="values">${valueCards}</div>
-    </section>`;
-}
-function settingChoices(key, label, choices) {
-  const buttons = choices
-    .map(
-      ([value, title, copy]) =>
-        `<button type="button" data-setting="${key}" data-value="${value}" aria-pressed="${appearanceSettings[key] === value}">
-          <strong>${title}</strong>
-          ${copy ? `<small>${copy}</small>` : ""}
-        </button>`,
-    )
-    .join("");
-  return `<div class="setting-field">
-    <span class="setting-label">${label}</span>
-    <div class="setting-choices" role="group" aria-label="${label}">${buttons}</div>
-  </div>`;
-}
-function settingRange(key, label, minimum, maximum, step, unit) {
-  const value = appearanceSettings[key];
-  const shown = key === "startScale" ? (value / 10).toFixed(1) : value;
-  const rangeHints =
-    key === "duration"
-      ? '<span class="range-hints"><small>速い</small><small>ゆっくり</small></span>'
-      : "";
-  return `<label class="setting-range">
-    <span>
-      <strong>${label}</strong>
-      <output data-setting-output="${key}">${shown}${unit}</output>
-    </span>
-    <input type="range" min="${minimum}" max="${maximum}" step="${step}" value="${value}" data-setting-range="${key}" aria-label="${label}">
-    ${rangeHints}
-  </label>`;
-}
-function settingToggle(key, title, copy) {
-  return `<button class="setting-toggle" type="button" role="switch" aria-checked="${appearanceSettings[key]}" data-setting-toggle="${key}">
-    <span><strong>${title}</strong><small>${copy}</small></span>
-    <i aria-hidden="true"></i>
-  </button>`;
-}
-function colorPicker() {
-  return `<label class="color-picker${appearanceSettings.accent === "custom" ? " active" : ""}">
-    <input type="color" value="${E(appearanceSettings.customColor)}" data-custom-color aria-label="自由な差し色">
-    <span aria-hidden="true" style="--picked-color:${E(appearanceSettings.customColor)}"></span>
-    <div><strong>カラーパレット</strong><small>好きな色を選ぶ</small></div>
-  </label>`;
-}
-function motionSettings() {
-  const choices = [
-    ["standard", "標準", "軽く、素早く"],
-    ["smooth", "ゆったり", "今回の新しい動き"],
-    ["snappy", "きびきび", "短く小さく"],
-    ["none", "静止", "動かさない"],
-  ];
-  return `<section class="settings-card floating settings-motion">
-    <div class="settings-heading">
-      ${icon("motion")}
-      <div><h2>Motion</h2><p>カードが現れる動きを調整</p></div>
-      <button class="preview-button" type="button" data-play-preview>${icon("sparkle")}再生</button>
-    </div>
-    ${settingChoices("motion", "プリセット", choices)}
-    <div class="motion-preview" data-motion-preview>
-      <span></span><strong>Preview card</strong><small>設定した動きをここで確認</small>
-    </div>
-    <div class="range-grid">
-      ${settingRange("duration", "アニメーション速度", 200, 1200, 20, "ms")}
-      ${settingRange("stagger", "カード間隔", 0, 120, 2, "ms")}
-      ${settingRange("travel", "移動量", 0, 90, 2, "px")}
-      ${settingRange("blur", "ぼかし", 0, 18, 1, "px")}
-      ${settingRange("startScale", "開始時の大きさ", 880, 1000, 5, "%")}
-    </div>
-  </section>`;
-}
-function headerSettings() {
-  const choices = [
-    ["slide", "スライド", "上からなめらかに"],
-    ["fade", "フェード", "その場で現れる"],
-    ["none", "静止", "動かさない"],
-  ];
-  return `<section class="settings-card floating settings-header">
-    <div class="settings-heading">
-      ${icon("header")}
-      <div><h2>Header</h2><p>透け方、ぼかし、登場を調整</p></div>
-      <button class="preview-button" type="button" data-play-header>${icon("sparkle")}再生</button>
-    </div>
-    <div class="range-grid">
-      ${settingRange("headerTransparency", "透明度", 0, 80, 2, "%")}
-      ${settingRange("headerBlur", "背景のブラー", 0, 30, 1, "px")}
-      ${settingRange("headerDuration", "アニメーション時間", 200, 1200, 20, "ms")}
-    </div>
-    ${settingChoices("headerMotion", "ヘッダーのアニメーション", choices)}
-    ${settingToggle("glass", "ガラス効果", "透けとブラーを有効にする")}
-  </section>`;
-}
-function themeSettings() {
-  const themes = [
-    ["light", "Light", "明るい表示"],
-    ["dark", "Dark", "暗い表示"],
-  ];
-  const surfaces = [
-    ["standard", "標準", "TowaPCの基本"],
-    ["material", "Material 3", "明快な面と輪郭"],
-    ["liquid", "Liquid Glass", "透明感と光"],
-    ["paper", "Paper", "影を抑えた紙面"],
-  ];
-  const accents = [
-    ["standard", "標準", "TowaPC Yellow"],
-    ["lavender", "藤", "Lavender"],
-    ["mint", "若葉", "Mint"],
-    ["peach", "夕焼け", "Peach"],
-  ];
-  return `<section class="settings-card floating">
-    <div class="settings-heading">
-      ${icon("palette")}
-      <div><h2>Theme</h2><p>色と質感を選択</p></div>
-    </div>
-    ${settingToggle("themePinned", "テーマを任意で固定する", "オフなら端末の設定を優先")}
-    ${settingChoices("theme", "固定する明るさ", themes)}
-    ${settingChoices("surface", "デザインテーマ", surfaces)}
-    ${settingChoices("accent", "カラーテーマ", accents)}
-    ${colorPicker()}
-  </section>`;
-}
-function shapeSettings() {
-  const corners = [
-    ["soft", "標準", "やわらかい"],
-    ["round", "まるい", "大きな丸み"],
-    ["precise", "かっちり", "小さな丸み"],
-  ];
-  const densities = [
-    ["comfortable", "ゆったり", "広めの間隔"],
-    ["compact", "コンパクト", "情報を近く"],
-  ];
-  return `<section class="settings-card floating">
-    <div class="settings-heading">
-      ${icon("corners")}
-      <div><h2>Shape & Size</h2><p>形と画面の密度を調整</p></div>
-    </div>
-    ${settingChoices("corners", "カードの角", corners)}
-    ${settingChoices("density", "余白", densities)}
-    ${settingRange("uiScale", "UIの大きさ", 90, 110, 1, "%")}
-  </section>`;
-}
-function secretSettings() {
-  return `<section class="settings-card floating secret-settings">
-    <div class="settings-heading">
-      ${icon("sparkle")}
-      <div><h2>Secret</h2><p>ここへ移動した謎の機能</p></div>
-    </div>
-    ${settingToggle("animationMode", "謎のアニメーションモード", "光と浮遊がサイト全体を動き回ります")}
-  </section>`;
-}
-function appearanceLab() {
-  return `${pageHero("Appearance Lab", "見つけた人だけの外観実験室", "appearance-hero")}
-    <section class="section wrap appearance-lab">
-      <div class="article floating appearance-intro">
-        <div>
-          <h2>見た目で遊ぶ。</h2>
-          <p>サイトの動き、色、形、大きさを好きなように調整できます。変更はこの端末に自動で保存されます。</p>
-        </div>
-        <div class="appearance-orbit" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><i></i>
-        </div>
-      </div>
-      <div class="settings-grid">
-        ${motionSettings()}
-        ${headerSettings()}
-        ${themeSettings()}
-        ${shapeSettings()}
-        ${secretSettings()}
-      </div>
-      <div class="settings-reset floating">
-        <div>
-          <strong>最初の見た目へ戻す</strong>
-          <small>このページの設定だけをリセットします。</small>
-        </div>
-        <button type="button" data-reset-appearance>${icon("reset")}リセット</button>
-      </div>
-    </section>`;
-}
-function join() {
-  const url = safeHttpUrl(S.joinUrl);
-  const steps = [
-    [
-      "興味を見つける",
-      "製品や取り組みを見て、気になるテーマを探してみてください。",
-    ],
-    [
-      "アイデアを持ち寄る",
-      "経験の多さよりも、知りたい・つくりたいという気持ちを。",
-    ],
-    [
-      "TowaPC Communityへ",
-      "Discordの招待リンクから参加し、興味のあることを共有できます。",
-    ],
-  ];
-  const stepCards = steps
-    .map(
-      ([heading, copy]) =>
-        `<div class="value floating join-value"><h3>${heading}</h3><p>${copy}</p></div>`,
-    )
-    .join("");
-  const joinAction = url
-    ? `<a class="cta" href="${E(url)}" target="_blank" rel="noopener">TowaPC Communityに参加する ${icon("right")}</a>`
-    : '<span class="status">参加方法は、ただいま準備中です</span>';
-  return `${pageHero("Join", "私たちの一員になる")}
-    <section class="section wrap join-section">
-      <div class="join-box floating">
-        <h2>あなたの「つくりたい」を、<br>ここから。</h2>
-        <p>プログラミング、デザイン、アイデア。<br>それぞれの得意や好奇心を持ち寄って、一緒に新しいものづくりをはじめませんか。</p>
-        ${joinAction}
-      </div>
-      <div class="values">${stepCards}</div>
-    </section>`;
-}
-function directory(kind) {
-  const cooperation = kind === "cooperation";
-  const list = cooperation ? S.partners : S.members;
-  const title = cooperation ? "Cooperation" : "Members";
-  const jp = cooperation ? "協力関係がある団体・個人" : "TowaPCのメンバー";
-  const imageClass = cooperation
-    ? "directory-image company-logo"
-    : "directory-image member-image";
-  const entries = list
-    .map((item) => {
-      const url = safeHttpUrl(item.url);
-      return `<article class="directory-card floating">
-        ${img(item.image, item.name, imageClass)}
-        <div>
-          <span class="category">${E(item.role || "")}</span>
-          <h2>${E(item.name)}</h2>
-          <p>${E(item.description || "")}</p>
-          ${url ? `<a class="text-link" href="${E(url)}" target="_blank" rel="noopener">Webサイト ${icon("right")}</a>` : ""}
-        </div>
-      </article>`;
-    })
-    .join("");
-  const emptyState = `<div class="empty-state floating">
-    ${icon(cooperation ? "link" : "people")}
-    <p>${cooperation ? "掲載する団体・個人" : "メンバー情報"}を準備しています。</p>
-    <small>dataフォルダーのCSVから追加できます。</small>
-  </div>`;
-  return `${pageHero(title, jp)}
-    <section class="section wrap">
-      <div class="directory-grid">${entries || emptyState}</div>
-    </section>`;
-}
-function contact() {
-  const contacts = [
-    ["youtube", "YouTube", S.socials.youtube, S.labels.youtube],
-    ["x", "X", S.socials.x, S.labels.x],
-    ["discord", "Discord", S.socials.discord, S.labels.discord],
-    ["mail", "お問い合わせ", S.contactUrl, S.labels.contact],
-  ];
-  const cards = contacts
-    .map(([type, label, value, detail]) => {
-      const url = type === "mail" ? safeContactUrl(value) : safeHttpUrl(value);
-      const contactIcon = type === "mail" ? icon(type) : brandIcon(type);
-      if (!url) {
-        return `<button id="${type}" class="contact-card floating pending" type="button" aria-label="${label}：URL準備中">
-          ${contactIcon}
-          <div><h2>${label}</h2><p>URL準備中</p></div>
-          ${icon("right")}
-        </button>`;
-      }
-      const externalAttributes =
-        type === "mail" ? "" : ' target="_blank" rel="noopener"';
-      return `<a id="${type}" class="contact-card floating" href="${E(url)}"${externalAttributes}>
-        ${contactIcon}
-        <div><h2>${label}</h2><p>${E(detail || "公式ページ")}</p></div>
-        ${icon("right")}
-      </a>`;
-    })
-    .join("");
-  return `${pageHero("Contact", "お問い合わせ・公式リンク")}
-    <section class="section wrap">
-      <div class="contact-grid">${cards}</div>
-    </section>`;
-}
-function detail(kind, id) {
-  if (!["product", "information"].includes(kind)) return missing();
-  const isProduct = kind === "product";
-  const item = (isProduct ? S.products : S.news).find(
-    (entry) => entry.id === id,
-  );
-  if (!item) return missing();
-  const links = relatedLinks(item.links);
-  const linkButtons = links.length
-    ? `<div class="related-links">${links
-        .map(
-          ({ label, url }) =>
-            `<a class="cta item-url" href="${E(url)}" target="_blank" rel="noopener">${E(label)} ${icon("right")}</a>`,
-        )
-        .join("")}</div>`
-    : "";
-  const category = isProduct
-    ? E(item.category)
-    : `${E(item.date)} · ${newsBadge(item)}`;
-  const title = isProduct ? item.name : item.title;
-  const body = isProduct ? item.description : item.body;
-  const copy = `<div class="detail-copy">
-    <span class="category detail-category">${category}</span>
-    <h2>${E(title)}</h2>
-    <p>${textWithBreaks(body)}</p>
-    <div class="detail-actions">
-      <a class="text-link back-link" href="/${kind}/">${icon("left")} 一覧に戻る</a>
-      ${linkButtons}
-    </div>
-  </div>`;
-  const content = isProduct
-    ? `${art(item)}${copy}`
-    : `${img(item.image, item.title, "article-image")}${copy}`;
-  return `${pageHero(isProduct ? "Product" : "Information", isProduct ? "私たちの製品の紹介" : "お知らせ")}
-    <section class="section wrap">
-      <article class="article floating ${isProduct ? "product-detail" : ""}">${content}</article>
-    </section>`;
-}
-function legalPage(kind) {
-  const privacy = kind === "privacy";
-  const title = privacy ? "Privacy Policy" : "Terms of Service";
-  const subtitle = privacy ? "プライバシーポリシー" : "利用規約";
-  const content = privacy ? privacyContent : termsContent;
-  return `${pageHero(title, subtitle)}
-    <section class="section wrap">
-      <article class="article legal-document floating">
-        <header><h2>${subtitle}</h2></header>
-        ${content}
-      </article>
-    </section>`;
-}
-function missing() {
-  return `<section class="section wrap not-found">
-    <div class="not-found-card floating">
-      <button class="not-found-number" type="button" aria-label="404" data-shred-trigger>404</button>
-      <p class="not-found-label">Not found</p>
-      <p class="not-found-copy">お探しのページは迷子かもしれません。</p>
-    </div>
-  </section>`;
+  return `<span class="nav-selection"></span>${links}`;
 }
 
-// 隠し機能とAppearance Labの操作
-function showEggStatus(message) {
-  document.querySelector(".egg-status")?.remove();
-  const status = document.createElement("div");
-  status.className = "egg-status";
-  status.setAttribute("role", "status");
-  status.textContent = message;
-  document.body.append(status);
-  setTimeout(() => status.remove(), 2600);
+function currentLocation() {
+  const parts = location.pathname.split("/").filter(Boolean);
+  return { route: parts[0] || "", id: parts[1] || "" };
 }
 
-function animationSweep() {
-  const sweep = document.createElement("div");
-  sweep.className = "animation-sweep";
-  sweep.setAttribute("aria-hidden", "true");
-  document.body.append(sweep);
-  setTimeout(() => sweep.remove(), 1400);
-}
-
-function setupAppearanceEgg() {
-  const trigger = document.querySelector("[data-animation-trigger]");
-  if (!trigger) return;
-  let clicks = 0;
-  let resetTimer;
-  trigger.addEventListener("click", () => {
-    clicks += 1;
-    trigger.classList.remove("logo-tap");
-    void trigger.offsetWidth;
-    trigger.classList.add("logo-tap");
-    clearTimeout(resetTimer);
-    resetTimer = setTimeout(() => (clicks = 0), 1800);
-    if (clicks < 5) return;
-    clicks = 0;
-    clearTimeout(resetTimer);
-    history.pushState(null, "", "/appearance/");
-    render();
-  });
-}
-
-const motionPresets = {
-  standard: {
-    duration: 520,
-    stagger: 42,
-    travel: 42,
-    blur: 8,
-    startScale: 965,
-  },
-  smooth: { duration: 680, stagger: 48, travel: 42, blur: 8, startScale: 965 },
-  snappy: { duration: 360, stagger: 28, travel: 24, blur: 4, startScale: 980 },
-  none: { duration: 200, stagger: 0, travel: 0, blur: 0, startScale: 1000 },
-};
-function syncThemeControls() {
-  const theme = resolvedTheme();
-  const switcher = document.querySelector(".theme-switch");
-  if (switcher) switcher.dataset.active = theme;
-  document.querySelectorAll("[data-theme-option]").forEach((button) => {
-    const active = button.dataset.themeOption === theme;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-}
-function syncAppearanceControls() {
-  document.querySelectorAll("[data-setting]").forEach((button) => {
-    button.setAttribute(
-      "aria-pressed",
-      String(
-        appearanceSettings[button.dataset.setting] === button.dataset.value,
-      ),
-    );
-  });
-  document.querySelectorAll("[data-setting-toggle]").forEach((button) => {
-    button.setAttribute(
-      "aria-checked",
-      String(Boolean(appearanceSettings[button.dataset.settingToggle])),
-    );
-  });
-  const picker = document.querySelector(".color-picker");
-  picker?.classList.toggle("active", appearanceSettings.accent === "custom");
-  syncThemeControls();
-}
-function playMotionPreview() {
-  const preview = document.querySelector("[data-motion-preview]");
-  if (!preview) return;
-  preview.classList.remove("preview-play");
-  void preview.offsetWidth;
-  preview.classList.add("preview-play");
-}
-function playHeaderPreview() {
-  const header = document.querySelector(".header");
-  if (!header) return;
-  header.classList.remove("header-replay");
-  void header.offsetWidth;
-  header.classList.add("header-replay");
-  header.addEventListener(
-    "animationend",
-    () => header.classList.remove("header-replay"),
-    { once: true },
-  );
-}
-function updateAppearance(setting, value) {
-  appearanceSettings[setting] = value;
-  saveAppearance();
-  applyAppearance();
-  syncAppearanceControls();
-}
-function setupAppearanceControls() {
-  if (!document.querySelector(".appearance-lab")) return;
-  document.querySelectorAll("[data-setting]").forEach((button) =>
-    button.addEventListener("click", () => {
-      const { setting, value } = button.dataset;
-      appearanceSettings[setting] = value;
-      if (setting === "theme") appearanceSettings.themePinned = true;
-      if (setting === "motion")
-        Object.assign(appearanceSettings, motionPresets[value]);
-      saveAppearance();
-      applyAppearance();
-      syncAppearanceControls();
-      if (setting === "motion") {
-        document.querySelectorAll("[data-setting-range]").forEach((input) => {
-          const key = input.dataset.settingRange;
-          input.value = appearanceSettings[key];
-          const output = document.querySelector(
-            `[data-setting-output="${key}"]`,
-          );
-          if (!output) return;
-          const value = appearanceSettings[key];
-          const unit =
-            key === "uiScale" || key === "startScale"
-              ? "%"
-              : key === "travel" || key === "blur"
-                ? "px"
-                : "ms";
-          output.textContent = `${key === "startScale" ? (value / 10).toFixed(1) : value}${unit}`;
-        });
-        playMotionPreview();
-      }
-      if (setting === "headerMotion") playHeaderPreview();
-    }),
-  );
-  document.querySelectorAll("[data-setting-range]").forEach((input) =>
-    input.addEventListener("input", () => {
-      const key = input.dataset.settingRange;
-      const value = Number(input.value);
-      appearanceSettings[key] = value;
-      if (["duration", "stagger", "travel", "blur", "startScale"].includes(key))
-        appearanceSettings.motion = "custom";
-      const output = document.querySelector(`[data-setting-output="${key}"]`);
-      if (output) {
-        const unit =
-          key === "uiScale" ||
-          key === "startScale" ||
-          key === "headerTransparency"
-            ? "%"
-            : key === "travel" || key === "blur" || key === "headerBlur"
-              ? "px"
-              : "ms";
-        output.textContent = `${key === "startScale" ? (value / 10).toFixed(1) : value}${unit}`;
-      }
-      saveAppearance();
-      applyAppearance();
-      syncAppearanceControls();
-    }),
-  );
-  document.querySelectorAll("[data-setting-toggle]").forEach((button) =>
-    button.addEventListener("click", () => {
-      const key = button.dataset.settingToggle;
-      const nextValue = !appearanceSettings[key];
-      if (key === "themePinned" && nextValue)
-        appearanceSettings.theme = resolvedTheme();
-      updateAppearance(key, nextValue);
-      if (key === "animationMode" && appearanceSettings[key]) animationSweep();
-    }),
-  );
-  document
-    .querySelector("[data-play-preview]")
-    ?.addEventListener("click", playMotionPreview);
-  document
-    .querySelector("[data-play-header]")
-    ?.addEventListener("click", playHeaderPreview);
-  document
-    .querySelector("[data-custom-color]")
-    ?.addEventListener("input", (event) => {
-      const value = event.currentTarget.value;
-      if (!/^#[0-9a-f]{6}$/i.test(value)) return;
-      appearanceSettings.customColor = value;
-      appearanceSettings.accent = "custom";
-      saveAppearance();
-      applyAppearance();
-      const picker = event.currentTarget.closest(".color-picker");
-      picker?.classList.add("active");
-      picker?.querySelector("span")?.style.setProperty("--picked-color", value);
-      syncAppearanceControls();
-    });
-  document
-    .querySelector("[data-reset-appearance]")
-    ?.addEventListener("click", () => {
-      appearanceSettings = { ...appearanceDefaults };
-      saveAppearance();
-      applyAppearance();
-      render();
-      showEggStatus("APPEARANCE // RESET");
-    });
-  syncAppearanceControls();
-}
-
-function shredPage() {
-  if (document.querySelector(".page-shredder")) return;
-  const shredder = document.createElement("div");
-  shredder.className = "page-shredder";
-  shredder.setAttribute("role", "status");
-  shredder.setAttribute("aria-live", "polite");
-  const strips = Array.from({ length: 24 }, (_, index) => {
-    const offset = -46 + index * 4;
-    const turn = -7 + ((index * 11) % 15);
-    const length = 25 + ((index * 7) % 6);
-    return `<span style="--strip:${index};--strip-x:${offset}px;--strip-turn:${turn}deg;--strip-length:${length}vh"></span>`;
-  }).join("");
-  shredder.innerHTML = `<div class="shred-machine" aria-hidden="true">
-    <div class="shred-machine-top">
-      <span>404 PAGE SHREDDER</span><i></i><i></i>
-    </div>
-    <div class="shred-slot"></div>
-    <div class="shred-strips">${strips}</div>
-  </div>
-  <div class="shred-complete">
-    <strong>404は細断されました。</strong>
-    <small>ページの残り容量：0 byte</small>
-    <button type="button" data-shred-restore>ページを再構成する</button>
-  </div>`;
-  document.body.append(shredder);
-  document.body.classList.add("shredding-page");
-  shredder
-    .querySelector("[data-shred-restore]")
-    .addEventListener("click", () => {
-      document.body.classList.remove("shredding-page");
-      shredder.remove();
-    });
-}
-
-function setupShredEgg() {
-  const trigger = document.querySelector("[data-shred-trigger]");
-  if (!trigger) return;
-  let clicks = 0;
-  let resetTimer;
-  trigger.addEventListener("click", () => {
-    clicks += 1;
-    trigger.classList.remove("shred-tap");
-    void trigger.offsetWidth;
-    trigger.classList.add("shred-tap");
-    clearTimeout(resetTimer);
-    resetTimer = setTimeout(() => (clicks = 0), 1800);
-    if (clicks < 4) return;
-    clicks = 0;
-    clearTimeout(resetTimer);
-    shredPage();
-  });
-}
-
-// ページ描画と共通操作
-function headerNav(route) {
-  const items = [
-    ["", "Home"],
-    ["product", "Product"],
-    ["information", "Information"],
-    ["about", "About"],
-    ["contact", "Contact"],
-  ];
-  return `<span class="nav-selection"></span>${items.map(([path, label]) => `<a href="/${path ? `${path}/` : ""}" data-route="${path}">${label}</a>`).join("")}`;
-}
-function render() {
-  const parts = location.pathname.split("/").filter(Boolean),
-    route = parts[0] || "",
-    pages = {
-      "": home,
-      product: products,
-      information,
-      about,
-      appearance: appearanceLab,
-      join,
-      cooperation: () => directory("cooperation"),
-      members: () => directory("members"),
-      contact,
-      terms: () => legalPage("terms"),
-      privacy: () => legalPage("privacy"),
-    };
-  const main = document.getElementById("main");
-  const pageContent =
-    parts.length > 1 ? detail(route, parts[1]) : (pages[route] || missing)();
-  main.innerHTML =
-    pageContent +
-    (route
-      ? `<div class="page-home-link wrap"><a class="text-link" href="/">${icon("left")} ホームに戻る</a></div>`
-      : "");
+function pageTitle(route) {
   const specialTitles = {
     appearance: "Appearance Lab",
     terms: "Terms of Service",
     privacy: "Privacy Policy",
   };
-  document.title = `TowaPC — ${specialTitles[route] || routes.find(([p]) => p === `/${route}`)?.[1] || (route ? "Not found" : "Home")}`;
-  const logo = safeImageSource(S.logo) || "/assets/TowaPC.svg";
-  document
-    .querySelectorAll(".custom-logo")
-    .forEach((image) => image.setAttribute("src", logo));
+  return (
+    specialTitles[route] ||
+    routes.find(([path]) => path === `/${route}`)?.[1] ||
+    (route ? "Not found" : "Home")
+  );
+}
+
+function renderNavigation(route) {
   const nav = document.querySelector(".header nav");
-  if (!nav.querySelector("[data-route]")) nav.innerHTML = headerNav(route);
-  nav
-    .querySelectorAll("[data-route]")
-    .forEach((a) => a.classList.toggle("active", a.dataset.route === route));
-  document.querySelector("[data-footer-links]").innerHTML = routes
-    .filter(([p]) => p !== "/contact")
-    .map(([p, t]) => `<a href="${p === "/" ? "/" : p + "/"}">${t}</a>`)
-    .join("");
-  const footerSocials = [
-      ["YouTube", S.socials.youtube],
-      ["X", S.socials.x],
-      ["Discord", S.socials.discord],
-    ],
-    footerMail = safeContactUrl(S.contactUrl) || "/contact/";
+  if (!nav.querySelector("[data-route]")) nav.innerHTML = headerNavigation();
+  nav.querySelectorAll("[data-route]").forEach((link) => {
+    link.classList.toggle("active", link.dataset.route === route);
+  });
+  document.querySelector("[data-footer-links]").innerHTML = renderFooterLinks();
   document.querySelector("[data-footer-contact]").innerHTML =
-    footerSocials
-      .map(([label, value]) => [label, safeHttpUrl(value)])
-      .filter(([, url]) => url)
-      .map(
-        ([label, url]) =>
-          `<a href="${E(url)}" target="_blank" rel="noopener">${label}</a>`,
-      )
-      .join("") + `<a href="${E(footerMail)}">お問い合わせ</a>`;
+    renderFooterContacts();
+}
+
+function resetMenu() {
+  const nav = document.querySelector(".header nav");
+  const button = document.querySelector(".menu-button");
   nav.classList.remove("open");
   document.body.classList.remove("menu-open");
   document.body.style.removeProperty("--menu-scroll-y");
-  const menuButton = document.querySelector(".menu-button");
-  menuButton.setAttribute("aria-expanded", "false");
-  menuButton.setAttribute("aria-label", "メニューを開く");
-  menuButton.querySelector(".material-symbols-rounded").textContent = "menu";
-  document.querySelectorAll("[data-filter]").forEach((b) =>
-    b.addEventListener("click", () => {
-      document.querySelectorAll("[data-filter]").forEach((x) => {
-        x.classList.toggle("active", x === b);
-        x.setAttribute("aria-pressed", String(x === b));
-      });
-      const view =
-          document.querySelector("[data-product-view].active")?.dataset
-            .productView || productView(),
-        items = S.products.filter(
-          (p) => b.dataset.filter === "all" || p.type === b.dataset.filter,
-        );
-      document.getElementById("product-results").innerHTML = productResults(
-        items,
-        view,
-      );
-      reveal();
-    }),
+  button.setAttribute("aria-expanded", "false");
+  button.setAttribute("aria-label", "メニューを開く");
+  button.querySelector(".material-symbols-rounded").textContent = "menu";
+}
+
+function filterProducts(button) {
+  document.querySelectorAll("[data-filter]").forEach((candidate) => {
+    candidate.classList.toggle("active", candidate === button);
+    candidate.setAttribute("aria-pressed", String(candidate === button));
+  });
+  const view =
+    document.querySelector("[data-product-view].active")?.dataset.productView ||
+    productView();
+  const items = site.products.filter(
+    (product) =>
+      button.dataset.filter === "all" || product.type === button.dataset.filter,
   );
-  document.querySelectorAll("[data-product-view]").forEach((b) =>
-    b.addEventListener("click", () => {
-      document.querySelectorAll("[data-product-view]").forEach((x) => {
-        x.classList.toggle("active", x === b);
-        x.setAttribute("aria-pressed", String(x === b));
-      });
-      try {
-        localStorage.setItem("towapc-product-view", b.dataset.productView);
-      } catch {}
-      const filter =
-          document.querySelector("[data-filter].active")?.dataset.filter ||
-          "all",
-        items = S.products.filter((p) => filter === "all" || p.type === filter);
-      document.getElementById("product-results").innerHTML = productResults(
-        items,
-        b.dataset.productView,
-      );
-      reveal();
-    }),
+  document.getElementById("product-results").innerHTML = productResults(
+    items,
+    view,
   );
-  document.querySelectorAll("[data-news-view]").forEach((b) =>
-    b.addEventListener("click", () => {
-      document.querySelectorAll("[data-news-view]").forEach((x) => {
-        x.classList.toggle("active", x === b);
-        x.setAttribute("aria-pressed", String(x === b));
-      });
-      try {
-        localStorage.setItem("towapc-news-view", b.dataset.newsView);
-      } catch {}
-      const results = document.getElementById("information-results");
-      results.className =
-        b.dataset.newsView === "list" ? "info-list" : "news-results";
-      results.innerHTML =
-        b.dataset.newsView === "list"
-          ? informationRows(S.news)
-          : newsCards(S.news);
-      reveal();
-    }),
+  setupProjectDialogs();
+  reveal();
+}
+
+function switchProductView(button) {
+  document.querySelectorAll("[data-product-view]").forEach((candidate) => {
+    candidate.classList.toggle("active", candidate === button);
+    candidate.setAttribute("aria-pressed", String(candidate === button));
+  });
+  try {
+    localStorage.setItem("towapc-product-view", button.dataset.productView);
+  } catch {}
+  const filter =
+    document.querySelector("[data-filter].active")?.dataset.filter || "all";
+  const items = site.products.filter(
+    (product) => filter === "all" || product.type === filter,
   );
-  setupAppearanceEgg();
-  setupAppearanceControls();
+  document.getElementById("product-results").innerHTML = productResults(
+    items,
+    button.dataset.productView,
+  );
+  setupProjectDialogs();
+  reveal();
+}
+
+function setupPageControls() {
+  document.querySelectorAll("[data-filter]").forEach((button) => {
+    button.addEventListener("click", () => filterProducts(button));
+  });
+  document.querySelectorAll("[data-product-view]").forEach((button) => {
+    button.addEventListener("click", () => switchProductView(button));
+  });
+  setupMemberDialogs();
+  setupProjectDialogs();
+  setupAppearanceEgg(navigate);
+  setupAppearanceControls(render);
   setupShredEgg();
+}
+
+function render() {
+  const { route, id } = currentLocation();
+  const main = document.getElementById("main");
+  const content = renderPage(route, id, renderAppearanceLab);
+  const homeLink = route
+    ? `<div class="page-home-link wrap"><a class="text-link" href="/">${icon("left")} ホームに戻る</a></div>`
+    : "";
+  main.innerHTML = content + homeLink;
+  document.title = `TowaPC — ${pageTitle(route)}`;
+
+  const logo = safeImageSource(site.logo) || "/assets/TowaPC.svg";
+  document.querySelectorAll(".custom-logo").forEach((image) => {
+    image.setAttribute("src", logo);
+  });
+  renderNavigation(route);
+  resetMenu();
+  setupPageControls();
   window.scrollTo({ top: 0, behavior: "instant" });
   reveal();
   main.classList.remove("page-enter");
@@ -1168,6 +165,12 @@ function render() {
   main.classList.add("page-enter");
   requestAnimationFrame(positionSelection);
 }
+
+function navigate(path) {
+  if (location.pathname !== path) history.pushState(null, "", path);
+  render();
+}
+
 function showDataWarning(failures) {
   if (!failures.length) return;
   const warning = document.createElement("aside");
@@ -1177,26 +180,30 @@ function showDataWarning(failures) {
     "一部の情報を読み込めませんでした。時間を置いて再読み込みしてください。";
   document.getElementById("main").prepend(warning);
 }
+
 async function start() {
   const failures = await loadSiteData();
   render();
   showDataWarning(failures);
 }
+
 let menuScrollY = 0;
+
 function setMenuLock(open) {
   if (open) {
     menuScrollY = window.scrollY;
     document.body.style.setProperty("--menu-scroll-y", `${menuScrollY}px`);
     document.body.classList.add("menu-open");
-  } else {
-    document.body.classList.remove("menu-open");
-    document.body.style.removeProperty("--menu-scroll-y");
-    window.scrollTo({ top: menuScrollY, behavior: "instant" });
+    return;
   }
+  document.body.classList.remove("menu-open");
+  document.body.style.removeProperty("--menu-scroll-y");
+  window.scrollTo({ top: menuScrollY, behavior: "instant" });
 }
+
 function setMenuState(open) {
-  const nav = document.querySelector(".header nav"),
-    button = document.querySelector(".menu-button");
+  const nav = document.querySelector(".header nav");
+  const button = document.querySelector(".menu-button");
   nav.classList.toggle("open", open);
   setMenuLock(open);
   button.setAttribute("aria-expanded", String(open));
@@ -1208,53 +215,11 @@ function setMenuState(open) {
     ? "close"
     : "menu";
 }
-document.querySelector(".menu-button").addEventListener("click", () => {
-  const nav = document.querySelector(".header nav");
-  setMenuState(!nav.classList.contains("open"));
-});
-document.addEventListener("click", (e) => {
-  const nav = document.querySelector(".header nav");
-  if (
-    nav.classList.contains("open") &&
-    !e.target.closest(".header nav") &&
-    !e.target.closest(".menu-button")
-  )
-    setMenuState(false);
-});
-document
-  .querySelector(".back-top")
-  .addEventListener("click", () =>
-    window.scrollTo({ top: 0, behavior: "smooth" }),
-  );
-document.addEventListener("click", (e) => {
-  const a = e.target.closest("a");
-  if (
-    !a ||
-    e.defaultPrevented ||
-    e.button !== 0 ||
-    e.metaKey ||
-    e.ctrlKey ||
-    e.shiftKey ||
-    e.altKey ||
-    a.target
-  )
-    return;
-  const u = new URL(a.href, location.href);
-  if (u.origin !== location.origin) return;
-  e.preventDefault();
-  if (document.querySelector(".header nav").classList.contains("open"))
-    setMenuState(false);
-  const next = u.pathname === "/" ? "/" : u.pathname.replace(/\/?$/, "/");
-  if (location.pathname !== next) history.pushState(null, "", next + u.hash);
-  render();
-  if (u.hash)
-    requestAnimationFrame(() =>
-      document.querySelector(u.hash)?.scrollIntoView({ behavior: "smooth" }),
-    );
-});
+
 let observer;
+
 function reveal() {
-  if (observer) observer.disconnect();
+  observer?.disconnect();
   const items = [...document.querySelectorAll(".floating,.section-heading")];
   if (
     matchMedia("(prefers-reduced-motion:reduce)").matches ||
@@ -1267,8 +232,8 @@ function reveal() {
     return;
   }
   const current = new IntersectionObserver(
-    (es) =>
-      es.forEach((entry) => {
+    (entries) => {
+      entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const target = entry.target;
         target.style.setProperty(
@@ -1282,26 +247,31 @@ function reveal() {
           { once: true },
         );
         current.unobserve(target);
-      }),
+      });
+    },
     { threshold: 0.08 },
   );
   observer = current;
-  items.forEach((e, i) => {
-    e.classList.remove("is-visible", "play-reveal");
-    e.classList.add("reveal");
-    e.dataset.revealDelay = String((i % 4) * appearanceSettings.stagger);
+  items.forEach((element, index) => {
+    element.classList.remove("is-visible", "play-reveal");
+    element.classList.add("reveal");
+    element.dataset.revealDelay = String(
+      (index % 4) * appearanceSettings.stagger,
+    );
   });
   requestAnimationFrame(() => {
-    if (observer === current) items.forEach((e) => current.observe(e));
+    if (observer === current)
+      items.forEach((element) => current.observe(element));
   });
 }
+
 function positionSelection() {
   const nav = document.querySelector(".header nav");
   if (!nav) return;
   const selected = nav.querySelector(
-      ":scope>a.active,:scope>details.active-group>summary",
-    ),
-    pill = nav.querySelector(".nav-selection");
+    ":scope>a.active,:scope>details.active-group>summary",
+  );
+  const pill = nav.querySelector(".nav-selection");
   if (!pill) return;
   if (!selected || !nav.offsetWidth) {
     pill.style.opacity = "0";
@@ -1313,53 +283,78 @@ function positionSelection() {
   pill.style.transform = `translate(${selected.offsetLeft}px,${selected.offsetTop}px)`;
   requestAnimationFrame(() => nav.classList.add("nav-ready"));
 }
-function setupTheme() {
-  document.querySelectorAll("[data-theme-option]").forEach((button) =>
-    button.addEventListener("click", () => {
-      appearanceSettings.theme = button.dataset.themeOption;
-      appearanceSettings.themePinned = true;
-      saveAppearance();
-      applyAppearance();
-      syncAppearanceControls();
-    }),
-  );
-  const systemTheme = matchMedia("(prefers-color-scheme:dark)");
-  systemTheme.addEventListener("change", () => {
-    if (appearanceSettings.themePinned) return;
-    applyAppearance();
-    syncThemeControls();
-  });
-  syncThemeControls();
-}
-function migrate() {
-  if (location.hash.startsWith("#/"))
+
+function migrateLegacyHash() {
+  if (location.hash.startsWith("#/")) {
     history.replaceState(null, "", location.hash.slice(1).replace(/\/?$/, "/"));
+  }
 }
+
+document.querySelector(".menu-button").addEventListener("click", () => {
+  const nav = document.querySelector(".header nav");
+  setMenuState(!nav.classList.contains("open"));
+});
+
+document.addEventListener("click", (event) => {
+  const nav = document.querySelector(".header nav");
+  if (
+    nav.classList.contains("open") &&
+    !event.target.closest(".header nav") &&
+    !event.target.closest(".menu-button")
+  ) {
+    setMenuState(false);
+  }
+});
+
+document.querySelector(".back-top").addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest("a");
+  if (
+    !link ||
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey ||
+    link.target
+  ) {
+    return;
+  }
+  const url = new URL(link.href, location.href);
+  if (url.origin !== location.origin) return;
+  event.preventDefault();
+  const nextPath =
+    url.pathname === "/" ? "/" : url.pathname.replace(/\/?$/, "/");
+  navigate(nextPath);
+  if (url.hash) {
+    requestAnimationFrame(() => {
+      document.querySelector(url.hash)?.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+});
+
 window.addEventListener("resize", positionSelection);
 window.addEventListener("popstate", () => {
-  migrate();
+  migrateLegacyHash();
   render();
 });
 window.addEventListener("hashchange", () => {
-  migrate();
+  migrateLegacyHash();
   render();
 });
 document.addEventListener("keydown", (event) => {
-  if (
-    event.key === "Escape" &&
-    document.body.classList.contains("animation-mode") &&
-    !document.querySelector("dialog[open]")
-  ) {
-    appearanceSettings.animationMode = false;
-    saveAppearance();
-    applyAppearance();
-    syncAppearanceControls();
-    showEggStatus("ANIMATION MODE // OFF");
-  }
+  if (handleMemberDialogEscape(event)) return;
+  if (handleProjectDialogEscape(event)) return;
+  if (event.key === "Escape") disableAnimationMode();
 });
+
 document.fonts.ready.then(positionSelection);
 applyAppearance();
 setupTheme();
 setupCookieConsent();
-migrate();
+migrateLegacyHash();
 start();

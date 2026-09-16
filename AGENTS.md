@@ -25,21 +25,23 @@
 
 ## 設計
 
-- 表示内容の正本は `data` フォルダー内のCSV。実際の紹介文をJavaScriptへ重複させない。
+- 表示内容の正本は `data` フォルダー内のCSVと規約Markdown。実際の文章をJavaScriptへ重複させない。
 - `csv.js` がブラウザー表示と検査で共用するCSV解析を担当する。CSV解析を別の場所へ複製しない。
 - `site-schema.js` がCSVの列、必須項目、タグ、製品種別、色、読み込み対象を一元管理する。仕様追加時はここを正本にする。
 - `site-data.js` がCSVの読み込み、URL検証、画像パス検証、HTMLエスケープを担当する。
 - `cookie-consent.js` がCookie設定の保存、同意バー、アクセス解析の許可・拒否操作を担当する。
-- `app-v2.js` がページ表示と画面操作を担当するES Module。
-- `style-v2.css` が通常ページの基礎レイアウトと配色を担当する。`appearance.css` がAppearance Labとユーザー選択テーマによる上書きを担当し、基礎CSSの後に読み込む。
+- `app-v2.js` は画面遷移、ナビゲーション、各機能の起動だけを担当する。
+- `page-views.js` が各ページ本文、`legal-markdown.js` が規約Markdownの安全な表示、`appearance-settings.js` が外観設定、`member-dialog.js` と `project-dialog.js` が詳細表示、`easter-eggs.js` が404シュレッダー、`ui.js` が表示用共通部品を担当する。責務を `app-v2.js` へ戻さない。
+- CSSは `styles` 内で基礎、ページ、レスポンシブ、ダーク、Cookie、Appearance Lab、Material 3、Monochrome、特殊演出に分ける。巨大なCSSへ再結合しない。
+- HTML内へ長いJavaScriptやCSSを書かない。初期テーマは `theme-bootstrap.js`、アクセス解析は `analytics.js` を使う。
 - 全ページ共通のHTMLは `templates/page.html` だけを直接編集する。
-- HTML更新後や製品・お知らせのID変更後は `bun run sync-pages` を実行する。
-- `bun run sync-pages` はCSVに存在する製品・お知らせの詳細ページを生成し、CSVに存在しない古い詳細ページを削除する。`product/*/index.html` と `information/*/index.html` を手作業で追加しない。
+- HTML更新後やお知らせのID変更後は `bun run sync-pages` を実行する。
+- `bun run sync-pages` はCSVに存在するお知らせの詳細ページを生成し、古い詳細ページを削除する。製品詳細ページは生成せず、一覧カードのポップアップで紹介する。`information/*/index.html` を手作業で追加しない。
 - `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、固定表示資産、共通HTML、JavaScript、Git管理対象を検査する。
 - CSVの全列、タグ、改行、複数リンク、画像、手動公開の正規手順は `data/README.md` に集約する。ルート `README.md` はサイト紹介だけを載せる。
 - 公開前に必ず `bun run format`、`bun run format:check`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` は固定済み依存関係を導入し、整形とサイト構造を検査する。リポジトリ取得はNode.js 24対応の `actions/checkout@v7` を使う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、`app-v2.js`・`site-data.js` 内のimportを同じ番号にする。現在は `v70`。
+- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、各ES Module内のimportを同じ番号にする。現在は `v71`。
 - `.gitignore` は依存関係、キャッシュ、出力、ログ、環境変数、OS・エディター固有ファイル、ZIPを除外する。`bun run check` は除外対象が誤ってGit追跡されていないかも検査する。
 - `.gitattributes` でテキストの改行をLFへ統一し、WindowsとGitHub間で内容と無関係な差分を作らない。画像はバイナリとして扱う。
 - `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
@@ -74,6 +76,7 @@
 - 新しいページを追加するときも、`pageHero()`、`.section.wrap`、既存カードの視覚言語を基準にする。
 - 規約本文カードに `TOWAPC.COM` のような飾り用の英字ラベルを追加しない。Homeと同じ内側シャドウを使い、リンク色を選択中のカラーテーマへ追従させる。
 - 添付された利用規約・プライバシーポリシーの本文は原文を維持する。明示された変更、実リンクへの置換、実装に必要な追記以外では、要約・言い換え・段落結合をしない。
+- 利用規約は `data/terms.md`、プライバシーポリシーは `data/privacy.md` を正本とし、本文変更のためにJavaScriptや生成HTMLを編集しない。
 - 利用規約・プライバシーポリシーは共通のAppearance設定に追従させる。ライト／ダーク、カラーパレット、標準／Material／Liquid Glass／紙、角丸、密度、ページ遷移の適用を維持する。
 - ライト／ダークは初期状態および通常の外観変更後も端末設定を優先する。Appearance Labの「テーマを任意で固定する」を有効にした場合だけ、選択したLightまたはDarkを端末設定より優先する。
 
@@ -82,21 +85,25 @@
 - ホームのお知らせ欄は、複数件でも日付・タグ・タイトル・矢印の位置が行ごとにずれないよう固定する。「すべて見る」はPCでは「Information」の下、スマートフォンでは同じ行の右端に置く。ショートカットは `Product / About / Contact / Join` の順。
 - ダークテーマの選択中ヘッダータブは、薄い背景 `#eef1e8` と濃い文字 `#171a16` で表示する。スマートフォンの展開メニューでも同じ配色を使う。
 - Productの説明は「私たちの製品の紹介」、Joinの説明は「私たちの一員になる」。
-- 製品・お知らせのリンクは各CSVの `links` 列へ `ボタン名|URL` で記入する。複数リンクは `;;` またはセル内改行で区切る。詳細ページ下部は左に一覧へ戻るリンク、右に名前付き関連リンクボタンを表示する。
+- 製品・お知らせのリンクは各CSVの `links` 列へ `ボタン名|URL` で記入する。複数リンクは `;;` またはセル内改行で区切る。製品は先頭のURLを一覧とポップアップの移動ボタンに使い、お知らせ詳細は左に一覧へ戻るリンク、右に名前付き関連リンクを表示する。
 - 製品の説明とお知らせ本文は `\\n` またはCSVセル内の実改行を詳細ページの改行として表示する。一覧では改行を空白へ整えてレイアウトを崩さない。
-- お知らせの `tag` は `new`、`important`、`release`、`update` の4種類とし、表示は `NEW`、`重要`、`リリース`、`更新` にする。
+- お知らせの `tag` は `new`、`important`、`release`、`update` の4種類とし、表示は `NEW`、`Important`、`リリース`、`更新` にする。
 - テキストリンクには下線を付けず、ホーム内の「TowaPCについて」や一覧リンクは右揃えにする。
 - フッターのLinksにはJoinを含め、右側にContact欄を置く。
-- フッターのContact欄にはYouTube、X、Discord、お問い合わせを置く。
+- フッターのContact欄にはYouTube、X、Discord、Emailを置く。
+- フッターのContact欄ではYouTube、X、Discord、Emailをモノクロアイコン付きで表示し、`data/contacts.csv` の追加リンクは従来どおり文字リンクで表示する。
+- フッターのLinksではJoinを最後尾に置く。著作権表示は `© 2024〜2026 TowaPC. All rights reserved.` とする。
 - Joinページの参加ボタンも同じDiscord招待リンクを開く。
-- Join上部の「あなたの『つくりたい』を、ここから。」カードはテーマと反転させ、ライトでは黒背景・白文字・白ボタン、ダークでは白背景・黒文字・黒ボタンにする。
-- ダークテーマで白背景・黒文字のままにするのは、Join最上部、Contact、Aboutの「TowaPCについて」カード。Aboutカード内のリンクは薄いグレー背景・黒文字にする。ほかのカードはダーク配色にする。Informationリストの外側は透明にして、角の後ろに四角い背景が見えないようにする。
-- Discord招待URL: `https://discord.gg/WJrAwzMp2U`
+- Joinは「TowaPCのメンバーになるには、以下のリンクから私たちのDiscordサーバーに参加してください。」とDiscord参加ボタンだけを表示し、下部の説明カードは置かない。
+- Aboutのロゴと説明を載せる白いカードには見出し「TowaPCについて」やリンクボタンを入れない。3つのリンクボタンは白いままカード外へ置く。Informationリストの外側は透明にして、角の後ろに四角い背景が見えないようにする。
+- Discordリンク: `https://towapc.com/discord`
+- Informationは左に画像を上端へ直結した注目項目、右に一覧を置く。カードの中に画像用カードを重ねない。
+- Productは詳細ページを持たない。カード本体で紹介ポップアップを開き、先頭の`links`を強調した「プロジェクトに移動」ボタンに使う。
 - Contactカードの補足表示:
   - YouTube: `@TowaPC`
   - X: `@TowaPC_Official`
   - Discord: `TowaPC Community`
-  - お問い合わせ: `contact@towapc.com`
+  - Email: `contact@towapc.com`
 - Contactカードの値は `data/site.csv` の `labels.*` で管理する。
 - ContactのXロゴは、ライト・ダークとも黒で固定する。
 - フッター下部に「利用規約」「プライバシーポリシー」「Cookie設定」を表示する。規約は `/terms/`、プライバシーポリシーは `/privacy/`。
@@ -104,7 +111,8 @@
 - 通常カードとセクション見出しの標準登場は、下42px・0.965倍・8pxぼかし・透明から定位置・等倍・ぼかしなしへ0.52秒でフェードアップする。減速カーブは `cubic-bezier(0.16, 1, 0.3, 1)`、カード間の遅延は42ms。v52の軽い動きを標準にする。
 - `/appearance/` は通常のヘッダー・フッターリンクへ載せない隠し外観設定ページ。設定は `towapc-appearance-v1` として端末のlocalStorageへ保存する。
 - 外観設定では、登場アニメーションのプリセットに加えて、速度200〜1200ms、カード間隔、移動量、ぼかし、開始時の大きさをスライダーで個別調整できる。標準は0.52秒、ゆったりはv53の0.68秒、ほかにきびきび・静止を用意する。
-- 外観設定では、端末設定へ追従する明るさ、任意固定時のLight・Dark、差し色（標準・藤・若葉・夕焼け・自由色カラーパレット）、デザインテーマ（標準・Material 3・Liquid Glass・Paper）、カードの角、余白、UIの大きさも変更できる。Material 3は専用のsurface container、outline、primary container、filled button、低いelevationを全ページに適用し、ダークでも白固定カードを残さない。
+- 外観設定では、端末設定へ追従する明るさ、任意固定時のLight・Dark、差し色（標準・藤・若葉・夕焼け・自由色カラーパレット）、デザインテーマ（標準・Material 3・Liquid Glass・Paper・Monochrome）、カードの角、余白、UIの大きさも変更できる。Material 3は専用のsurface container、outline、primary container、filled button、低いelevationを全ページに適用する。
+- デザインテーマには、線とモノクロで構成しドロップシャドウを使わないMonochromeも含める。Appearance Labでは安全なJSON形式の外部テーマを読み込めるようにし、同ページへ作成ガイドラインと例を載せる。外部テーマからHTML、CSS、JavaScript、外部URLを実行しない。
 - ヘッダーは標準で透明度42%・背景ブラー14px。外観設定で透明度、ブラー、アニメーション時間、スライド・フェード・静止、ガラス効果を変更できる。
 - 旧Aboutロゴ5回押しの謎のアニメーションモードは、外観設定内の保存可能なスイッチへ移す。Escキーでも解除できる。
 - 隠し外観設定へ移動するときはスナックバーや花火を出さない。設定ページの回転する菱形は維持する。謎のアニメーションモードを有効化したときは、画面下から上へ抜ける白いオーバーレイを1回だけ表示する。`EASTER EGG 01` の文字は表示しない。
@@ -114,18 +122,26 @@
 
 ## メンバーと協力関係
 
-- メンバー画像と企業ロゴは常に正方形。
-- PCは180×180px、スマートフォンは104×104px。
-- メンバー画像は正方形にトリミングし、企業ロゴは正方形内に全体を収める。
+- メンバー画像は正方形にトリミングし、一覧ではPC 96×96px、スマートフォン72×72pxを基準にする。
+- 企業ロゴは縦横比を維持して全体を収め、カード最上部へ置く。PCは高さ90px、スマートフォンは52pxを基準にする。
 - Towaの画像: `assets/member-towa.png`
 - Arielogicの画像は `assets/partner-arielogic.png`。利用者から提供された正方形のロゴ画像を使用する。
+- メンバー一覧の説明は3行で省略する。カードを押すと、背景ブラーと暗転を使ったシャドウなしの詳細カードを開き、上に画像、下に全文、右上に×を表示する。
+
+## v71 完了状態（2026-09-16）
+
+- v71では全ページのHTML、JavaScript、CSSを責務別ファイルへ整理し、長いインラインHTML・スクリプトと巨大CSSを廃止した。
+- Aboutは色付き価値カードを廃止し、`data/history.csv` で編集する履歴と、`data/site.csv` で編集する名前の由来へ変更した。履歴カードは着色有無、背景色、白黒の文字色をCSVで指定する。
+- Contactのメール表記はEmailへ変更し、`data/contacts.csv` から追加リンクを表示できる。JoinはDiscord参加案内と参加ボタンだけに簡略化した。
+- お知らせと製品はタイトルを日付・タグ・カテゴリーより先に表示する。Cookieバーは境界線を削除し、ボタンとバーをドロップシャドウ中心の表示へ変更した。
 
 ## この変更の確認状況
 
 - ローカル表示で製品1件、お知らせ2件を確認済み。
-- Contactの表示は `@TowaPC`、`@TowaPC_Official`、`TowaPC Community`、`contact@towapc.com`。
-- Aboutの新しい文章、3つの色付き枠、Joinリンクを確認済み。
-- JoinとフッターのDiscordリンクを確認済み。
+- Contactの表示はYouTube、X、Discord、Emailの4件。`contacts.csv`へ一時的に追加したリンクがContactカードとフッター文字リンクの両方へ出ることも確認済み。
+- Aboutはロゴと本文の白いカード、外側の白いリンクカード、履歴カード、名前の由来の順。通常カードとCSV指定の着色カードをライト・ダークで確認済み。
+- JoinはDiscord参加案内と参加ボタンだけを表示する。
+- メンバー詳細カードの表示・×・Esc、協力関係ロゴの上配置、Monochromeのライト・ダーク、外部テーマJSON読込を確認済み。
 - サンプル注記が表示されないことを確認済み。
 - ブラウザーの警告・エラーなし。
 - 変更を公開するときは、最終検査、コミット、`main`へのpush、配布ZIP更新、公開サイト確認までを一続きで行う。

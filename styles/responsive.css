@@ -1,0 +1,264 @@
+/* Responsive layout */
+@media (max-width: 960px) {
+  .header {
+    padding: 0 4%;
+  }
+  .header nav > a,
+  .nav-menu > summary {
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+  .custom-logo {
+    width: 175px;
+  }
+  .wrap {
+    width: 90%;
+  }
+  .grid {
+    gap: 14px;
+  }
+  .quick-link {
+    padding: 21px 15px;
+    gap: 10px;
+  }
+  .quick-link strong {
+    font-size: 17px;
+  }
+  footer {
+    grid-template-columns: minmax(180px, 1fr) minmax(0, auto);
+    column-gap: 24px;
+  }
+  .footer-groups {
+    gap: 24px;
+  }
+  .footer-groups nav {
+    grid-template-columns: max-content;
+  }
+}
+@media (max-width: 720px) {
+  :root {
+    --header-height: 64px;
+  }
+  .custom-logo {
+    width: 155px;
+    max-height: 36px;
+  }
+  .menu-button {
+    display: flex;
+  }
+  .header nav {
+    display: none;
+    position: absolute;
+    top: 58px;
+    left: 4%;
+    right: 4%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(12px) saturate(105%);
+    -webkit-backdrop-filter: blur(12px) saturate(105%);
+    box-shadow:
+      inset 0 0 16px #0003,
+      0 8px 22px #0004;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .header nav.open {
+    display: flex;
+  }
+  .header nav > a {
+    font-size: 15px;
+    padding: 11px 14px;
+  }
+  .header nav > a.active {
+    background: #fff;
+    color: #242822;
+  }
+  .nav-selection {
+    display: none;
+  }
+  .hero {
+    height: 400px;
+    min-height: 360px;
+  }
+  .hero-background {
+    object-position: 53% center;
+  }
+  .hero h1 {
+    font-size: 22px;
+    padding: 20px 14px;
+  }
+  .intro {
+    margin-top: 25px;
+    padding: 26px 22px;
+  }
+  .intro h2,
+  .section-heading h2 {
+    font-size: 27px;
+  }
+  .intro p {
+    text-align: left;
+  }
+  .news-strip {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .news-heading {
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    transform: none;
+  }
+  .news-row {
+    gap: 8px;
+    font-size: 10px;
+  }
+  .news-strip .news-thumb {
+    display: none;
+  }
+  .badge {
+    font-size: 9px;
+    min-width: 55px;
+  }
+  .quick-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .quick-link {
+    min-width: 0;
+    padding: 22px 12px;
+  }
+  .quick-link strong {
+    font-size: 16px;
+  }
+  .quick-link > .icon {
+    width: 18px;
+    font-size: 18px;
+  }
+  .quick-link > .arrow {
+    margin-left: auto;
+  }
+  .section {
+    padding: 44px 0 52px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .product-art {
+    height: auto;
+    aspect-ratio: 8/5;
+  }
+  .product h3 {
+    font-size: 16px;
+  }
+  .page-hero {
+    padding: 32px 0;
+  }
+  .page-hero h1 {
+    font-size: 42px;
+  }
+  .information-row {
+    grid-template-columns: 112px minmax(0, 1fr);
+  }
+  .information-row-art {
+    width: 112px;
+    min-height: 138px;
+  }
+  .information-row-copy {
+    padding: 16px;
+  }
+  .information-row-copy p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+  .article {
+    padding: 25px;
+  }
+  .detail-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .detail-actions .back-link {
+    margin-right: 0;
+  }
+  .related-links {
+    justify-content: flex-start;
+  }
+  .about-links,
+  .values,
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+  .join-section {
+    margin-top: 30px;
+    margin-bottom: 45px;
+    padding: 24px 4%;
+  }
+  .join-box {
+    padding: 34px 22px;
+  }
+  .join-box .cta {
+    width: 100%;
+    padding: 13px 16px;
+    justify-content: center;
+    gap: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .page-home-link {
+    margin-top: -28px;
+    margin-bottom: 48px;
+  }
+  .directory-card {
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 16px;
+    padding: 18px;
+  }
+  .directory-image {
+    width: 104px;
+    justify-self: start;
+  }
+  footer {
+    border-radius: 29px 29px 0 0;
+    padding: 33px 6% 76px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .footer-brand {
+    min-height: 0;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-groups {
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 30px;
+  }
+  .footer-copyright {
+    order: 3;
+    margin-top: 34px;
+    align-self: flex-start;
+  }
+  .footer-groups nav {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+  .back-top {
+    width: 42px;
+    height: 42px;
+    right: 16px;
+    bottom: 16px;
+  }
+}

@@ -1,0 +1,144 @@
+/* Line-based monochrome theme */
+:root[data-surface="monochrome"] {
+  --accent: #fff;
+  --accent-soft: #f4f4f4;
+  --accent-strong: #111;
+  --accent-header: #fff;
+  --inner: none;
+}
+
+:root[data-surface="monochrome"] body {
+  background: #fff;
+  color: #111;
+}
+
+:root[data-surface="monochrome"] body * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+:root[data-surface="monochrome"] .header,
+:root[data-surface="monochrome"] footer,
+:root[data-surface="monochrome"] .page-hero {
+  border-color: #111;
+  background: #fff;
+  color: #111;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+:root[data-surface="monochrome"] .header {
+  border-bottom: 1px solid #111;
+}
+
+:root[data-surface="monochrome"] footer {
+  border-top: 1px solid #111;
+}
+
+:root[data-surface="monochrome"] main .floating,
+:root[data-surface="monochrome"] main .settings-card,
+:root[data-surface="monochrome"] main .settings-reset,
+:root[data-surface="monochrome"] .filter,
+:root[data-surface="monochrome"] .view-button,
+:root[data-surface="monochrome"] .soft-button,
+:root[data-surface="monochrome"] .status,
+:root[data-surface="monochrome"] .setting-choices button,
+:root[data-surface="monochrome"] .color-picker,
+:root[data-surface="monochrome"] .cookie-consent {
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+}
+
+:root[data-surface="monochrome"] .hero-background,
+:root[data-surface="monochrome"] main img {
+  filter: grayscale(1) contrast(1.05);
+}
+
+:root[data-surface="monochrome"] .hero::before {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+:root[data-surface="monochrome"] .hero h1 {
+  color: #fff;
+}
+
+:root[data-surface="monochrome"] .pink,
+:root[data-surface="monochrome"] .lavender,
+:root[data-surface="monochrome"] .mint,
+:root[data-surface="monochrome"] .cream,
+:root[data-surface="monochrome"] .peach,
+:root[data-surface="monochrome"] .history-card.is-colored {
+  background: #fff;
+  color: #111;
+}
+
+:root[data-surface="monochrome"] .nav-selection,
+:root[data-surface="monochrome"] .filter.active,
+:root[data-surface="monochrome"] .view-button.active,
+:root[data-surface="monochrome"] .cta,
+:root[data-surface="monochrome"] .theme-import-button {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+}
+
+:root[data-surface="monochrome"] .history-timeline::before {
+  background: #111;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] {
+  --accent: #111;
+  --accent-soft: #1a1a1a;
+  --accent-strong: #fff;
+  --accent-header: #111;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] body,
+:root[data-theme="dark"][data-surface="monochrome"] .header,
+:root[data-theme="dark"][data-surface="monochrome"] footer,
+:root[data-theme="dark"][data-surface="monochrome"] .page-hero {
+  border-color: #fff;
+  background: #111;
+  color: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] main .floating,
+:root[data-theme="dark"][data-surface="monochrome"] main .settings-card,
+:root[data-theme="dark"][data-surface="monochrome"] main .settings-reset,
+:root[data-theme="dark"][data-surface="monochrome"] .filter,
+:root[data-theme="dark"][data-surface="monochrome"] .view-button,
+:root[data-theme="dark"][data-surface="monochrome"] .soft-button,
+:root[data-theme="dark"][data-surface="monochrome"] .status,
+:root[data-theme="dark"][data-surface="monochrome"] .setting-choices button,
+:root[data-theme="dark"][data-surface="monochrome"] .color-picker,
+:root[data-theme="dark"][data-surface="monochrome"] .cookie-consent,
+:root[data-theme="dark"][data-surface="monochrome"] .member-dialog {
+  border-color: #fff;
+  background: #111;
+  color: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .pink,
+:root[data-theme="dark"][data-surface="monochrome"] .lavender,
+:root[data-theme="dark"][data-surface="monochrome"] .mint,
+:root[data-theme="dark"][data-surface="monochrome"] .cream,
+:root[data-theme="dark"][data-surface="monochrome"] .peach,
+:root[data-theme="dark"][data-surface="monochrome"] .history-card.is-colored {
+  background: #111;
+  color: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .nav-selection,
+:root[data-theme="dark"][data-surface="monochrome"] .filter.active,
+:root[data-theme="dark"][data-surface="monochrome"] .view-button.active,
+:root[data-theme="dark"][data-surface="monochrome"] .cta,
+:root[data-theme="dark"][data-surface="monochrome"] .theme-import-button {
+  border-color: #fff;
+  background: #fff;
+  color: #111;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .history-timeline::before {
+  background: #fff;
+}

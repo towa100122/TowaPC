@@ -18,15 +18,10 @@ export const basePageFiles = [
 ];
 
 export async function getPageFiles(root) {
-  const [productsText, newsText] = await Promise.all([
-    readFile(resolve(root, "data/products.csv"), "utf8"),
-    readFile(resolve(root, "data/news.csv"), "utf8"),
-  ]);
-  const products = parseCsv(productsText).rows;
+  const newsText = await readFile(resolve(root, "data/news.csv"), "utf8");
   const news = parseCsv(newsText).rows;
   return [
     ...basePageFiles,
-    ...products.map(({ id }) => `product/${id}/index.html`),
     ...news.map(({ id }) => `information/${id}/index.html`),
   ];
 }

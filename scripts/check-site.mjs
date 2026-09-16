@@ -47,21 +47,49 @@ try {
   problem(`Git管理対象の検査: ${error.message}`);
 }
 
-const requiredClientFiles = [
+const clientScripts = [
+  "analytics.js",
   "app-v2.js",
-  "appearance.css",
+  "appearance-settings.js",
   "cookie-consent.js",
   "csv.js",
-  "legal-content.js",
+  "easter-eggs.js",
+  "legal-markdown.js",
+  "member-dialog.js",
+  "page-views.js",
+  "project-dialog.js",
   "site-data.js",
   "site-schema.js",
-  "style-v2.css",
+  "theme-bootstrap.js",
+  "ui.js",
+  "content-v2.js",
+];
+const stylesheets = [
+  "styles/foundation.css",
+  "styles/home.css",
+  "styles/content.css",
+  "styles/footer.css",
+  "styles/responsive.css",
+  "styles/dark-motion.css",
+  "styles/legal-cookie.css",
+  "styles/appearance-lab.css",
+  "styles/ui-polish.css",
+  "styles/features.css",
+  "styles/material-theme.css",
+  "styles/monochrome-theme.css",
+  "styles/easter-eggs.css",
+];
+const requiredClientFiles = [
+  ...clientScripts,
+  ...stylesheets,
   "apple-touch-icon.png",
   "favicon.png",
   "assets/TowaPC.svg",
   "assets/social-discord.svg",
   "assets/social-x.svg",
   "assets/social-youtube.svg",
+  "data/terms.md",
+  "data/privacy.md",
 ];
 for (const file of requiredClientFiles) {
   if (!existsSync(resolve(root, file))) {
@@ -75,6 +103,10 @@ function isHttpUrl(value) {
   } catch {
     return false;
   }
+}
+
+function isContactUrl(value) {
+  return /^mailto:[^\s@]+@[^\s@]+$/i.test(value) || isHttpUrl(value);
 }
 
 function checkLinks(file, rowNumber, value) {
@@ -128,9 +160,11 @@ for (const [file, expectedHeaders] of Object.entries(csvSchemas)) {
           problem(`${file} ${rowNumber}行目: ${field}は必須です。`);
       }
       checkImage(file, rowNumber, row.image);
-      if (row.url && !isHttpUrl(row.url)) {
+      const validRowUrl =
+        file === "contacts.csv" ? isContactUrl(row.url) : isHttpUrl(row.url);
+      if (row.url && !validRowUrl) {
         problem(
-          `${file} ${rowNumber}行目: urlが正しいHTTP(S) URLではありません。`,
+          `${file} ${rowNumber}行目: urlが正しい${file === "contacts.csv" ? "HTTP(S)またはmailto" : "HTTP(S)"} URLではありません。`,
         );
       }
       checkLinks(file, rowNumber, row.links);
@@ -180,6 +214,25 @@ for (const [index, news] of (csvData["news.csv"] || []).entries()) {
   if (!newsTags.has(news.tag)) {
     problem(
       `news.csv ${index + 2}行目: tag「${news.tag}」は使用できません。new、important、release、updateから選んでください。`,
+    );
+  }
+}
+
+for (const [index, event] of (csvData["history.csv"] || []).entries()) {
+  const rowNumber = index + 2;
+  if (!["y", "n"].includes(event.colored)) {
+    problem(
+      `history.csv ${rowNumber}行目: coloredはyまたはnで指定してください。`,
+    );
+  }
+  if (event.colored === "y" && !/^#[0-9a-f]{6}$/i.test(event.color)) {
+    problem(
+      `history.csv ${rowNumber}行目: coloredがyの場合、colorは#から始まる6桁のカラーコードにしてください。`,
+    );
+  }
+  if (!["black", "white"].includes(event.textColor)) {
+    problem(
+      `history.csv ${rowNumber}行目: textColorはblackまたはwhiteで指定してください。`,
     );
   }
 }
@@ -252,15 +305,7 @@ try {
 }
 
 const transpiler = new Bun.Transpiler({ loader: "js" });
-for (const file of [
-  "app-v2.js",
-  "cookie-consent.js",
-  "csv.js",
-  "site-data.js",
-  "site-schema.js",
-  "legal-content.js",
-  "content-v2.js",
-]) {
+for (const file of clientScripts) {
   try {
     const source = await readFile(resolve(root, file), "utf8");
     transpiler.transformSync(source);

@@ -1,5 +1,5 @@
-import { parseCsv } from "./csv.js?v=70";
-import { dataFiles, directSiteKeys } from "./site-schema.js?v=70";
+import { parseCsv } from "./csv.js?v=71";
+import { dataFiles, directSiteKeys } from "./site-schema.js?v=71";
 
 export const site = {
   logo: "/assets/TowaPC.svg",
@@ -11,10 +11,14 @@ export const site = {
   contactUrl: "/contact/",
   socials: {},
   labels: {},
+  about: {},
   products: [],
   news: [],
   partners: [],
   members: [],
+  history: [],
+  contacts: [],
+  legal: { terms: "", privacy: "" },
 };
 
 export const escapeHtml = (value) =>
@@ -62,6 +66,14 @@ async function fetchCsv(path) {
   return parseCsv(await response.text()).rows;
 }
 
+async function fetchText(path) {
+  const response = await fetch(`${path}?v=${Date.now()}`, {
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`${path}: ${response.status}`);
+  return response.text();
+}
+
 export async function loadSiteData() {
   const results = await Promise.allSettled(
     dataFiles.map(([, path]) => fetchCsv(path)),
@@ -81,8 +93,22 @@ export async function loadSiteData() {
         if (directKeys.has(key)) site[key] = value;
         else if (key.startsWith("socials.")) site.socials[key.slice(8)] = value;
         else if (key.startsWith("labels.")) site.labels[key.slice(7)] = value;
+        else if (key.startsWith("about.")) site.about[key.slice(6)] = value;
       });
     } else site[name] = result.value;
+  });
+
+  const legalFiles = [
+    ["terms", "/data/terms.md"],
+    ["privacy", "/data/privacy.md"],
+  ];
+  const legalResults = await Promise.allSettled(
+    legalFiles.map(([, path]) => fetchText(path)),
+  );
+  legalResults.forEach((result, index) => {
+    const [name, path] = legalFiles[index];
+    if (result.status === "fulfilled") site.legal[name] = result.value;
+    else failures.push(path);
   });
 
   return failures;
