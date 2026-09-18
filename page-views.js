@@ -215,7 +215,7 @@ function home() {
   </section>
   <div class="wrap">
     <section class="intro floating">
-      <h2>What’s “TowaPC”?</h2>
+      <h2>What’s TowaPC?</h2>
       <p>${escapeHtml(site.description)}</p>
       <a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a>
     </section>
