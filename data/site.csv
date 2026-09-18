@@ -1,8 +1,8 @@
 ﻿key,value
 logo,/assets/TowaPC.svg
 hero,/assets/hero-original.jpg
-headline,Toward Solving Humanity’s Timeless Challenges.
-description,人々が抱える、永遠と思えるような難しい課題を、少しずつテクノロジーで解決できるように。少しの発見とのびのびとした発想で、暮らしを少し豊かに、便利にしていくためのものづくりを。
+headline,永遠を、少し便利に。
+description,難しい未来を、少し近く。伸びすぎず、手に届くように。
 joinUrl,https://towapc.com/discord
 contactUrl,mailto:contact@towapc.com
 socials.youtube,https://www.youtube.com/@TowaPC
@@ -13,4 +13,4 @@ labels.x,@TowaPC_Official
 labels.discord,TowaPC Community
 labels.contact,contact@towapc.com
 about.originTitle,名前の由来
-about.originBody,ここにTowaPCという名前の由来を書きます。\nこの文章はdata/site.csvから編集できます。
+about.originBody,TowaPCとは、創業者の本名であるTowaに、名前を付けたころにわくわくしていたPCをつけたシンプルな名前です。Towaには、永遠、永久といった意味もあり、人々の記憶に少しでもいいから残るような製品づくりを目指します。
