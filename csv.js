@@ -57,3 +57,14 @@ export function parseCsv(text) {
 
   return { headers, rows };
 }
+
+export function stringifyCsv(headers, rows) {
+  const escapeField = (value) => {
+    const text = String(value ?? "");
+    return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+  };
+  return `${[
+    headers.map(escapeField).join(","),
+    ...rows.map((row) => headers.map((key) => escapeField(row[key])).join(",")),
+  ].join("\n")}\n`;
+}

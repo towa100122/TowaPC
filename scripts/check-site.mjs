@@ -11,7 +11,11 @@ import {
   requiredFields,
   requiredSiteKeys,
 } from "../site-schema.js";
-import { getPageFiles } from "./site-files.mjs";
+import {
+  getPageDescriptors,
+  getPageFiles,
+  getRedirectDescriptors,
+} from "./site-files.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const problems = [];
@@ -62,7 +66,13 @@ const clientScripts = [
   "site-schema.js",
   "theme-bootstrap.js",
   "ui.js",
-  "content-v2.js",
+  "editor/editor.js",
+];
+const serverScripts = [
+  "editor/server.mjs",
+  "scripts/load-site-data.mjs",
+  "scripts/site-files.mjs",
+  "scripts/sync-pages.mjs",
 ];
 const stylesheets = [
   "styles/foundation.css",
@@ -91,6 +101,11 @@ const requiredClientFiles = [
   "assets/social-youtube.svg",
   "data/terms.md",
   "data/privacy.md",
+  "editor/index.html",
+  "editor/editor.css",
+  "editor/server.mjs",
+  "files/.gitkeep",
+  "assets/uploads/.gitkeep",
 ];
 for (const file of requiredClientFiles) {
   if (!existsSync(resolve(root, file))) {
@@ -144,6 +159,29 @@ function checkImage(file, rowNumber, image) {
   }
 }
 
+function checkAttachments(file, rowNumber, value) {
+  if (!value) return;
+  const entries = String(value)
+    .replace(/\\n/g, "\n")
+    .split(/;;|\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  entries.forEach((entry, index) => {
+    const separator = entry.indexOf("|");
+    const label = separator > 0 ? entry.slice(0, separator).trim() : "";
+    const path = separator > 0 ? entry.slice(separator + 1).trim() : "";
+    if (!label || !/^\/files\/[a-zA-Z0-9._-]+$/.test(path)) {
+      problem(
+        `${file} ${rowNumber}行目: attachmentsの${index + 1}件目は「表示名|/files/ファイル名」で指定してください。`,
+      );
+    } else if (!existsSync(resolve(root, path.slice(1)))) {
+      problem(
+        `${file} ${rowNumber}行目: 添付ファイル${path}が見つかりません。`,
+      );
+    }
+  });
+}
+
 for (const [file, expectedHeaders] of Object.entries(csvSchemas)) {
   try {
     const text = await readFile(resolve(root, "data", file), "utf8");
@@ -169,6 +207,8 @@ for (const [file, expectedHeaders] of Object.entries(csvSchemas)) {
         );
       }
       checkLinks(file, rowNumber, row.links);
+      if (file === "news.csv")
+        checkAttachments(file, rowNumber, row.attachments);
     });
   } catch (error) {
     problem(`${file}: ${error.message}`);
@@ -272,7 +312,6 @@ if (
 }
 
 try {
-  const template = await readFile(resolve(root, "templates/page.html"), "utf8");
   const pageFiles = await getPageFiles(root);
   for (const page of pageFiles) {
     const pagePath = resolve(root, page);
@@ -280,16 +319,37 @@ try {
       problem(`${page}がありません。bun run sync-pagesを実行してください。`);
       continue;
     }
-    if ((await readFile(pagePath, "utf8")) !== template) {
+  }
+  const [pages, redirects] = await Promise.all([
+    getPageDescriptors(root),
+    getRedirectDescriptors(root),
+  ]);
+  for (const page of pages) {
+    const html = await readFile(resolve(root, page.file), "utf8");
+    if (/\{\{[A-Z_]+\}\}/.test(html))
+      problem(`${page.file}: 未置換のテンプレート変数があります。`);
+    if (!/<title>[^<]+<\/title>/.test(html))
+      problem(`${page.file}: ページ固有titleがありません。`);
+    if (!/<link rel="canonical" href="https:\/\/towapc\.com\//.test(html))
+      problem(`${page.file}: canonicalがありません。`);
+    if (!/<main id="main">[\s\S]+<\/main>/.test(html))
+      problem(`${page.file}: 静的な主要本文がありません。`);
+    if (/href="\/(?:product|information)(?:\/|\")/.test(html))
+      problem(`${page.file}: 旧URLへの内部リンクが残っています。`);
+  }
+  for (const redirect of redirects) {
+    const html = await readFile(resolve(root, redirect.file), "utf8");
+    if (!html.includes(`href="https://towapc.com${redirect.target}"`))
       problem(
-        `${page}が共通テンプレートと一致していません。bun run sync-pagesを実行してください。`,
+        `${redirect.file}: ${redirect.target}への移動リンクがありません。`,
       );
-    }
+    if (!html.includes('rel="canonical"'))
+      problem(`${redirect.file}: canonicalがありません。`);
   }
   const expectedPages = new Set(
     pageFiles.map((page) => page.replaceAll("\\", "/")),
   );
-  for (const section of ["product", "information"]) {
+  for (const section of ["products", "news", "product", "information"]) {
     const entries = await readdir(resolve(root, section), {
       withFileTypes: true,
     });
@@ -306,7 +366,7 @@ try {
 }
 
 const transpiler = new Bun.Transpiler({ loader: "js" });
-for (const file of clientScripts) {
+for (const file of [...clientScripts, ...serverScripts]) {
   try {
     const source = await readFile(resolve(root, file), "utf8");
     transpiler.transformSync(source);

@@ -1,10 +1,5 @@
-import {
-  escapeHtml,
-  safeHttpUrl,
-  safeImageSource,
-  site,
-} from "./site-data.js?v=73";
-import { icon, textWithBreaks } from "./ui.js?v=73";
+import { escapeHtml, safeHttpUrl, safeImageSource, site } from "./site-data.js";
+import { icon, textWithBreaks } from "./ui.js";
 
 let previousFocus;
 

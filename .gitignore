@@ -5,6 +5,8 @@ dist/
 coverage/
 tmp/
 temp/
+editor-temp/
+**/*.upload.tmp
 outputs/
 
 .env

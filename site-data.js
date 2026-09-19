@@ -1,5 +1,5 @@
-import { parseCsv } from "./csv.js?v=73";
-import { dataFiles, directSiteKeys } from "./site-schema.js?v=73";
+import { parseCsv } from "./csv.js";
+import { dataFiles, directSiteKeys } from "./site-schema.js";
 
 export const site = {
   logo: "/assets/TowaPC.svg",
@@ -19,6 +19,7 @@ export const site = {
   history: [],
   contacts: [],
   legal: { terms: "", privacy: "" },
+  attachmentMeta: {},
 };
 
 export const escapeHtml = (value) =>
@@ -59,22 +60,23 @@ export const safeImageSource = (value) => {
 };
 
 async function fetchCsv(path) {
-  const response = await fetch(`${path}?v=${Date.now()}`, {
-    cache: "no-store",
-  });
+  const response = await fetch(path);
   if (!response.ok) throw new Error(`${path}: ${response.status}`);
   return parseCsv(await response.text()).rows;
 }
 
 async function fetchText(path) {
-  const response = await fetch(`${path}?v=${Date.now()}`, {
-    cache: "no-store",
-  });
+  const response = await fetch(path);
   if (!response.ok) throw new Error(`${path}: ${response.status}`);
   return response.text();
 }
 
 export async function loadSiteData() {
+  const embedded = document.getElementById("site-data")?.textContent;
+  if (embedded) {
+    Object.assign(site, JSON.parse(embedded));
+    return [];
+  }
   const results = await Promise.allSettled(
     dataFiles.map(([, path]) => fetchCsv(path)),
   );

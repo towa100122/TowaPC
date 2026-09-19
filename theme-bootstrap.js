@@ -12,6 +12,12 @@
       : systemTheme;
     root.dataset.theme =
       settings.themePinned === true ? pinnedTheme : systemTheme;
+    document
+      .querySelector("[data-theme-color]")
+      ?.setAttribute(
+        "content",
+        root.dataset.theme === "dark" ? "#24261d" : "#f5e6ac",
+      );
     root.dataset.themePinned = settings.themePinned === true ? "on" : "off";
     root.dataset.accent = settings.accent || "standard";
     root.dataset.surface = settings.surface || "standard";
@@ -34,5 +40,8 @@
     );
   } catch {
     root.dataset.theme = systemTheme;
+    document
+      .querySelector("[data-theme-color]")
+      ?.setAttribute("content", systemTheme === "dark" ? "#24261d" : "#f5e6ac");
   }
 })();

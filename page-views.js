@@ -4,15 +4,15 @@ import {
   safeHttpUrl,
   safeImageSource,
   site,
-} from "./site-data.js?v=73";
-import { renderLegalMarkdown } from "./legal-markdown.js?v=73";
-import { newsTagLabels, productTypeLabels } from "./site-schema.js?v=73";
-import { brandIcon, icon, image, textWithBreaks } from "./ui.js?v=73";
+} from "./site-data.js";
+import { renderLegalMarkdown } from "./legal-markdown.js";
+import { newsTagLabels, productTypeLabels } from "./site-schema.js";
+import { brandIcon, icon, image, textWithBreaks } from "./ui.js";
 
 export const routes = [
   ["/", "Home"],
-  ["/product", "Product"],
-  ["/information", "Information"],
+  ["/products", "Products"],
+  ["/news", "News"],
   ["/about", "About"],
   ["/cooperation", "Cooperation"],
   ["/members", "Members"],
@@ -38,36 +38,52 @@ function productArt(product) {
   </div>`;
 }
 
-function productCard(product, className) {
-  const destination = parseRelatedLinks(product.links)[0]?.url;
-  const action = destination
-    ? `<a class="project-move" href="${escapeHtml(destination)}" target="_blank" rel="noopener">プロジェクトに移動 ${icon("right")}</a>`
+function productPrimaryAction(product) {
+  const destination = parseRelatedLinks(product.links)[0];
+  return destination
+    ? `<a class="project-move" href="${escapeHtml(destination.url)}" target="_blank" rel="noopener">${escapeHtml(destination.label)} ${icon("external")}</a>`
     : `<span class="project-move is-disabled">リンク準備中</span>`;
-  return `<article class="${className} floating">
-    <button class="product-details-trigger" type="button" data-project-id="${escapeHtml(product.id)}" aria-label="${escapeHtml(product.name)}の詳細を表示">
-      ${productArt(product)}
-      <span class="product-copy">
-        <h3>${escapeHtml(product.name)}</h3>
-        <span class="category">${escapeHtml(product.category)}</span>
-        <span class="product-preview">
-          <span class="product-description">${plainText(product.description)}</span>
-          <span class="product-bottom"><span>詳細</span>${icon("popup")}</span>
-        </span>
-      </span>
-    </button>
-    ${action}
+}
+
+function productDetails(product) {
+  return `<button class="product-detail-action" type="button" data-project-id="${escapeHtml(product.id)}" aria-label="${escapeHtml(product.name)}の詳細を表示">詳細 ${icon("right")}</button>`;
+}
+
+function productGridCard(product) {
+  return `<article class="product floating">
+    ${productArt(product)}
+    <div class="product-copy">
+      <h3>${escapeHtml(product.name)}</h3>
+      <span class="category">${escapeHtml(product.category)}</span>
+      <p class="product-description">${plainText(product.description)}</p>
+      ${productDetails(product)}
+      ${productPrimaryAction(product)}
+    </div>
+  </article>`;
+}
+
+function productListRow(product) {
+  return `<article class="product-row floating">
+    ${productArt(product)}
+    <div class="product-copy">
+      <h3>${escapeHtml(product.name)}</h3>
+      <span class="category">${escapeHtml(product.category)}</span>
+      <p class="product-description">${plainText(product.description)}</p>
+      <div class="product-row-actions">
+        ${productDetails(product)}
+        ${productPrimaryAction(product)}
+      </div>
+    </div>
   </article>`;
 }
 
 function productCards(items) {
-  return `<div class="grid">${items
-    .map((item) => productCard(item, "product"))
-    .join("")}</div>`;
+  return `<div class="grid">${items.map(productGridCard).join("")}</div>`;
 }
 
 function productRows(items) {
   return `<div class="product-list">${items
-    .map((item) => productCard(item, "product-row"))
+    .map(productListRow)
     .join("")}</div>`;
 }
 
@@ -124,11 +140,28 @@ function parseRelatedLinks(value) {
     .filter(Boolean);
 }
 
+function parseAttachments(value) {
+  return String(value || "")
+    .replace(/\\n/g, "\n")
+    .split(/;;|\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const separator = entry.indexOf("|");
+      const label = separator > 0 ? entry.slice(0, separator).trim() : "";
+      const path = separator > 0 ? entry.slice(separator + 1).trim() : "";
+      if (!label || !/^\/files\/[a-zA-Z0-9._-]+$/.test(path)) return null;
+      const extension = path.split(".").pop()?.toUpperCase() || "FILE";
+      return { label, path, extension, size: site.attachmentMeta[path] || "" };
+    })
+    .filter(Boolean);
+}
+
 function compactNewsRows(items) {
   return items
     .map(
       (item) =>
-        `<a class="news-row" href="/information/${escapeHtml(item.id)}/">
+        `<a class="news-row" href="/news/${escapeHtml(item.id)}/">
           <span class="news-title">${escapeHtml(item.title)}</span>
           <span class="news-meta"><time>${escapeHtml(item.date)}</time>${newsBadge(item)}</span>
           <span class="row-actions">
@@ -150,7 +183,7 @@ export function informationRows(items) {
   return `<div class="information-list">${items
     .map(
       (item) =>
-        `<a class="information-row floating" href="/information/${escapeHtml(item.id)}/">
+        `<a class="information-row floating" href="/news/${escapeHtml(item.id)}/">
           <div class="information-row-art">${newsArt(item, "information-row-image")}</div>
           <div class="information-row-copy">
             <h2>${escapeHtml(item.title)}</h2>
@@ -168,7 +201,7 @@ export function newsCards(items) {
     .map(
       (
         item,
-      ) => `<a class="news-card floating" href="/information/${escapeHtml(item.id)}/">
+      ) => `<a class="news-card floating" href="/news/${escapeHtml(item.id)}/">
         <div class="news-card-art">${newsArt(item, "news-card-image")}</div>
         <div class="news-card-copy">
           <h2>${escapeHtml(item.title)}</h2>
@@ -194,7 +227,7 @@ export function pageHero(title, subtitle, extraClass = "") {
 
 function home() {
   const quickLinks = [
-    ["product", "Product", "私たちの製品の紹介", "lavender", "grid"],
+    ["products", "Products", "私たちの製品の紹介", "lavender", "grid"],
     ["about", "About", "TowaPCについて", "mint", "about"],
     ["contact", "Contact", "お問い合わせ", "pink", "mail"],
     ["join", "Join", "私たちの一員になる", "cream", "join"],
@@ -221,18 +254,18 @@ function home() {
     </section>
     <section class="news-strip floating">
       <div class="news-heading">
-        <a class="news-label" href="/information/">${icon("bell")}Information</a>
-        <a class="news-all text-link" href="/information/">すべて見る ${icon("right")}</a>
+        <a class="news-label" href="/news/">${icon("bell")}News</a>
+        <a class="news-all text-link" href="/news/">すべて見る ${icon("right")}</a>
       </div>
-      <div class="news-list">${compactNewsRows(site.news)}</div>
+      <div class="news-list">${compactNewsRows(site.news.slice(0, 3))}</div>
     </section>
     <section class="quick-links">${quickLinks}</section>
     <section class="section">
       <div class="section-heading">
         <h2>Our products</h2>
-        <a class="text-link" href="/product/">すべての製品を見る ${icon("right")}</a>
+        <a class="text-link" href="/products/">すべての製品を見る ${icon("right")}</a>
       </div>
-      ${productCards(site.products)}
+      ${productCards(site.products.slice(0, 3))}
     </section>
   </div>`;
 }
@@ -245,7 +278,7 @@ function products() {
         `<button class="filter ${value === "all" ? "active" : ""}" data-filter="${value}" aria-pressed="${value === "all"}">${label}</button>`,
     )
     .join("");
-  return `${pageHero("Product", "私たちの製品の紹介")}
+  return `${pageHero("Products", "私たちの製品の紹介")}
     <section class="section wrap">
       <div class="product-toolbar">
         <div class="filters">${filters}</div>
@@ -266,7 +299,7 @@ function information() {
         `<button class="filter ${value === "all" ? "active" : ""}" data-news-filter="${escapeHtml(value)}" aria-pressed="${value === "all"}">${escapeHtml(label)}</button>`,
     )
     .join("");
-  return `${pageHero("Information", "TowaPCからのお知らせ")}
+  return `${pageHero("News", "TowaPCからのお知らせ")}
     <section class="section wrap">
       <div class="information-toolbar">
         <div class="filters">${filters}</div>
@@ -281,6 +314,7 @@ function information() {
 
 function historyCards() {
   return site.history
+    .filter((event) => !/20XX|X月|X日/i.test(event.date))
     .map((event) => {
       const colored =
         event.colored === "y" && /^#[0-9a-f]{6}$/i.test(event.color);
@@ -298,6 +332,7 @@ function historyCards() {
 
 function about() {
   const logo = safeImageSource(site.logo) || "/assets/TowaPC.svg";
+  const history = historyCards();
   return `${pageHero("About", "TowaPCについて")}
     <section class="section wrap about-page">
       <div class="article floating about-summary">
@@ -307,23 +342,31 @@ function about() {
           </button>
         </div>
         <p>${escapeHtml(site.description)}</p>
-        <p>かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。</p>
+        ${site.about.statement ? `<p>${escapeHtml(site.about.statement)}</p>` : ""}
+        <nav class="about-links about-actions" aria-label="TowaPCについてのリンク">
+          <a class="soft-button" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a>
+          <a class="soft-button" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a>
+          <a class="soft-button" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a>
+        </nav>
       </div>
-      <nav class="about-links about-actions" aria-label="TowaPCについてのリンク">
-        <a class="soft-button floating" href="/members/"><span>TowaPCのメンバー</span>${icon("right")}</a>
-        <a class="soft-button floating" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a>
-        <a class="soft-button floating" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a>
-      </nav>
-      <section class="about-section history-section">
+      ${
+        history
+          ? `<section class="about-section history-section">
         <div class="section-heading"><h2>History</h2></div>
-        <div class="history-timeline">${historyCards()}</div>
-      </section>
-      <section class="about-section origin-section">
+        <div class="history-timeline">${history}</div>
+      </section>`
+          : ""
+      }
+      ${
+        site.about.originTitle && site.about.originBody
+          ? `<section class="about-section origin-section">
         <div class="origin-content">
-          <h2>${escapeHtml(site.about.originTitle || "名前の由来")}</h2>
-          <p>${textWithBreaks(site.about.originBody || "ここに名前の由来を書きます。")}</p>
+          <h2>${escapeHtml(site.about.originTitle)}</h2>
+          <p>${textWithBreaks(site.about.originBody)}</p>
         </div>
-      </section>
+      </section>`
+          : ""
+      }
     </section>`;
 }
 
@@ -429,10 +472,11 @@ function contact() {
 }
 
 function detail(kind, id) {
-  if (kind !== "information") return missing();
+  if (kind !== "news") return missing();
   const item = site.news.find((entry) => entry.id === id);
   if (!item) return missing();
   const links = parseRelatedLinks(item.links);
+  const attachments = parseAttachments(item.attachments);
   const linkButtons = links.length
     ? `<div class="related-links">${links
         .map(
@@ -448,9 +492,22 @@ function detail(kind, id) {
     <h2>${escapeHtml(title)}</h2>
     <span class="category detail-category">${meta}</span>
     <p>${textWithBreaks(body)}</p>
+    ${
+      attachments.length
+        ? `<section class="news-attachments" aria-label="添付ファイル"><h3>Attachments</h3>${attachments
+            .map(
+              (
+                attachment,
+              ) => `<a class="file-attachment" href="${escapeHtml(attachment.path)}" download>
+          ${icon("file")}<span><strong>${escapeHtml(attachment.label)}</strong><small>${escapeHtml(attachment.extension)}${attachment.size ? ` · ${escapeHtml(attachment.size)}` : ""}</small></span>${icon("download")}
+        </a>`,
+            )
+            .join("")}</section>`
+        : ""
+    }
     <div class="detail-actions">
       ${linkButtons}
-      <a class="text-link back-link" href="/information/">${icon("left")} 一覧に戻る</a>
+      <a class="text-link back-link" href="/news/">${icon("left")} 一覧に戻る</a>
     </div>
   </div>`;
   const content = `${image(item.image, item.title, "article-image")}${copy}`;
@@ -460,7 +517,7 @@ function detail(kind, id) {
         <h2>ほかのお知らせ</h2>
         ${otherNews
           .map(
-            (entry) => `<a href="/information/${escapeHtml(entry.id)}/">
+            (entry) => `<a href="/news/${escapeHtml(entry.id)}/">
               <strong>${escapeHtml(entry.title)}</strong>
               <span>${escapeHtml(entry.date)} ${newsBadge(entry)}</span>
             </a>`,
@@ -468,7 +525,7 @@ function detail(kind, id) {
           .join("")}
       </aside>`
     : "";
-  return `${pageHero("Information", "お知らせ")}
+  return `${pageHero("News", "お知らせ")}
     <section class="section wrap detail-layout">
       <article class="article floating information-article">${content}</article>
       ${sidebar}
@@ -504,8 +561,8 @@ export function renderPage(route, id, appearanceView) {
   if (id) return detail(route, id);
   const pages = {
     "": home,
-    product: products,
-    information,
+    products,
+    news: information,
     about,
     appearance: appearanceView,
     join,

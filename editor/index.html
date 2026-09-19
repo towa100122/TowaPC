@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TowaPC Local Editor</title>
+    <link rel="stylesheet" href="/editor.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <strong>TowaPC Local Editor</strong
+        ><small>このPCだけで動作します</small>
+      </div>
+      <button type="button" id="check">保存済みデータを検査</button>
+    </header>
+    <main>
+      <aside>
+        <label for="dataset">編集する内容</label
+        ><select id="dataset"></select
+        ><button type="button" id="add">項目を追加</button
+        ><a href="http://127.0.0.1:4174/" target="_blank" rel="noopener"
+          >プレビューを開く</a
+        >
+      </aside>
+      <section>
+        <div class="section-heading">
+          <div>
+            <h1 id="title"></h1>
+            <p id="file"></p>
+          </div>
+          <button type="button" id="save">保存</button>
+        </div>
+        <div id="editor"></div>
+        <pre id="status" aria-live="polite"></pre>
+      </section>
+    </main>
+    <script type="module" src="/editor.js"></script>
+  </body>
+</html>

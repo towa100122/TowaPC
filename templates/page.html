@@ -3,37 +3,50 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="theme-color"
-      content="#f5e6ac"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#24261d"
-      media="(prefers-color-scheme: dark)"
-    />
-    <meta
-      name="description"
-      content="人々が抱える、永遠と思えるような難しい課題を、少しずつテクノロジーで解決できるように。暮らしを少し豊かに、便利にしていくためのものづくりを。"
-    />
-    <title>TowaPC</title>
+    <meta name="theme-color" content="#f5e6ac" data-theme-color />
+    <meta name="description" content="{{DESCRIPTION}}" />
+    <link rel="canonical" href="{{CANONICAL}}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TowaPC" />
+    <meta property="og:title" content="{{TITLE}}" />
+    <meta property="og:description" content="{{DESCRIPTION}}" />
+    <meta property="og:url" content="{{CANONICAL}}" />
+    <meta property="og:image" content="https://towapc.com/assets/TowaPC.svg" />
+    <title>{{TITLE}}</title>
 
-    <script src="/theme-bootstrap.js?v=73"></script>
-    <link rel="stylesheet" href="/styles/foundation.css?v=73" />
-    <link rel="stylesheet" href="/styles/home.css?v=73" />
-    <link rel="stylesheet" href="/styles/content.css?v=73" />
-    <link rel="stylesheet" href="/styles/footer.css?v=73" />
-    <link rel="stylesheet" href="/styles/responsive.css?v=73" />
-    <link rel="stylesheet" href="/styles/dark-motion.css?v=73" />
-    <link rel="stylesheet" href="/styles/legal-cookie.css?v=73" />
-    <link rel="stylesheet" href="/styles/appearance-lab.css?v=73" />
-    <link rel="stylesheet" href="/styles/ui-polish.css?v=73" />
-    <link rel="stylesheet" href="/styles/material-theme.css?v=73" />
-    <link rel="stylesheet" href="/styles/features.css?v=73" />
-    <link rel="stylesheet" href="/styles/shadowless-theme.css?v=73" />
-    <link rel="stylesheet" href="/styles/monochrome-theme.css?v=73" />
-    <link rel="stylesheet" href="/styles/easter-eggs.css?v=73" />
+    <script src="/theme-bootstrap.js"></script>
+    <style>
+      html,
+      body {
+        background: #f5f5f2;
+        color: #242822;
+      }
+      html[data-theme="dark"],
+      html[data-theme="dark"] body {
+        background: #10120f;
+        color: #f1f3ed;
+      }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Google+Sans&amp;family=Noto+Sans+JP:wght@400;500;600;700&amp;display=swap"
+    />
+    <link rel="stylesheet" href="/styles/foundation.css" />
+    <link rel="stylesheet" href="/styles/home.css" />
+    <link rel="stylesheet" href="/styles/content.css" />
+    <link rel="stylesheet" href="/styles/footer.css" />
+    <link rel="stylesheet" href="/styles/responsive.css" />
+    <link rel="stylesheet" href="/styles/dark-motion.css" />
+    <link rel="stylesheet" href="/styles/legal-cookie.css" />
+    <link rel="stylesheet" href="/styles/appearance-lab.css" />
+    <link rel="stylesheet" href="/styles/ui-polish.css" />
+    <link rel="stylesheet" href="/styles/material-theme.css" />
+    <link rel="stylesheet" href="/styles/features.css" />
+    <link rel="stylesheet" href="/styles/shadowless-theme.css" />
+    <link rel="stylesheet" href="/styles/monochrome-theme.css" />
+    <link rel="stylesheet" href="/styles/easter-eggs.css" />
 
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=3" />
     <link
@@ -47,7 +60,7 @@
       as="image"
       type="image/svg+xml"
     />
-    <script src="/analytics.js?v=73"></script>
+    <script src="/analytics.js"></script>
   </head>
   <body>
     <header class="header">
@@ -66,12 +79,12 @@
         aria-label="メニューを開く"
         aria-expanded="false"
       >
-        <span class="material-symbols-rounded" aria-hidden="true">menu</span>
+        <span class="menu-glyph" aria-hidden="true"><i></i><i></i><i></i></span>
       </button>
-      <nav aria-label="メインナビゲーション"></nav>
+      <nav aria-label="メインナビゲーション">{{HEADER_NAV}}</nav>
     </header>
 
-    <main id="main"></main>
+    <main id="main">{{MAIN}}</main>
 
     <footer>
       <div class="footer-brand">
@@ -98,11 +111,15 @@
       <div class="footer-groups">
         <section>
           <strong>Links</strong>
-          <nav data-footer-links aria-label="サイト内リンク"></nav>
+          <nav data-footer-links aria-label="サイト内リンク">
+            {{FOOTER_LINKS}}
+          </nav>
         </section>
         <section>
           <strong><a href="/contact/">Contact</a></strong>
-          <nav data-footer-contact aria-label="公式リンクとお問い合わせ"></nav>
+          <nav data-footer-contact aria-label="公式リンクとお問い合わせ">
+            {{FOOTER_CONTACTS}}
+          </nav>
         </section>
       </div>
       <div class="footer-legal">
@@ -116,10 +133,13 @@
     </footer>
 
     <button class="back-top" aria-label="ページの先頭へ">
-      <span class="material-symbols-rounded" aria-hidden="true">
-        arrow_upward
-      </span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m12 5-7 7 1.4 1.4 4.6-4.6V20h2V8.8l4.6 4.6L19 12z" />
+      </svg>
     </button>
-    <script type="module" src="/app-v2.js?v=73"></script>
+    <script id="site-data" type="application/json">
+      {{SITE_DATA}}
+    </script>
+    <script type="module" src="/app-v2.js"></script>
   </body>
 </html>

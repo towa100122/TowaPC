@@ -20,7 +20,16 @@ export const csvSchemas = {
     "image",
     "links",
   ],
-  "news.csv": ["id", "date", "tag", "title", "body", "image", "links"],
+  "news.csv": [
+    "id",
+    "date",
+    "tag",
+    "title",
+    "body",
+    "image",
+    "links",
+    "attachments",
+  ],
   "partners.csv": ["name", "role", "description", "image", "url"],
   "members.csv": ["name", "role", "description", "image", "url"],
   "history.csv": [
@@ -55,8 +64,8 @@ export const productColors = ["pink", "lavender", "mint", "cream", "peach"];
 export const newsTagLabels = {
   new: "NEW",
   important: "Important",
-  release: "リリース",
-  update: "更新",
+  release: "Release",
+  update: "Update",
 };
 
 export const directSiteKeys = [
@@ -79,6 +88,7 @@ export const requiredSiteKeys = [
   "labels.contact",
   "about.originTitle",
   "about.originBody",
+  "about.statement",
 ];
 
 export const nonEmptySiteKeys = requiredSiteKeys.filter(

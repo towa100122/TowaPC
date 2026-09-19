@@ -21,30 +21,32 @@
 - 公開URL: `https://towapc.com/`
 - 配布用フォルダー: `C:\Users\towa\towapc\outputs\towapc`
 - 配布用ZIP: `C:\Users\towa\towapc\outputs\TowaPC-Web.zip`
-- 公開後は実サイトを開き、CSV読み込み完了後の表示件数とブラウザーエラーを確認する。
+- 公開後は実サイトを開き、静的本文、表示件数、ブラウザーエラーを確認する。
 
 ## 設計
 
 - 表示内容の正本は `data` フォルダー内のCSVと規約Markdown。実際の文章をJavaScriptへ重複させない。
 - `csv.js` がブラウザー表示と検査で共用するCSV解析を担当する。CSV解析を別の場所へ複製しない。
 - `site-schema.js` がCSVの列、必須項目、タグ、製品種別、色、読み込み対象を一元管理する。仕様追加時はここを正本にする。
-- `site-data.js` がCSVの読み込み、URL検証、画像パス検証、HTMLエスケープを担当する。
+- `scripts/load-site-data.mjs` が生成時のデータ読込、`site-data.js` が埋め込みデータの復元、URL検証、HTMLエスケープを担当する。
 - `cookie-consent.js` がCookie設定の保存、同意バー、アクセス解析の許可・拒否操作を担当する。
 - `app-v2.js` は画面遷移、ナビゲーション、各機能の起動だけを担当する。
 - `page-views.js` が各ページ本文、`legal-markdown.js` が規約Markdownの安全な表示、`appearance-settings.js` が外観設定、`member-dialog.js` と `project-dialog.js` が詳細表示、`easter-eggs.js` が404シュレッダー、`ui.js` が表示用共通部品を担当する。責務を `app-v2.js` へ戻さない。
 - CSSは `styles` 内で基礎、ページ、レスポンシブ、ダーク、Cookie、Appearance Lab、Material 3、Monochrome、特殊演出に分ける。巨大なCSSへ再結合しない。
 - HTML内へ長いJavaScriptやCSSを書かない。初期テーマは `theme-bootstrap.js`、アクセス解析は `analytics.js` を使う。
 - 全ページ共通のHTMLは `templates/page.html` だけを直接編集する。
-- HTML更新後やお知らせのID変更後は `bun run sync-pages` を実行する。
-- `bun run sync-pages` はCSVに存在するお知らせの詳細ページを生成し、古い詳細ページを削除する。製品詳細ページは生成せず、一覧カードのポップアップで紹介する。`information/*/index.html` を手作業で追加しない。
+- 正式URLは`/products/`、`/news/`、`/news/{id}/`。旧`/product/`、`/information/`、`/information/{id}/`は静的移動ページとしてのみ維持する。
+- `bun run editor`は127.0.0.1専用の管理GUIを起動する。CSV・規約Markdown・画像・News添付を安全な許可先だけへ保存し、Git操作は行わない。
+- News添付は`news.csv`の`attachments`へ`表示名|/files/ファイル名`で保存し、複数は`;;`で区切る。公開ファイルは`files`直下に限定する。
+- HTML更新後やNewsのID変更後は `bun run sync-pages` を実行する。
+- `bun run sync-pages` はCSVとMarkdownからページ固有title、description、canonical、OGP、主要本文を含む静的HTMLを生成する。News詳細は`news/*/index.html`、Products詳細は一覧ポップアップ。旧`product`と`information`には新URLへの互換ページを生成する。生成HTMLを手作業で編集しない。
 - `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、固定表示資産、共通HTML、JavaScript、Git管理対象を検査する。
-- CSVの全列、タグ、改行、複数リンク、画像、手動公開の正規手順は `data/README.md` に集約する。ルート `README.md` はサイト紹介だけを載せる。
+- CSVの全列、タグ、改行、リンク、News添付、管理GUI、公開手順は `data/README.md` に集約する。
 - 公開前に必ず `bun run format`、`bun run format:check`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` は固定済み依存関係を導入し、整形とサイト構造を検査する。リポジトリ取得はNode.js 24対応の `actions/checkout@v7` を使う。
-- キャッシュ番号を変更するときは `templates/page.html` のCSS・JavaScriptと、各ES Module内のimportを同じ番号にする。現在は `v73`。
+- JavaScriptとCSSは安定URLを使い、手作業のキャッシュ番号更新へ依存しない。
 - `.gitignore` は依存関係、キャッシュ、出力、ログ、環境変数、OS・エディター固有ファイル、ZIPを除外する。`bun run check` は除外対象が誤ってGit追跡されていないかも検査する。
 - `.gitattributes` でテキストの改行をLFへ統一し、WindowsとGitHub間で内容と無関係な差分を作らない。画像はバイナリとして扱う。
-- `content-v2.js` はv30以前のキャッシュ互換専用。実際の表示内容を書かない。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
 
 ## 現在の表示内容
@@ -80,14 +82,14 @@
 - 利用規約・プライバシーポリシーは共通のAppearance設定に追従させる。ライト／ダーク、カラーパレット、標準／Material／Liquid Glass／紙、角丸、密度、ページ遷移の適用を維持する。
 - ライト／ダークは初期状態および通常の外観変更後も端末設定を優先する。Appearance Labの「テーマを任意で固定する」を有効にした場合だけ、選択したLightまたはDarkを端末設定より優先する。
 
-- ヘッダー: `Home / Product / Information / About / Contact`
+- ヘッダー: `Home / Products / News / About / Contact`
 - ホーム以外の全ページは、本文の下・フッターの手前に「← ホームに戻る」を表示する。
-- ホームのお知らせ欄は、複数件でも日付・タグ・タイトル・矢印の位置が行ごとにずれないよう固定する。「すべて見る」はPCでは「Information」の下、スマートフォンでは同じ行の右端に置く。ショートカットは `Product / About / Contact / Join` の順。
+- HomeはNews最新3件、Products代表3件まで表示する。Newsの「すべて見る」とProductsの一覧リンクから各正式URLへ移動する。ショートカットは `Products / About / Contact / Join` の順。
 - ダークテーマの選択中ヘッダータブは、薄い背景 `#eef1e8` と濃い文字 `#171a16` で表示する。スマートフォンの展開メニューでも同じ配色を使う。
-- Productの説明は「私たちの製品の紹介」、Joinの説明は「私たちの一員になる」。
+- Productsの説明は「私たちの製品の紹介」、Joinの説明は「私たちの一員になる」。
 - 製品・お知らせのリンクは各CSVの `links` 列へ `ボタン名|URL` で記入する。複数リンクは `;;` またはセル内改行で区切る。製品は先頭のURLを一覧とポップアップの移動ボタンに使い、お知らせ詳細は左に一覧へ戻るリンク、右に名前付き関連リンクを表示する。
 - 製品の説明とお知らせ本文は `\\n` またはCSVセル内の実改行を詳細ページの改行として表示する。一覧では改行を空白へ整えてレイアウトを崩さない。
-- お知らせの `tag` は `new`、`important`、`release`、`update` の4種類とし、表示は `NEW`、`Important`、`リリース`、`更新` にする。
+- Newsの `tag` は `new`、`important`、`release`、`update` の4種類とし、表示は `NEW`、`Important`、`Release`、`Update` にする。
 - テキストリンクには下線を付けず、ホーム内の「TowaPCについて」や一覧リンクは右揃えにする。
 - フッターのLinksにはJoinを含め、右側にContact欄を置く。
 - フッターのContact欄にはYouTube、X、Discord、Emailを置く。
@@ -95,10 +97,10 @@
 - フッターのLinksではJoinを最後尾に置く。著作権表示は `© 2024〜2026 TowaPC. All rights reserved.` とする。
 - Joinページの参加ボタンも同じDiscord招待リンクを開く。
 - Joinは「TowaPCのメンバーになるには、以下のリンクから私たちのDiscordサーバーに参加してください。」とDiscord参加ボタンだけを表示し、下部の説明カードは置かない。
-- Aboutのロゴと説明を載せる白いカードには見出し「TowaPCについて」やリンクボタンを入れない。3つのリンクボタンは白いままカード外へ置く。Informationリストの外側は透明にして、角の後ろに四角い背景が見えないようにする。
+- Aboutの3つの関連ボタンは紹介文の白いカード内へ置き、カード内カードに見えない静かな背景と影なしの形にする。
 - Discordリンク: `https://towapc.com/discord`
-- Information一覧はタグ絞り込みとグリッド／リスト切替を備える。詳細は広い画面で本文の右にほかの記事を表示し、関連リンクの下へ一覧に戻る操作を置く。
-- Productは詳細ページを持たない。カード本体で紹介ポップアップを開き、先頭の`links`を強調した「プロジェクトに移動」ボタンに使う。グリッドとリストでタイトル、カテゴリ、3行紹介、詳細操作の順序を揃える。
+- News一覧はタグ絞り込みとグリッド／リスト切替を備える。詳細は広い画面で本文の右にほかの記事を表示し、関連リンクと添付の下へ一覧に戻る操作を置く。
+- Productsは詳細ページを持たない。グリッドとリストは専用構造を使い、3行紹介の末尾付近に詳細、下部に`links`先頭の名前を使った大きな主操作を置く。
 - MembersとCooperationは一覧本文を3行で省略し、カードからアニメーション付き詳細を開く。正方形の協力ロゴはメンバーと同じ配置、横長ロゴはロゴの右に名前を置く。
 - Contactカードの補足表示:
   - YouTube: `@TowaPC`
@@ -140,7 +142,7 @@
 
 - ローカル表示で製品1件、お知らせ2件を確認済み。
 - Contactの表示はYouTube、X、Discord、Emailの4件。`contacts.csv`へ一時的に追加したリンクがContactカードとフッター文字リンクの両方へ出ることも確認済み。
-- Aboutはロゴと本文の白いカード、外側の白いリンクカード、履歴カード、名前の由来の順。通常カードとCSV指定の着色カードをライト・ダークで確認済み。
+- Aboutはロゴ、本文、3つの関連ボタンを同じ白い紹介カードへ置き、その下へ履歴と名前の由来を表示する。
 - JoinはDiscord参加案内と参加ボタンだけを表示する。
 - メンバー詳細カードの表示・×・Esc、協力関係ロゴの上配置、Monochromeのライト・ダーク、外部テーマJSON読込を確認済み。
 - サンプル注記が表示されないことを確認済み。

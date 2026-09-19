@@ -49,7 +49,7 @@
   .header nav {
     display: none;
     position: absolute;
-    top: 58px;
+    top: 100%;
     left: 4%;
     right: 4%;
     padding: 10px;
@@ -114,13 +114,13 @@
   }
   .news-row {
     gap: 8px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .news-strip .news-thumb {
     display: none;
   }
   .badge {
-    font-size: 9px;
+    font-size: 11px;
     min-width: 55px;
   }
   .quick-links {
@@ -145,15 +145,15 @@
     padding: 44px 0 52px;
   }
   .grid {
-    grid-template-columns: 1fr;
-    gap: 22px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
   .product-art {
     height: auto;
     aspect-ratio: 8/5;
   }
   .product h3 {
-    font-size: 16px;
+    font-size: 14px;
   }
   .page-hero {
     padding: 32px 0;
@@ -178,7 +178,8 @@
     overflow: hidden;
   }
   .news-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
   .article {
     padding: 25px;
@@ -232,6 +233,13 @@
     height: 42px;
     right: 16px;
     bottom: 16px;
+  }
+}
+
+@media (max-width: 340px) {
+  .grid,
+  .news-grid {
+    grid-template-columns: 1fr;
   }
 }
 

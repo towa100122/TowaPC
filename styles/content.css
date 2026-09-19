@@ -44,7 +44,7 @@
 }
 .category {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 1px;
 }
 .product h3 {
@@ -53,28 +53,80 @@
   margin: 7px 0;
 }
 .product p {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
   line-height: 1.9;
 }
-.product-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  padding-top: 18px;
-  font-size: 10px;
-  color: #85897f;
+.product-description {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
-.product-bottom span:last-child {
+.product-detail-action {
   display: inline-flex;
-  gap: 6px;
+  width: fit-content;
+  margin: 7px 0 14px auto;
+  padding: 6px 2px;
   align-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
 }
-.product-bottom .icon {
-  width: 14px;
-  height: 14px;
+.product-detail-action .icon {
+  width: 16px;
+  height: 16px;
+}
+.project-move {
+  display: inline-flex;
+  min-height: 48px;
+  padding: 14px 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 14px;
+  background: var(--ink);
+  color: #fff;
   font-size: 14px;
+  font-weight: 600;
+}
+.project-move.is-disabled {
+  opacity: 0.55;
+}
+.product-row-actions {
+  display: flex;
+  margin-top: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.product-list {
+  display: grid;
+  gap: 16px;
+}
+.product-row {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  min-height: 160px;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #fff;
+}
+.product-row .product-art {
+  width: 180px;
+  height: 100%;
+  min-height: 160px;
+  aspect-ratio: auto;
+}
+.product-row .product-copy {
+  min-width: 0;
+  padding: 20px 24px;
+}
+.product-row h3 {
+  margin: 0 0 4px;
+  font-size: 17px;
 }
 .page-hero {
   padding: 58px 0 44px;
@@ -111,6 +163,12 @@
   font-size: 12px;
   box-shadow: var(--inner);
 }
+.product-toolbar .filters,
+.product-toolbar .view-switch,
+.information-toolbar .filters,
+.information-toolbar .view-switch {
+  margin-bottom: 0;
+}
 .view-button {
   display: inline-flex;
   align-items: center;
@@ -136,12 +194,15 @@
 }
 .information-toolbar {
   display: flex;
-  justify-content: flex-end;
+  margin-bottom: 24px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
 }
 .information-row {
   display: grid;
   grid-template-columns: 180px minmax(0, 1fr);
-  min-height: 145px;
+  min-height: 150px;
   overflow: hidden;
   background: #fff;
   border-radius: 22px;
@@ -185,7 +246,7 @@
 }
 .information-row-copy p {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 .information-row-more {
   display: flex;
@@ -203,8 +264,14 @@
 }
 .news-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
+}
+
+@media (max-width: 960px) {
+  .news-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 .news-card {
   display: flex;
@@ -249,11 +316,57 @@
 }
 .news-card-copy p {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .product-copy,
+  .news-card-copy {
+    padding: 14px;
+  }
+  .product-art,
+  .news-card-art {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+  .product-description,
+  .news-card-copy p {
+    -webkit-line-clamp: 2;
+    font-size: 12px;
+  }
+  .product-detail-action {
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  .project-move {
+    width: 100%;
+    min-height: 46px;
+    padding: 12px;
+    font-size: 13px;
+  }
+  .product-row {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+  .product-row .product-art {
+    width: 96px;
+    min-height: 150px;
+    aspect-ratio: auto;
+  }
+  .product-row .product-copy {
+    padding: 14px;
+  }
+  .product-row-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .product-row-actions .product-detail-action {
+    align-self: flex-end;
+    margin: 0;
+  }
 }
 .news-card-more {
   display: flex;

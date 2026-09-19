@@ -45,6 +45,7 @@
 }
 :root[data-theme="dark"] .intro,
 :root[data-theme="dark"] .product,
+:root[data-theme="dark"] .product-row,
 :root[data-theme="dark"] .info-list,
 :root[data-theme="dark"] .article,
 :root[data-theme="dark"] .directory-card,
@@ -57,6 +58,7 @@
 }
 :root[data-theme="dark"] .intro p,
 :root[data-theme="dark"] .product p,
+:root[data-theme="dark"] .product-row p,
 :root[data-theme="dark"] .product-bottom,
 :root[data-theme="dark"] .article p,
 :root[data-theme="dark"] .directory-card p,
@@ -65,6 +67,10 @@
 :root[data-theme="dark"] .contact-card p,
 :root[data-theme="dark"] .join-box p {
   color: var(--muted);
+}
+:root[data-theme="dark"] .project-move {
+  background: #eef1e8;
+  color: #171a16;
 }
 :root[data-theme="dark"] .news-strip,
 :root[data-theme="dark"] .news-card-art {

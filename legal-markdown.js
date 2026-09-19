@@ -1,4 +1,4 @@
-import { escapeHtml } from "./site-data.js?v=73";
+import { escapeHtml } from "./site-data.js";
 
 function inline(text) {
   const pattern = /\[([^\]]+)\]\(([^)]+)\)/g;
@@ -27,10 +27,10 @@ export function renderLegalMarkdown(source) {
     .split(/\n---\n/, 2);
   const output = [];
   let sectionOpen = false;
-  let listOpen = false;
+  let listType = "";
   const closeList = () => {
-    if (listOpen) output.push("</ul>");
-    listOpen = false;
+    if (listType) output.push(`</${listType}>`);
+    listType = "";
   };
   for (const line of body.split("\n")) {
     const text = line.trim();
@@ -38,15 +38,31 @@ export function renderLegalMarkdown(source) {
       closeList();
       continue;
     }
-    if (text.startsWith("## ")) {
+    if (text.startsWith("# ")) {
+      closeList();
+      output.push(`<h1 class="legal-title">${escapeHtml(text.slice(2))}</h1>`);
+    } else if (text.startsWith("## ")) {
       closeList();
       if (sectionOpen) output.push("</section>");
       output.push(`<section><h2>${escapeHtml(text.slice(3))}</h2>`);
       sectionOpen = true;
-    } else if (text.startsWith("- ")) {
-      if (!listOpen) output.push("<ul>");
-      listOpen = true;
-      output.push(`<li>${inline(text.slice(2))}</li>`);
+    } else if (text.startsWith("### ")) {
+      closeList();
+      output.push(`<h3>${escapeHtml(text.slice(4))}</h3>`);
+    } else if (/^(?:-|\*)\s+/.test(text)) {
+      if (listType !== "ul") {
+        closeList();
+        output.push("<ul>");
+        listType = "ul";
+      }
+      output.push(`<li>${inline(text.replace(/^(?:-|\*)\s+/, ""))}</li>`);
+    } else if (/^\d+\.\s+/.test(text)) {
+      if (listType !== "ol") {
+        closeList();
+        output.push("<ol>");
+        listType = "ol";
+      }
+      output.push(`<li>${inline(text.replace(/^\d+\.\s+/, ""))}</li>`);
     } else {
       closeList();
       output.push(`<p>${inline(text)}</p>`);

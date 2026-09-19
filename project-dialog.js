@@ -1,10 +1,5 @@
-import {
-  escapeHtml,
-  safeHttpUrl,
-  safeImageSource,
-  site,
-} from "./site-data.js?v=73";
-import { icon, textWithBreaks } from "./ui.js?v=73";
+import { escapeHtml, safeHttpUrl, safeImageSource, site } from "./site-data.js";
+import { icon, textWithBreaks } from "./ui.js";
 
 let previousFocus;
 
@@ -13,7 +8,10 @@ function destination(value) {
     .replace(/\\n/g, "\n")
     .split(/;;|\r?\n/)[0];
   const separator = first.indexOf("|");
-  return separator > 0 ? safeHttpUrl(first.slice(separator + 1).trim()) : "";
+  if (separator < 1) return null;
+  const label = first.slice(0, separator).trim();
+  const url = safeHttpUrl(first.slice(separator + 1).trim());
+  return label && url ? { label, url } : null;
 }
 
 function closeDialog() {
@@ -27,7 +25,7 @@ function openDialog(project, trigger) {
   closeDialog();
   previousFocus = trigger;
   const imageSource = safeImageSource(project.image);
-  const url = destination(project.links);
+  const action = destination(project.links);
   const backdrop = document.createElement("div");
   backdrop.className = "project-dialog-backdrop";
   backdrop.innerHTML = `<section class="project-dialog" role="dialog" aria-modal="true" aria-labelledby="project-dialog-title">
@@ -37,7 +35,7 @@ function openDialog(project, trigger) {
       <h2 id="project-dialog-title">${escapeHtml(project.name)}</h2>
       <span class="category">${escapeHtml(project.category || "")}</span>
       <p>${textWithBreaks(project.description || "")}</p>
-      ${url ? `<a class="project-dialog-move" href="${escapeHtml(url)}" target="_blank" rel="noopener">プロジェクトに移動 ${icon("right")}</a>` : '<span class="project-dialog-move is-disabled">リンク準備中</span>'}
+      ${action ? `<a class="project-dialog-move" href="${escapeHtml(action.url)}" target="_blank" rel="noopener">${escapeHtml(action.label)} ${icon("external")}</a>` : '<span class="project-dialog-move is-disabled">リンク準備中</span>'}
     </div>
   </section>`;
   document.body.append(backdrop);

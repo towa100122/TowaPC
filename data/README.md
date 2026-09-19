@@ -1,207 +1,102 @@
 # サイト内容の更新・公開手順
 
-TowaPC.comの文章や掲載項目は、この `data` フォルダー内のCSVで管理します。この文書に、CSVの入力規則から公開までをまとめています。
+TowaPC.comの文章と掲載項目は、この`data`フォルダーで管理します。通常はCSVを直接編集せず、ローカル管理画面を使います。
 
-## 最初に知っておくこと
+## ローカル管理画面
 
-- CSVの1行目にある列名と列の順番は変更しません。
-- 1行追加すると掲載項目が増え、行を削除すると掲載項目も消えます。
-- 半角カンマを含む値は、値全体を半角ダブルクォートで囲みます。
-- 値の中で半角ダブルクォートを使う場合は `""` と2個続けます。
-- 説明文を改行する場所には `\n`、1行空ける場所には `\n\n` と書けます。ダブルクォートで囲んだセル内へ実際の改行を入れる方法にも対応しています。
-- 画像を使わない項目やリンクを設けない項目は、該当セルを空欄にします。
-- CSVはUTF-8で保存します。
-
-## お知らせを編集する `news.csv`
-
-列は次の順番です。
-
-| 列 | 内容 | 入力例・規則 |
-| --- | --- | --- |
-| `id` | 詳細ページのURLに使う識別子 | `privacy-policy-added`。半角英小文字、数字、ハイフンのみ。重複不可 |
-| `date` | 公開日 | `2026.09.13` のように `YYYY.MM.DD` |
-| `tag` | 一覧に表示するタグ | 下の4種類から選択 |
-| `title` | お知らせの見出し | 必須 |
-| `body` | 詳細本文 | 必須。`\n` と `\n\n` で改行可能 |
-| `image` | 一覧・詳細用画像 | `/assets/news-example.jpg`。不要なら空欄 |
-| `links` | 詳細下部の関連リンク | `ボタン名|URL`。複数指定も可能 |
-
-`tag` に使える値と表示は次のとおりです。
-
-| CSVへ書く値 | サイトでの表示 | 用途 |
-| --- | --- | --- |
-| `new` | NEW | 新しい告知 |
-| `important` | Important | 特に確認してほしい告知 |
-| `release` | リリース | 公開・提供開始 |
-| `update` | 更新 | 更新・変更のお知らせ |
-
-入力例:
-
-```csv
-id,date,tag,title,body,image,links
-privacy-policy-added,2026.09.13,new,利用規約などを追加しました,"1段落目です。\n\n2段落目です。",,"利用規約|https://towapc.com/terms/;;プライバシーポリシー|https://towapc.com/privacy/"
-```
-
-## 製品を編集する `products.csv`
-
-| 列 | 内容 | 入力例・規則 |
-| --- | --- | --- |
-| `id` | 詳細ページのURLに使う識別子 | `neko-bousai-now`。半角英小文字、数字、ハイフンのみ。重複不可 |
-| `name` | 製品名 | 必須 |
-| `category` | 画面に表示する分類名 | `防災アプリ` など |
-| `type` | 一覧の絞り込み分類 | `app`、`web`、`project` のいずれか |
-| `description` | 製品説明 | 必須。`\n` と `\n\n` で改行可能 |
-| `color` | 画像がない部分などの背景色 | `pink`、`lavender`、`mint`、`cream`、`peach` のいずれか |
-| `image` | 製品画像 | `/assets/product-example.png`。不要なら空欄 |
-| `links` | プロジェクトの移動先 | `ボタン名|URL`。先頭のURLを「プロジェクトに移動」ボタンに使用 |
-
-入力例:
-
-```csv
-id,name,category,type,description,color,image,links
-example-app,Example App,アプリケーション,app,"製品の説明です。\n詳しい説明を次の行へ表示できます。",lavender,/assets/product-example.png,"公式サイト|https://example.com/;;使い方|https://example.com/guide/"
-```
-
-## 関連リンクを複数設定する
-
-お知らせと製品の `links` は、リンク名とURLを半角の `|` でつなぎます。
-
-```text
-利用規約|https://towapc.com/terms/
-```
-
-複数のリンクは `;;` で区切ります。各リンクは入力した名前のボタンとして表示されます。
-
-```text
-利用規約|https://towapc.com/terms/;;プライバシーポリシー|https://towapc.com/privacy/
-```
-
-`links` 全体に半角カンマが入る場合は、セル全体をダブルクォートで囲みます。URLは `https://` または `http://` から書きます。
-
-## トップ・連絡先を編集する `site.csv`
-
-`key,value` の2列です。`key` は変更せず、`value` を編集します。
-
-| key | 内容 |
-| --- | --- |
-| `logo` | ヘッダーとフッターのロゴ画像 |
-| `hero` | トップの背景画像 |
-| `headline` | トップの大見出し |
-| `description` | トップとAboutで使う紹介文 |
-| `joinUrl` | TowaPC Communityの参加URL |
-| `contactUrl` | お問い合わせURLまたは `mailto:` |
-| `socials.youtube` | YouTubeのURL |
-| `socials.x` | XのURL |
-| `socials.discord` | DiscordのURL |
-| `labels.youtube` | Contactに表示するYouTube名 |
-| `labels.x` | Contactに表示するX名 |
-| `labels.discord` | Contactに表示するDiscord名 |
-| `labels.contact` | Contactに表示する連絡先 |
-| `about.originTitle` | Aboutの「名前の由来」セクション見出し |
-| `about.originBody` | 名前の由来の本文。`\n`で改行可能 |
-
-## Aboutの歴史を編集する `history.csv`
-
-1行が歴史セクションのミニカード1枚になります。行の順番が、そのまま上からの表示順です。
-
-| 列 | 内容 | 入力例・規則 |
-| --- | --- | --- |
-| `date` | 日付・年代 | `2024年\n4月1日`。`\n`で改行可能 |
-| `title` | 出来事の見出し | 必須 |
-| `description` | 詳細 | 必須。`\n`で改行可能 |
-| `colored` | カードを着色するか | `y` または `n` |
-| `color` | 背景色 | `colored` が `y` の場合だけ、`#ffff99`のような6桁カラーコードを指定 |
-| `textColor` | 文字色 | `black` または `white` |
-
-入力例:
-
-```csv
-date,title,description,colored,color,textColor
-2024年\n4月1日,TowaPC始動,ここに出来事の詳細を書きます。,y,#ffff99,black
-2025年,新しい出来事,通常の白いカードとして表示します。,n,,black
-```
-
-## Contactへリンクを追加する `contacts.csv`
-
-YouTube、X、Discord、Emailは `site.csv` で管理します。それ以外のリンクは `contacts.csv` へ追加します。Contactページではカード、フッターでは通常の文字リンクとして表示されます。
-
-| 列 | 内容 | 入力例・規則 |
-| --- | --- | --- |
-| `label` | リンク名 | 必須 |
-| `url` | リンク先 | `https://`、`http://`、`mailto:`のいずれか |
-| `description` | Contactカードの補足 | 空欄ならURLを表示 |
-
-入力例:
-
-```csv
-label,url,description
-GitHub,https://github.com/example,開発中のプロジェクト
-```
-
-## 利用規約とプライバシーポリシーを編集する
-
-- 利用規約は `terms.md`、プライバシーポリシーは `privacy.md` を編集します。
-- 普通の文章は、そのまま1行に書きます。段落を分ける場所には空行を入れます。
-- 見出しは行の先頭へ `## ` を付けます。例: `## 禁止事項`
-- 箇条書きは行の先頭へ `- ` を付けます。
-- リンクは `[表示名](URL)` と書きます。例: `[Contactページ](/contact/)`
-- 文末の `---` より下は制定日、最終更新日、団体名です。団体名の `**TowaPC**` は太字として表示されます。
-
-本文を変更するときは、元の段落や意味を意図せず変えていないか差分で確認します。ページのHTMLやJavaScriptを編集する必要はありません。
-
-## 協力関係を編集する `partners.csv`
-
-| 列 | 内容 |
-| --- | --- |
-| `name` | 団体・個人名 |
-| `role` | 関係や役割 |
-| `description` | 紹介文 |
-| `image` | `/assets/` から始まる正方形画像 |
-| `url` | Webサイト。不要なら空欄 |
-
-## メンバーを編集する `members.csv`
-
-| 列 | 内容 |
-| --- | --- |
-| `name` | 表示名 |
-| `role` | 役割 |
-| `description` | 紹介文 |
-| `image` | `/assets/` から始まる正方形画像 |
-| `url` | 紹介先。不要なら空欄 |
-
-メンバー一覧では説明が3行を超えると省略されます。カードを押すと、画像と全文を載せた詳細カードが開きます。
-
-## 画像を追加する
-
-1. 画像をサイト直下の `assets` フォルダーへ入れます。
-2. 分かりやすい半角英数字とハイフンのファイル名にします。例: `news-new-site.png`。
-3. CSVの `image` に `/assets/news-new-site.png` のように書きます。
-4. ファイル名と大文字・小文字が一致していることを確認します。
-
-## 手動でサイトを更新する
-
-作業にはGitとBunを使います。PowerShellでサイトのフォルダーを開き、次の順で進めます。
-
-### 1. 最新状態を取り込む
+リポジトリ直下で次を実行します。
 
 ```powershell
-cd "C:\Users\towa\towapc\TowaPC-repo"
-git switch update/towapc-site
-git fetch origin
-git merge --ff-only origin/main
 bun install --frozen-lockfile
-git status
+bun run editor
 ```
 
-`bun install --frozen-lockfile` は、サイトが使う整形ツールを決められたバージョンでそろえます。初回だけでなく、`package.json` や `bun.lock` が更新されたときにも実行します。
+ブラウザーで`http://127.0.0.1:4175/`を開きます。管理画面は127.0.0.1だけで待ち受け、外部には公開されません。
 
-### 2. CSVと画像を編集する
+1. 左側からNews、Products、サイト基本情報などを選びます。
+2. フォームを編集して「保存」を押します。
+3. News画像・添付ファイル、Products画像はファイル選択から追加できます。
+4. 最後に「保存済みデータを検査」を押します。
 
-この `data` フォルダーのCSVや規約のMarkdownを編集します。画像が必要なら `assets` フォルダーへ追加します。
+画像は`assets/uploads`、News添付ファイルは`files`へ保存されます。Gitのcommitとpushは管理画面から行いません。
 
-お知らせの `id` を追加・変更・削除すると、次の手順で詳細ページが自動生成されます。`information` 内のHTMLを直接作る必要はありません。製品は詳細ページを生成せず、一覧のカードを押すと詳しい紹介がポップアップで開きます。
+## Newsを編集する `news.csv`
 
-### 3. 表示用ページを生成して検査する
+| 列 | 内容 |
+| --- | --- |
+| `id` | URLに使う識別子。半角英小文字、数字、ハイフン。重複不可 |
+| `date` | `YYYY.MM.DD`形式の公開日 |
+| `tag` | `new`、`important`、`release`、`update` |
+| `title` | 見出し |
+| `body` | 本文。`\n`またはセル内改行に対応 |
+| `image` | `/assets/`から始まる画像。不要なら空欄 |
+| `links` | 関連リンク。`名前|https://...`、複数は`;;`区切り |
+| `attachments` | 添付。`表示名|/files/ファイル名`、複数は`;;`区切り |
+
+タグの表示は`NEW`、`Important`、`Release`、`Update`です。
+
+```csv
+id,date,tag,title,body,image,links,attachments
+example,2026.09.19,update,更新のお知らせ,"本文です。\n次の行です。",/assets/uploads/example.png,"公式ページ|https://example.com/","資料.pdf|/files/example.pdf"
+```
+
+添付ファイルはNews詳細ページで種類とサイズとともに表示されます。公開ファイルは`files`直下だけを使用でき、`../`を含むパスは検査で拒否されます。
+
+## Productsを編集する `products.csv`
+
+| 列 | 内容 |
+| --- | --- |
+| `id` | 識別子。半角英小文字、数字、ハイフン |
+| `name` | 製品名 |
+| `category` | 表示する分類名 |
+| `type` | `app`、`web`、`project` |
+| `description` | 紹介文 |
+| `color` | `pink`、`lavender`、`mint`、`cream`、`peach` |
+| `image` | `/assets/`から始まる画像 |
+| `links` | 主操作。先頭の`名前|URL`をカードと詳細で使用 |
+
+Productsは個別URLを生成せず、一覧カードの「詳細」からポップアップを開きます。主操作には`links`へ入力した名前が表示されます。
+
+## その他のCSV
+
+- `site.csv`: Hero、紹介文、連絡先、About本文
+- `history.csv`: Historyの日時・見出し・説明・色
+- `members.csv`: メンバー
+- `partners.csv`: 協力関係
+- `contacts.csv`: Contactへ追加する任意リンク
+
+列名と列順は変更しません。CSVはUTF-8で保存します。直接編集する場合、カンマや改行を含むセルはダブルクォートで囲み、セル内の`"`は`""`と書きます。
+
+## 利用規約とプライバシーポリシー
+
+- 利用規約: `terms.md`
+- プライバシーポリシー: `privacy.md`
+
+対応するMarkdown記法:
+
+```text
+# ページタイトル
+## 大見出し
+### 小見出し
+
+通常の段落
+
+* 箇条書き
+1. 番号付き箇条書き
+[表示名](https://example.com/)
+```
+
+本文は明示された変更以外で言い換えません。
+
+## 正式URLと旧URL
+
+- Products: `/products/`
+- News: `/news/`
+- News詳細: `/news/{id}/`
+
+旧`/product/`、`/information/`、`/information/{id}/`には新URLへの静的移動ページが生成されます。サイト内リンクには新URLだけを使います。
+
+## ページ生成と検査
 
 ```powershell
 bun run format
@@ -211,55 +106,16 @@ bun run check
 git diff --check
 ```
 
-`All matched files use Prettier code style!` と `サイトの構成・CSV・画像・リンクに問題はありません。` が表示されれば検査成功です。エラーが出た場合は、表示されたファイル名・CSV名・行番号・内容を修正して、同じ5つを再実行します。
+`sync-pages`はCSVとMarkdownから、本文・title・description・canonical・OGPを含む静的HTMLを生成します。生成された各ページの`index.html`を直接編集しません。共通HTMLは`templates/page.html`、表示構造は`page-views.js`を編集します。
 
-### 4. 変更内容を確認する
+## 公開
 
 ```powershell
 git status --short
 git diff
-```
-
-意図していないファイルや文章まで変わっていないか確認します。
-
-### 5. GitHubへ公開する
-
-コミット名は更新内容に合わせて変更します。
-
-```powershell
 git add .
-git commit -m "お知らせを更新"
+git commit -m "サイトを更新"
 git push origin HEAD:main
 ```
 
-push後、GitHub Actionsの検査とPages公開が完了するまで待ち、[https://towapc.com/](https://towapc.com/)を再読み込みします。お知らせ・製品の件数、詳細本文の改行、各リンク先を確認すれば完了です。
-
-## 編集してはいけない場所
-
-- 各ページの `index.html` は共通テンプレートから生成されるため、個別に編集しません。
-- 共通HTMLを変える場合は `templates/page.html` だけを編集し、`bun run sync-pages` を実行します。
-- 製品・お知らせの表示内容をJavaScriptへ直接書かず、CSVを正本にします。
-
-## サイトの仕組み
-
-普段の内容更新では `data` と `assets` だけを編集します。仕組み自体を変更するときは、次の役割分担を崩さないようにします。
-
-| 場所 | 役割 |
-| --- | --- |
-| `data/*.csv` | 掲載内容の正本 |
-| `csv.js` | ブラウザーと検査で共用するCSV解析 |
-| `site-schema.js` | CSVの列、必須項目、タグ、製品分類、色の共通定義 |
-| `site-data.js` | CSVの読み込みと安全なURL・画像・文字列処理 |
-| `app-v2.js` | 画面遷移、ナビゲーション、各機能の起動 |
-| `page-views.js` | Home、About、Contactなどのページ本文 |
-| `appearance-settings.js` | Appearance Lab、テーマ保存、外部テーマ読込 |
-| `member-dialog.js` | メンバー詳細カード |
-| `easter-eggs.js` | 404シュレッダー |
-| `ui.js` | アイコン、画像、改行表示の共通部品 |
-| `cookie-consent.js` | Cookie同意表示とアクセス解析の許可・拒否 |
-| `styles/*.css` | 基礎、各ページ、レスポンシブ、テーマごとに分けたデザイン |
-| `templates/page.html` | 全ページ共通のHTML |
-| `scripts/sync-pages.mjs` | 共通HTMLから各ページを生成 |
-| `scripts/check-site.mjs` | CSV、画像、固定表示資産、リンク、生成ページ、JavaScript、Git管理対象を検査 |
-
-データの流れは `data/*.csv` → `site-data.js` → `page-views.js` → `app-v2.js` → ブラウザー表示です。ページの器は `templates/page.html` → `scripts/sync-pages.mjs` → 各 `index.html` の順で生成されます。CSV仕様を増やす場合は `site-schema.js` を起点に変更し、表示、CSS、`data/README.md` の入力規則も同じ変更内で更新します。
+GitHub ActionsとPages公開が完了したら、`https://towapc.com/`でProducts、News、添付、規約、モバイル表示を確認します。

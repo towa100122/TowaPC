@@ -6,13 +6,13 @@ import {
   setupAppearanceControls,
   setupAppearanceEgg,
   setupTheme,
-} from "./appearance-settings.js?v=73";
-import { setupCookieConsent } from "./cookie-consent.js?v=73";
-import { setupShredEgg } from "./easter-eggs.js?v=73";
+} from "./appearance-settings.js";
+import { setupCookieConsent } from "./cookie-consent.js";
+import { setupShredEgg } from "./easter-eggs.js";
 import {
   handleMemberDialogEscape,
   setupMemberDialogs,
-} from "./member-dialog.js?v=73";
+} from "./member-dialog.js";
 import {
   informationResults,
   newsView,
@@ -22,18 +22,18 @@ import {
   renderFooterLinks,
   renderPage,
   routes,
-} from "./page-views.js?v=73";
+} from "./page-views.js";
 import {
   handleProjectDialogEscape,
   setupProjectDialogs,
-} from "./project-dialog.js?v=73";
-import { loadSiteData, safeImageSource, site } from "./site-data.js?v=73";
-import { icon } from "./ui.js?v=73";
+} from "./project-dialog.js";
+import { loadSiteData, safeImageSource, site } from "./site-data.js";
+import { icon } from "./ui.js";
 
 const headerRoutes = [
   ["", "Home"],
-  ["product", "Product"],
-  ["information", "Information"],
+  ["products", "Products"],
+  ["news", "News"],
   ["about", "About"],
   ["contact", "Contact"],
 ];
@@ -85,7 +85,7 @@ function resetMenu() {
   document.body.style.removeProperty("--menu-scroll-y");
   button.setAttribute("aria-expanded", "false");
   button.setAttribute("aria-label", "メニューを開く");
-  button.querySelector(".material-symbols-rounded").textContent = "menu";
+  button.classList.remove("is-open");
 }
 
 function filterProducts(button) {
@@ -181,7 +181,7 @@ function setupPageControls() {
   });
   setupMemberDialogs();
   setupProjectDialogs();
-  setupAppearanceEgg(navigate);
+  setupAppearanceEgg((path) => location.assign(path));
   setupAppearanceControls(render);
   setupShredEgg();
 }
@@ -211,11 +211,6 @@ function render() {
   requestAnimationFrame(positionSelection);
 }
 
-function navigate(path) {
-  if (location.pathname !== path) history.pushState(null, "", path);
-  render();
-}
-
 function showDataWarning(failures) {
   if (!failures.length) return;
   const warning = document.createElement("aside");
@@ -228,7 +223,12 @@ function showDataWarning(failures) {
 
 async function start() {
   const failures = await loadSiteData();
-  render();
+  const { route } = currentLocation();
+  renderNavigation(route);
+  resetMenu();
+  setupPageControls();
+  reveal();
+  requestAnimationFrame(positionSelection);
   showDataWarning(failures);
 }
 
@@ -256,9 +256,7 @@ function setMenuState(open) {
     "aria-label",
     open ? "メニューを閉じる" : "メニューを開く",
   );
-  button.querySelector(".material-symbols-rounded").textContent = open
-    ? "close"
-    : "menu";
+  button.classList.toggle("is-open", open);
 }
 
 let observer;
@@ -331,7 +329,7 @@ function positionSelection() {
 
 function migrateLegacyHash() {
   if (location.hash.startsWith("#/")) {
-    history.replaceState(null, "", location.hash.slice(1).replace(/\/?$/, "/"));
+    location.replace(location.hash.slice(1).replace(/\/?$/, "/"));
   }
 }
 
@@ -355,42 +353,7 @@ document.querySelector(".back-top").addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-document.addEventListener("click", (event) => {
-  const link = event.target.closest("a");
-  if (
-    !link ||
-    event.defaultPrevented ||
-    event.button !== 0 ||
-    event.metaKey ||
-    event.ctrlKey ||
-    event.shiftKey ||
-    event.altKey ||
-    link.target
-  ) {
-    return;
-  }
-  const url = new URL(link.href, location.href);
-  if (url.origin !== location.origin) return;
-  event.preventDefault();
-  const nextPath =
-    url.pathname === "/" ? "/" : url.pathname.replace(/\/?$/, "/");
-  navigate(nextPath);
-  if (url.hash) {
-    requestAnimationFrame(() => {
-      document.querySelector(url.hash)?.scrollIntoView({ behavior: "smooth" });
-    });
-  }
-});
-
 window.addEventListener("resize", positionSelection);
-window.addEventListener("popstate", () => {
-  migrateLegacyHash();
-  render();
-});
-window.addEventListener("hashchange", () => {
-  migrateLegacyHash();
-  render();
-});
 document.addEventListener("keydown", (event) => {
   if (handleMemberDialogEscape(event)) return;
   if (handleProjectDialogEscape(event)) return;

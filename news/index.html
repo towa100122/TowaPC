@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5e6ac" data-theme-color />
-    <meta name="description" content="TowaPCのメンバーを紹介します。" />
-    <link rel="canonical" href="https://towapc.com/members/" />
+    <meta name="description" content="TowaPCからの最新のお知らせです。" />
+    <link rel="canonical" href="https://towapc.com/news/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="TowaPC" />
-    <meta property="og:title" content="TowaPC — Members" />
-    <meta property="og:description" content="TowaPCのメンバーを紹介します。" />
-    <meta property="og:url" content="https://towapc.com/members/" />
+    <meta property="og:title" content="TowaPC — News" />
+    <meta property="og:description" content="TowaPCからの最新のお知らせです。" />
+    <meta property="og:url" content="https://towapc.com/news/" />
     <meta property="og:image" content="https://towapc.com/assets/TowaPC.svg" />
-    <title>TowaPC — Members</title>
+    <title>TowaPC — News</title>
 
     <script src="/theme-bootstrap.js"></script>
     <style>
@@ -86,21 +86,44 @@
 
     <main id="main"><section class="page-hero ">
     <div class="wrap">
-      <div class="breadcrumbs"><a href="/">Home</a> / Members</div>
-      <h1>Members</h1>
-      <p>TowaPCのメンバー</p>
+      <div class="breadcrumbs"><a href="/">Home</a> / News</div>
+      <h1>News</h1>
+      <p>TowaPCからのお知らせ</p>
     </div>
   </section>
     <section class="section wrap">
-      <div class="directory-grid member-grid"><button class="directory-card member-card floating" type="button" data-member-index="0" aria-label="towaの詳細を表示">
-        <img class="directory-image member-image" src="/assets/member-towa.png" alt="towa" width="512" height="512" loading="lazy">
-        <div class="directory-copy">
-          <h2>towa</h2>
-          <span class="category">リーダー</span>
-          <p>TowaPCのリーダー。2022年からScratchを始め、2026年にほぼ引退。主にUIデザインが得意です。現在、NekoBousaiNowという防災ソフトを開発中です。プログラミングはまだ乏しいですが、出来るように勉強していきます。</p>
-          <span class="directory-more">詳細 <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14ZM5 5h6v2H7v10h10v-4h2v6H5Z"></path></svg></span></span>
+      <div class="information-toolbar">
+        <div class="filters"><button class="filter active" data-news-filter="all" aria-pressed="true">すべて</button><button class="filter " data-news-filter="new" aria-pressed="false">NEW</button><button class="filter " data-news-filter="important" aria-pressed="false">Important</button><button class="filter " data-news-filter="release" aria-pressed="false">Release</button><button class="filter " data-news-filter="update" aria-pressed="false">Update</button></div>
+        <div class="view-switch" role="group" aria-label="お知らせの表示形式">
+          <button class="view-button active" data-news-view="grid" aria-pressed="true"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3Zm10 0h8v8h-8ZM3 13h8v8H3Zm10 0h8v8h-8Z"></path></svg></span>グリッド</button>
+          <button class="view-button " data-news-view="list" aria-pressed="false"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h3v3H4Zm5 0h11v3H9ZM4 10.5h3v3H4Zm5 0h11v3H9ZM4 16h3v3H4Zm5 0h11v3H9Z"></path></svg></span>リスト</button>
         </div>
-      </button></div>
+      </div>
+      <div id="information-results"><div class="news-grid"><a class="news-card floating" href="/news/site-updating-1/">
+        <div class="news-card-art"><span><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22a2.3 2.3 0 0 0 2.2-2h-4.4A2.3 2.3 0 0 0 12 22Zm7-6v-5a7 7 0 0 0-5-6.7V3a2 2 0 1 0-4 0v1.3A7 7 0 0 0 5 11v5l-2 2v1h18v-1Z"></path></svg></span></span></div>
+        <div class="news-card-copy">
+          <h2>サイト現在更新中</h2>
+          <div class="news-meta"><time>2026.09.17</time><span class="badge update">Update</span></div>
+          <p>現在、TowaPC.comは更新中です。 不完全なところがあり、調整をおこなっています。 更新完了までしばらくお待ちください。</p>
+          <span class="news-card-more">詳しく見る <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7-1.4-1.4 4.6-4.6H3v-2h9.2L7.6 6.4Z"></path></svg></span></span>
+        </div>
+      </a><a class="news-card floating" href="/news/site-teams-of-service-update/">
+        <div class="news-card-art"><span><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22a2.3 2.3 0 0 0 2.2-2h-4.4A2.3 2.3 0 0 0 12 22Zm7-6v-5a7 7 0 0 0-5-6.7V3a2 2 0 1 0-4 0v1.3A7 7 0 0 0 5 11v5l-2 2v1h18v-1Z"></path></svg></span></span></div>
+        <div class="news-card-copy">
+          <h2>利用規約とプライバシーポリシーを更新します</h2>
+          <div class="news-meta"><time>2026.09.17</time><span class="badge important">Important</span></div>
+          <p>2026年9月18日0時ちょうどを持って利用規約とプライバシーポリシーを改訂します。 サイトの都合によりファイルをアップロードできないため、Discordサーバーで公開を行っています。 ご了承ください。</p>
+          <span class="news-card-more">詳しく見る <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7-1.4-1.4 4.6-4.6H3v-2h9.2L7.6 6.4Z"></path></svg></span></span>
+        </div>
+      </a><a class="news-card floating" href="/news/site-teams-of-service/">
+        <div class="news-card-art"><span><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22a2.3 2.3 0 0 0 2.2-2h-4.4A2.3 2.3 0 0 0 12 22Zm7-6v-5a7 7 0 0 0-5-6.7V3a2 2 0 1 0-4 0v1.3A7 7 0 0 0 5 11v5l-2 2v1h18v-1Z"></path></svg></span></span></div>
+        <div class="news-card-copy">
+          <h2>利用規約とプライバシーポリシーを追加しました</h2>
+          <div class="news-meta"><time>2026.09.13</time><span class="badge important">Important</span></div>
+          <p>TowaPCはこの度、TowaPC.comに利用規約とプライバシーポリシーを追加しました。 これは、できる限り多くの人が自由に、そして安心して利用できるサービスにするための変更です。 今後、利用にはこれらへの同意が必要になります。ご了承ください。また、Cookie確認POPUPも追加しました。併せてご選択ください。 ご理解とご協力をよろしくお願いします。</p>
+          <span class="news-card-more">詳しく見る <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7-1.4-1.4 4.6-4.6H3v-2h9.2L7.6 6.4Z"></path></svg></span></span>
+        </div>
+      </a></div></div>
     </section><div class="page-home-link wrap"><a class="text-link" href="/"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7 1.4-1.4-4.6-4.6H21v-2h-9.2l4.6-4.6Z"></path></svg></span> ホームに戻る</a></div></main>
 
     <footer>

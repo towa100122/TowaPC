@@ -2,10 +2,11 @@
   "name": "towapc-website",
   "private": true,
   "scripts": {
+    "editor": "bun editor/server.mjs",
     "sync-pages": "bun scripts/sync-pages.mjs",
     "check": "bun scripts/check-site.mjs",
-    "format": "prettier --write \"*.js\" \"scripts/*.mjs\" \"styles/*.css\" templates/page.html",
-    "format:check": "prettier --check \"*.js\" \"scripts/*.mjs\" \"styles/*.css\" templates/page.html"
+    "format": "prettier --write \"*.js\" \"scripts/*.mjs\" \"editor/*.{js,mjs,css,html}\" \"styles/*.css\" templates/page.html",
+    "format:check": "prettier --check \"*.js\" \"scripts/*.mjs\" \"editor/*.{js,mjs,css,html}\" \"styles/*.css\" templates/page.html"
   },
   "devDependencies": {
     "prettier": "3.9.6"
