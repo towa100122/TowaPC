@@ -34,8 +34,8 @@ const headerRoutes = [
   ["contact", "Contact"],
 ];
 const NAV_FROM_KEY = "towapc-nav-from";
-const NAV_TIME_KEY = "towapc-nav-time";
 const NAV_SKIP_KEY = "towapc-nav-skip";
+const NAV_ACTIVE_UNTIL_KEY = "towapc-nav-active-until";
 let pendingNavigationRoute = null;
 let skipNavigationAnimation = false;
 let navigationPositioned = false;
@@ -337,6 +337,18 @@ function positionSelection() {
     pill.style.height = `${target.offsetHeight}px`;
     pill.style.transform = `translate(${target.offsetLeft}px,${target.offsetTop}px)`;
   };
+  const markAnimationActive = (duration) => {
+    const until = Date.now() + duration;
+    try {
+      sessionStorage.setItem(NAV_ACTIVE_UNTIL_KEY, String(until));
+    } catch {}
+    window.setTimeout(() => {
+      try {
+        if (Number(sessionStorage.getItem(NAV_ACTIVE_UNTIL_KEY)) === until)
+          sessionStorage.removeItem(NAV_ACTIVE_UNTIL_KEY);
+      } catch {}
+    }, duration);
+  };
   const hasPendingNavigation = pendingNavigationRoute !== null;
   const previous = hasPendingNavigation
     ? nav.querySelector(`[data-route="${CSS.escape(pendingNavigationRoute)}"]`)
@@ -365,6 +377,7 @@ function positionSelection() {
   } catch {}
 
   if (animate) {
+    markAnimationActive(420);
     nav.classList.remove("nav-ready");
     placePill(previous);
     void pill.offsetWidth;
@@ -373,6 +386,7 @@ function positionSelection() {
     return;
   }
   if (appearAtHome) {
+    markAnimationActive(260);
     nav.classList.remove("nav-ready");
     placePill(selected);
     pill.style.opacity = "0";
@@ -422,13 +436,10 @@ document.addEventListener("click", (event) => {
   if (!headerRoutes.some(([route]) => route === destinationRoute)) return;
   try {
     const now = Date.now();
-    const previousNavigation = Number(sessionStorage.getItem(NAV_TIME_KEY));
+    const animationUntil = Number(sessionStorage.getItem(NAV_ACTIVE_UNTIL_KEY));
     sessionStorage.setItem(NAV_FROM_KEY, currentLocation().route);
-    sessionStorage.setItem(
-      NAV_SKIP_KEY,
-      String(previousNavigation > 0 && now - previousNavigation < 700),
-    );
-    sessionStorage.setItem(NAV_TIME_KEY, String(now));
+    sessionStorage.setItem(NAV_SKIP_KEY, String(animationUntil > now));
+    if (animationUntil > now) sessionStorage.removeItem(NAV_ACTIVE_UNTIL_KEY);
   } catch {}
 });
 
