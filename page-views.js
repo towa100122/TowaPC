@@ -235,7 +235,7 @@ function home() {
     <h1>${escapeHtml(site.headline)}</h1>
   </section>
   <div class="wrap">
-    <section class="intro floating">
+    <section class="home-intro">
       <h2>What’s TowaPC?</h2>
       <p>${escapeHtml(site.description)}</p>
       <a class="text-link" href="/about/">TowaPCについて ${icon("right")}</a>
@@ -322,7 +322,7 @@ function about() {
   const history = historyCards();
   return `${pageHero("About", "TowaPCについて")}
     <section class="section wrap about-page">
-      <div class="article floating about-summary">
+      <section class="about-summary">
         <div class="about-heading">
           <button class="about-logo-trigger" type="button" aria-label="TowaPCロゴ" data-animation-trigger>
             <img class="about-logo" src="${escapeHtml(logo)}" alt="TowaPC">
@@ -335,7 +335,7 @@ function about() {
           <a class="soft-button" href="/cooperation/"><span>協力関係がある団体・個人</span>${icon("right")}</a>
           <a class="soft-button" href="/join/"><span>私たちの一員になる</span>${icon("right")}</a>
         </nav>
-      </div>
+      </section>
       ${
         history
           ? `<section class="about-section history-section">

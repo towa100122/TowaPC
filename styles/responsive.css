@@ -87,15 +87,15 @@
     font-size: 22px;
     padding: 20px 14px;
   }
-  .intro {
+  .home-intro {
     margin-top: 25px;
-    padding: 26px 22px;
+    padding: 8px 0;
   }
-  .intro h2,
+  .home-intro h2,
   .section-heading h2 {
     font-size: 27px;
   }
-  .intro p {
+  .home-intro p {
     text-align: left;
   }
   .news-strip {
