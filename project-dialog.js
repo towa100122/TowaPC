@@ -59,6 +59,15 @@ export function setupProjectDialogs() {
       if (project) openDialog(project, trigger);
     });
   });
+  document.querySelectorAll("[data-project-card]").forEach((card) => {
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("a,button,.project-move")) return;
+      const project = site.products.find(
+        (item) => item.id === card.dataset.projectCard,
+      );
+      if (project) openDialog(project, card);
+    });
+  });
 }
 
 export function handleProjectDialogEscape(event) {

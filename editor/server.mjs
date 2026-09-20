@@ -18,6 +18,7 @@ import {
 
 const root = resolve(import.meta.dirname, "..");
 const editorRoot = resolve(root, "editor");
+const previewPort = 4174;
 const editorPort = Number(process.env.TOWAPC_EDITOR_PORT || 4175);
 const csrfToken = randomBytes(32).toString("base64url");
 const allowedOrigins = new Set([
@@ -52,6 +53,44 @@ const uploadRules = {
     ]),
   },
 };
+const previewRootFiles = new Set([
+  "index.html",
+  "404.html",
+  "analytics.js",
+  "app-v2.js",
+  "appearance-settings.js",
+  "cookie-consent.js",
+  "csv.js",
+  "easter-eggs.js",
+  "legal-markdown.js",
+  "member-dialog.js",
+  "page-views.js",
+  "project-dialog.js",
+  "site-data.js",
+  "site-schema.js",
+  "theme-bootstrap.js",
+  "ui.js",
+  "favicon.png",
+  "apple-touch-icon.png",
+]);
+const previewRootDirectories = new Set([
+  "about",
+  "appearance",
+  "assets",
+  "contact",
+  "cooperation",
+  "files",
+  "generated",
+  "information",
+  "join",
+  "members",
+  "news",
+  "privacy",
+  "product",
+  "products",
+  "styles",
+  "terms",
+]);
 
 function json(value, status = 200) {
   return Response.json(value, {
@@ -66,6 +105,39 @@ function isInside(directory, target) {
     path === "" ||
     (!isAbsolute(path) && path !== ".." && !path.startsWith(`..${sep}`))
   );
+}
+
+function isLocalHost(request, port) {
+  const host = request.headers.get("host") || "";
+  return (
+    host === `127.0.0.1:${port}` || host.toLowerCase() === `localhost:${port}`
+  );
+}
+
+function isPreviewPathAllowed(path) {
+  const localPath = relative(root, path);
+  if (
+    !localPath ||
+    isAbsolute(localPath) ||
+    localPath === ".." ||
+    localPath.startsWith(`..${sep}`)
+  ) {
+    return false;
+  }
+  const normalized = localPath.replaceAll("\\", "/");
+  const rootDirectory = normalized.split("/")[0];
+  return (
+    previewRootFiles.has(normalized) ||
+    previewRootDirectories.has(rootDirectory)
+  );
+}
+
+function previewHeaders(contentType = "text/plain; charset=utf-8") {
+  return {
+    "cache-control": "no-store",
+    "content-type": contentType,
+    "x-content-type-options": "nosniff",
+  };
 }
 
 function sameToken(value) {
@@ -224,34 +296,44 @@ const previewTypes = {
 try {
   Bun.serve({
     hostname: "127.0.0.1",
-    port: 4174,
+    port: previewPort,
     async fetch(request) {
+      if (!isLocalHost(request, previewPort)) {
+        return new Response("Forbidden", {
+          status: 403,
+          headers: previewHeaders(),
+        });
+      }
       const url = new URL(request.url);
-      let relative = decodeURIComponent(url.pathname).replace(/^\/+/, "");
-      if (!relative || relative.endsWith("/")) relative += "index.html";
-      const path = resolve(root, relative);
-      if (!isInside(root, path) || path === root)
-        return new Response("Forbidden", { status: 403 });
+      let requestedPath = decodeURIComponent(url.pathname).replace(/^\/+/, "");
+      if (!requestedPath || requestedPath.endsWith("/"))
+        requestedPath += "index.html";
+      const path = resolve(root, requestedPath);
+      if (!isInside(root, path) || !isPreviewPathAllowed(path)) {
+        return new Response("Forbidden", {
+          status: 403,
+          headers: previewHeaders(),
+        });
+      }
       const file = Bun.file(path);
       if (await file.exists()) {
         return new Response(file, {
-          headers: {
-            "content-type":
-              previewTypes[extname(path).toLowerCase()] ||
+          headers: previewHeaders(
+            previewTypes[extname(path).toLowerCase()] ||
               "application/octet-stream",
-          },
+          ),
         });
       }
       return new Response(Bun.file(resolve(root, "404.html")), {
         status: 404,
-        headers: { "content-type": previewTypes[".html"] },
+        headers: previewHeaders(previewTypes[".html"]),
       });
     },
   });
-  console.log("TowaPC Preview: http://127.0.0.1:4174/");
+  console.log(`TowaPC Preview: http://127.0.0.1:${previewPort}/`);
 } catch {
   console.warn(
-    "Preview port 4174 is already in use. The editor will continue.",
+    `Preview port ${previewPort} is already in use. The editor will continue.`,
   );
 }
 
@@ -260,11 +342,7 @@ Bun.serve({
   port: editorPort,
   async fetch(request) {
     const url = new URL(request.url);
-    if (
-      !/^127\.0\.0\.1(?::\d+)?$|^localhost(?::\d+)?$/i.test(
-        request.headers.get("host") || "",
-      )
-    )
+    if (!isLocalHost(request, editorPort))
       return new Response("Forbidden", { status: 403 });
     try {
       if (request.method === "GET" && staticFiles[url.pathname])

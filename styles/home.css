@@ -222,7 +222,7 @@
 }
 .quick-link small {
   font-size: 11px;
-  color: #70736c;
+  color: var(--muted);
 }
 .pink {
   background: var(--pink);

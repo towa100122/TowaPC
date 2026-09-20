@@ -24,6 +24,10 @@
 .product:hover {
   --card-lift: -4px;
 }
+.product[data-project-card],
+.product-row[data-project-card] {
+  cursor: pointer;
+}
 .product-art {
   height: auto;
   aspect-ratio: 8/5;

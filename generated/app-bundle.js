@@ -804,7 +804,7 @@ function productDetails(product) {
   return `<button class="product-detail-action" type="button" data-project-id="${escapeHtml(product.id)}" aria-label="${escapeHtml(product.name)}の詳細を表示">詳細 ${icon("right")}</button>`;
 }
 function productGridCard(product) {
-  return `<article class="product floating">
+  return `<article class="product floating" data-project-card="${escapeHtml(product.id)}">
     ${productArt(product)}
     <div class="product-copy">
       <h3>${escapeHtml(product.name)}</h3>
@@ -816,7 +816,7 @@ function productGridCard(product) {
   </article>`;
 }
 function productListRow(product) {
-  return `<article class="product-row floating">
+  return `<article class="product-row floating" data-project-card="${escapeHtml(product.id)}">
     ${productArt(product)}
     <div class="product-copy">
       <h3>${escapeHtml(product.name)}</h3>
@@ -965,6 +965,15 @@ function setupProjectDialogs() {
       const project = site.products.find((item) => item.id === trigger.dataset.projectId);
       if (project)
         openDialog2(project, trigger);
+    });
+  });
+  document.querySelectorAll("[data-project-card]").forEach((card) => {
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("a,button,.project-move"))
+        return;
+      const project = site.products.find((item) => item.id === card.dataset.projectCard);
+      if (project)
+        openDialog2(project, card);
     });
   });
 }

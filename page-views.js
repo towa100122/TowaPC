@@ -50,7 +50,7 @@ function productDetails(product) {
 }
 
 function productGridCard(product) {
-  return `<article class="product floating">
+  return `<article class="product floating" data-project-card="${escapeHtml(product.id)}">
     ${productArt(product)}
     <div class="product-copy">
       <h3>${escapeHtml(product.name)}</h3>
@@ -63,7 +63,7 @@ function productGridCard(product) {
 }
 
 function productListRow(product) {
-  return `<article class="product-row floating">
+  return `<article class="product-row floating" data-project-card="${escapeHtml(product.id)}">
     ${productArt(product)}
     <div class="product-copy">
       <h3>${escapeHtml(product.name)}</h3>
