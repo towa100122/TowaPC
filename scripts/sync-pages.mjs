@@ -115,8 +115,9 @@ function renderDocument(page) {
     page.id,
     appearance.renderAppearanceLab,
   );
+  const aboutChild = ["members", "cooperation"].includes(page.route);
   const homeLink = page.route
-    ? `<div class="page-home-link wrap"><a class="text-link" href="/">${ui.icon("left")} ホームに戻る</a></div>`
+    ? `<div class="page-home-link wrap"><a class="text-link" href="${aboutChild ? "/about/" : "/"}">${ui.icon("left")} ${aboutChild ? "Aboutに戻る" : "ホームに戻る"}</a></div>`
     : "";
   const replacements = {
     "{{TITLE}}": escapeAttribute(title),

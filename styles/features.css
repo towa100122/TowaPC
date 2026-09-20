@@ -616,17 +616,8 @@ body.dialog-open {
   font-size: 11px;
 }
 
-.detail-actions {
-  align-items: flex-start;
-  flex-direction: column;
-}
-
 .related-links {
   justify-content: flex-start;
-}
-
-.detail-actions .back-link {
-  margin: 0;
 }
 
 .news-attachments {
@@ -821,9 +812,9 @@ body.dialog-open {
 }
 
 .footer-contact-mail > .icon {
-  width: 15px;
-  height: 15px;
-  font-size: 15px;
+  width: 21px;
+  height: 21px;
+  font-size: 21px;
 }
 
 :root[data-theme="dark"] .article-sidebar {

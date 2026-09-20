@@ -203,10 +203,13 @@ export function newsCards(items) {
   return `<div class="news-grid">${cards}</div>`;
 }
 
-export function pageHero(title, subtitle, extraClass = "") {
+export function pageHero(title, subtitle, extraClass = "", parent = null) {
+  const breadcrumbs = parent
+    ? `<a href="/">Home</a> / <a href="${escapeHtml(parent.href)}">${escapeHtml(parent.label)}</a> / ${escapeHtml(title)}`
+    : `<a href="/">Home</a> / ${escapeHtml(title)}`;
   return `<section class="page-hero ${extraClass}">
     <div class="wrap">
-      <div class="breadcrumbs"><a href="/">Home</a> / ${escapeHtml(title)}</div>
+      <div class="breadcrumbs">${breadcrumbs}</div>
       <h1>${escapeHtml(title)}</h1>
       <p>${escapeHtml(subtitle)}</p>
     </div>
@@ -267,7 +270,7 @@ function products() {
     )
     .join("");
   return `${pageHero("Products", "私たちの製品の紹介")}
-    <section class="section wrap">
+    <section class="section wrap products-section">
       <div class="product-toolbar">
         <div class="filters">${filters}</div>
         <div class="view-switch" role="group" aria-label="製品の表示形式">
@@ -288,7 +291,7 @@ function news() {
     )
     .join("");
   return `${pageHero("News", "TowaPCからのお知らせ")}
-    <section class="section wrap">
+    <section class="section wrap news-section">
       <div class="news-toolbar">
         <div class="filters">${filters}</div>
         <div class="view-switch" role="group" aria-label="お知らせの表示形式">
@@ -408,7 +411,7 @@ function directory(kind) {
     <p>${cooperation ? "掲載する団体・個人" : "メンバー情報"}を準備しています。</p>
     <small>dataフォルダーのCSVから追加できます。</small>
   </div>`;
-  return `${pageHero(title, subtitle)}
+  return `${pageHero(title, subtitle, "", { label: "About", href: "/about/" })}
     <section class="section wrap">
       <div class="directory-grid ${cooperation ? "partner-grid" : "member-grid"}">${entries || emptyState}</div>
     </section>`;
@@ -503,8 +506,8 @@ function detail(kind, id) {
         : ""
     }
     <div class="detail-actions">
-      ${linkButtons}
       <a class="text-link back-link" href="/news/">${icon("left")} 一覧に戻る</a>
+      ${linkButtons}
     </div>
   </div>`;
   const content = `${image(item.image, item.title, "article-image")}${copy}`;

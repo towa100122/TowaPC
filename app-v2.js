@@ -33,6 +33,13 @@ const headerRoutes = [
   ["about", "About"],
   ["contact", "Contact"],
 ];
+const NAV_FROM_KEY = "towapc-nav-from";
+let pendingNavigationRoute = null;
+let navigationPositioned = false;
+
+try {
+  pendingNavigationRoute = sessionStorage.getItem(NAV_FROM_KEY);
+} catch {}
 
 function headerNavigation() {
   const links = headerRoutes
@@ -316,10 +323,54 @@ function positionSelection() {
     pill.style.opacity = "0";
     return;
   }
-  pill.style.opacity = "1";
-  pill.style.width = `${selected.offsetWidth}px`;
-  pill.style.height = `${selected.offsetHeight}px`;
-  pill.style.transform = `translate(${selected.offsetLeft}px,${selected.offsetTop}px)`;
+  const placePill = (target) => {
+    pill.style.opacity = "1";
+    pill.style.width = `${target.offsetWidth}px`;
+    pill.style.height = `${target.offsetHeight}px`;
+    pill.style.transform = `translate(${target.offsetLeft}px,${target.offsetTop}px)`;
+  };
+  const hasPendingNavigation = pendingNavigationRoute !== null;
+  const previous = hasPendingNavigation
+    ? nav.querySelector(`[data-route="${CSS.escape(pendingNavigationRoute)}"]`)
+    : null;
+  const animate =
+    !navigationPositioned &&
+    previous &&
+    previous !== selected &&
+    !matchMedia("(prefers-reduced-motion:reduce)").matches &&
+    appearanceSettings.motion !== "none";
+  const appearAtHome =
+    !navigationPositioned &&
+    hasPendingNavigation &&
+    !previous &&
+    selected.dataset.route === "" &&
+    !matchMedia("(prefers-reduced-motion:reduce)").matches &&
+    appearanceSettings.motion !== "none";
+
+  navigationPositioned = true;
+  pendingNavigationRoute = null;
+  try {
+    sessionStorage.removeItem(NAV_FROM_KEY);
+  } catch {}
+
+  if (animate) {
+    nav.classList.remove("nav-ready");
+    placePill(previous);
+    void pill.offsetWidth;
+    nav.classList.add("nav-ready");
+    requestAnimationFrame(() => placePill(selected));
+    return;
+  }
+  if (appearAtHome) {
+    nav.classList.remove("nav-ready");
+    placePill(selected);
+    pill.style.opacity = "0";
+    void pill.offsetWidth;
+    nav.classList.add("nav-ready");
+    requestAnimationFrame(() => (pill.style.opacity = "1"));
+    return;
+  }
+  placePill(selected);
   requestAnimationFrame(() => nav.classList.add("nav-ready"));
 }
 
@@ -343,6 +394,24 @@ document.addEventListener("click", (event) => {
   ) {
     setMenuState(false);
   }
+  const link = event.target.closest("a[href]");
+  if (
+    !link ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  )
+    return;
+  const destination = new URL(link.href, location.href);
+  if (destination.origin !== location.origin) return;
+  const destinationRoute =
+    destination.pathname.split("/").filter(Boolean)[0] || "";
+  if (!headerRoutes.some(([route]) => route === destinationRoute)) return;
+  try {
+    sessionStorage.setItem(NAV_FROM_KEY, currentLocation().route);
+  } catch {}
 });
 
 document.querySelector(".back-top").addEventListener("click", () => {
