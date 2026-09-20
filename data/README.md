@@ -4,6 +4,7 @@ TowaPC.comの文章と掲載項目は、この`data`フォルダーで管理し�
 
 ## ローカル管理画面
 
+cd "C:\Users\towa\towapc\TowaPC-repo"
 リポジトリ直下で次を実行します。
 
 ```powershell
