@@ -80,7 +80,6 @@ const previewRootDirectories = new Set([
   "contact",
   "cooperation",
   "files",
-  "generated",
   "information",
   "join",
   "members",

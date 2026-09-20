@@ -161,9 +161,24 @@
     <script id="site-data" type="application/json">
       {{SITE_DATA}}
     </script>
-    <script
-      type="module"
-      src="/generated/app-bundle.js?v={{ASSET_VERSION}}"
-    ></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "/analytics.js": "/analytics.js?v={{ASSET_VERSION}}",
+          "/appearance-settings.js": "/appearance-settings.js?v={{ASSET_VERSION}}",
+          "/cookie-consent.js": "/cookie-consent.js?v={{ASSET_VERSION}}",
+          "/csv.js": "/csv.js?v={{ASSET_VERSION}}",
+          "/easter-eggs.js": "/easter-eggs.js?v={{ASSET_VERSION}}",
+          "/legal-markdown.js": "/legal-markdown.js?v={{ASSET_VERSION}}",
+          "/member-dialog.js": "/member-dialog.js?v={{ASSET_VERSION}}",
+          "/page-views.js": "/page-views.js?v={{ASSET_VERSION}}",
+          "/project-dialog.js": "/project-dialog.js?v={{ASSET_VERSION}}",
+          "/site-data.js": "/site-data.js?v={{ASSET_VERSION}}",
+          "/site-schema.js": "/site-schema.js?v={{ASSET_VERSION}}",
+          "/ui.js": "/ui.js?v={{ASSET_VERSION}}"
+        }
+      }
+    </script>
+    <script type="module" src="/app-v2.js?v={{ASSET_VERSION}}"></script>
   </body>
 </html>

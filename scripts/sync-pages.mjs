@@ -14,30 +14,34 @@ const themeBootstrap = await readFile(
   resolve(root, "theme-bootstrap.js"),
   "utf8",
 );
-const bundleResult = await Bun.build({
-  entrypoints: [resolve(root, "app-v2.js")],
-  target: "browser",
-  format: "esm",
-  minify: false,
-  sourcemap: "none",
-});
-if (!bundleResult.success) {
-  throw new Error(
-    `ブラウザー用JavaScriptの生成に失敗しました。\n${bundleResult.logs.join("\n")}`,
-  );
-}
-const appBundle = await bundleResult.outputs[0].text();
-await mkdir(resolve(root, "generated"), { recursive: true });
-await writeFile(resolve(root, "generated/app-bundle.js"), appBundle, "utf8");
 const styleFiles = [...template.matchAll(/href="\/(styles\/[^"?]+\.css)/g)].map(
   (match) => match[1],
 );
-const styleSources = await Promise.all(
-  styleFiles.map((file) => readFile(resolve(root, file), "utf8")),
+const publicScriptFiles = [
+  "analytics.js",
+  "app-v2.js",
+  "appearance-settings.js",
+  "cookie-consent.js",
+  "csv.js",
+  "easter-eggs.js",
+  "legal-markdown.js",
+  "member-dialog.js",
+  "page-views.js",
+  "project-dialog.js",
+  "site-data.js",
+  "site-schema.js",
+  "theme-bootstrap.js",
+  "ui.js",
+];
+const assetSources = await Promise.all(
+  [...styleFiles, ...publicScriptFiles].map((file) =>
+    readFile(resolve(root, file), "utf8"),
+  ),
 );
 const assetVersion = createHash("sha256")
-  .update(appBundle)
-  .update(styleSources.join("\n"))
+  .update(
+    assetSources.map((source) => source.replace(/\r\n/g, "\n")).join("\n"),
+  )
   .digest("hex")
   .slice(0, 12);
 const data = await loadSiteDataFromDisk(root);

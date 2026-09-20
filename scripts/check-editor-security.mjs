@@ -75,7 +75,7 @@ try {
     },
     400,
   );
-  for (const path of ["/", "/generated/app-bundle.js"]) {
+  for (const path of ["/", "/app-v2.js"]) {
     const response = await fetch(`${previewOrigin}${path}`);
     if (!response.ok)
       throw new Error(`${path}: Previewの公開ファイルを取得できません。`);

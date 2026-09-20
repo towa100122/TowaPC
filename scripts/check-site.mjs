@@ -67,7 +67,6 @@ const clientScripts = [
   "theme-bootstrap.js",
   "ui.js",
   "editor/editor.js",
-  "generated/app-bundle.js",
 ];
 const serverScripts = [
   "editor/server.mjs",
@@ -378,7 +377,7 @@ try {
       problem(`${page.file}: 自動生成された資産バージョンがありません。`);
     if (
       version &&
-      (!html.includes(`/generated/app-bundle.js?v=${version}`) ||
+      (!html.includes(`/app-v2.js?v=${version}`) ||
         [...html.matchAll(/href="\/styles\/[^"?]+\.css\?v=([^"&]+)/g)].some(
           (match) => match[1] !== version,
         ))
