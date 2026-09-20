@@ -2,6 +2,51 @@ import { escapeHtml, safeHttpUrl, safeImageSource, site } from "./site-data.js";
 import { icon, textWithBreaks } from "./ui.js";
 
 let previousFocus;
+let inertElements = [];
+
+const focusableSelector = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
+function setBackgroundInert(backdrop) {
+  inertElements = [...document.body.children].filter(
+    (element) =>
+      element !== backdrop &&
+      !element.inert &&
+      !["SCRIPT", "STYLE"].includes(element.tagName),
+  );
+  inertElements.forEach((element) => (element.inert = true));
+}
+
+function clearBackgroundInert() {
+  inertElements.forEach((element) => (element.inert = false));
+  inertElements = [];
+}
+
+function trapFocus(event, dialog) {
+  if (event.key !== "Tab") return;
+  const focusable = [...dialog.querySelectorAll(focusableSelector)].filter(
+    (element) => !element.hidden && element.getClientRects().length,
+  );
+  if (!focusable.length) {
+    event.preventDefault();
+    return;
+  }
+  const first = focusable[0];
+  const last = focusable.at(-1);
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
 
 function destination(value) {
   const first = String(value || "")
@@ -16,6 +61,7 @@ function destination(value) {
 
 function closeDialog() {
   document.querySelector(".project-dialog-backdrop")?.remove();
+  clearBackgroundInert();
   document.body.classList.remove("dialog-open");
   previousFocus?.focus();
   previousFocus = null;
@@ -39,8 +85,11 @@ function openDialog(project, trigger) {
     </div>
   </section>`;
   document.body.append(backdrop);
+  setBackgroundInert(backdrop);
   document.body.classList.add("dialog-open");
+  const dialog = backdrop.querySelector(".project-dialog");
   backdrop.querySelector("[data-project-dialog-close]").focus();
+  backdrop.addEventListener("keydown", (event) => trapFocus(event, dialog));
   backdrop.addEventListener("click", (event) => {
     if (
       event.target === backdrop ||

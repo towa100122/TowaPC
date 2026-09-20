@@ -75,6 +75,23 @@ try {
     },
     400,
   );
+  const svgUpload = new FormData();
+  svgUpload.set("kind", "image");
+  svgUpload.set(
+    "file",
+    new File(['<svg xmlns="http://www.w3.org/2000/svg"/>'], "blocked.svg", {
+      type: "image/svg+xml",
+    }),
+  );
+  await expectStatus(
+    "/api/upload",
+    {
+      method: "POST",
+      headers: { origin, "x-towapc-csrf": state.csrfToken },
+      body: svgUpload,
+    },
+    400,
+  );
   for (const path of ["/", "/app-v2.js"]) {
     const response = await fetch(`${previewOrigin}${path}`);
     if (!response.ok)

@@ -80,6 +80,14 @@ function headerNavigation() {
     .join("")}`;
 }
 
+function canonicalFor(page) {
+  const canonicalPath =
+    page.file === "index.html"
+      ? "/"
+      : `/${page.file.replace(/index\.html$/, "")}`;
+  return new URL(canonicalPath, location.origin).href;
+}
+
 function renderDocument(page) {
   const label = page.title === "Home" ? "Home" : page.title;
   const title = `TowaPC — ${label}`;
@@ -101,11 +109,7 @@ function renderDocument(page) {
     routeDescriptions[page.route] ||
     data.description
   ).slice(0, 160);
-  const canonicalPath =
-    page.file === "index.html"
-      ? "/"
-      : `/${page.file.replace(/index\.html$/, "")}`;
-  const canonical = new URL(canonicalPath, location.origin).href;
+  const canonical = canonicalFor(page);
   const body = views.renderPage(
     page.route,
     page.id,
@@ -117,6 +121,8 @@ function renderDocument(page) {
   const replacements = {
     "{{TITLE}}": escapeAttribute(title),
     "{{DESCRIPTION}}": escapeAttribute(description),
+    "{{ROBOTS_META}}":
+      page.route === "404" ? '<meta name="robots" content="noindex" />' : "",
     "{{CANONICAL}}": escapeAttribute(canonical),
     "{{HEADER_NAV}}": headerNavigation(),
     "{{MAIN}}": body + homeLink,
@@ -199,6 +205,41 @@ for (const redirect of redirects) {
   await mkdir(dirname(target), { recursive: true });
   await writeFile(target, redirectDocument(redirect.target), "utf8");
 }
+
+const sitemapRoutes = new Set([
+  "",
+  "products",
+  "news",
+  "about",
+  "cooperation",
+  "members",
+  "contact",
+  "join",
+  "terms",
+  "privacy",
+]);
+const sitemapUrls = pages
+  .filter((page) => sitemapRoutes.has(page.route))
+  .map((page) => `  <url><loc>${canonicalFor(page)}</loc></url>`)
+  .join("\n");
+await writeFile(
+  resolve(root, "sitemap.xml"),
+  `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapUrls}
+</urlset>
+`,
+  "utf8",
+);
+await writeFile(
+  resolve(root, "robots.txt"),
+  `User-agent: *
+Allow: /
+
+Sitemap: https://towapc.com/sitemap.xml
+`,
+  "utf8",
+);
 
 const expected = new Set(await getPageFiles(root));
 for (const section of ["products", "news", "product", "information"]) {

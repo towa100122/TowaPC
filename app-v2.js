@@ -349,6 +349,14 @@ window.addEventListener("resize", positionSelection);
 document.addEventListener("keydown", (event) => {
   if (handleMemberDialogEscape(event)) return;
   if (handleProjectDialogEscape(event)) return;
+  if (
+    event.key === "Escape" &&
+    document.querySelector(".header nav")?.classList.contains("open")
+  ) {
+    setMenuState(false);
+    document.querySelector(".menu-button")?.focus();
+    return;
+  }
   if (event.key === "Escape") disableAnimationMode();
 });
 

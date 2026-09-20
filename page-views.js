@@ -535,7 +535,13 @@ function legalPage(kind) {
   const content = renderLegalMarkdown(
     privacy ? site.legal.privacy : site.legal.terms,
   );
-  return `${pageHero(title, subtitle)}
+  return `<section class="page-hero">
+    <div class="wrap">
+      <div class="breadcrumbs"><a href="/">Home</a> / ${escapeHtml(title)}</div>
+      <p class="page-hero-title">${escapeHtml(title)}</p>
+      <p>${escapeHtml(subtitle)}</p>
+    </div>
+  </section>
     <section class="section wrap">
       <article class="article legal-document floating">
         ${content}
@@ -547,7 +553,7 @@ export function missing() {
   return `<section class="section wrap not-found">
     <div class="not-found-card floating">
       <button class="not-found-number" type="button" aria-label="404" data-shred-trigger>404</button>
-      <p class="not-found-label">Not found</p>
+      <h1 class="not-found-label">Not found</h1>
       <p class="not-found-copy">お探しのページは迷子かもしれません。</p>
     </div>
   </section>`;

@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5e6ac" data-theme-color />
     <meta name="description" content="{{DESCRIPTION}}" />
+    {{ROBOTS_META}}
     <link rel="canonical" href="{{CANONICAL}}" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="TowaPC" />
     <meta property="og:title" content="{{TITLE}}" />
     <meta property="og:description" content="{{DESCRIPTION}}" />
     <meta property="og:url" content="{{CANONICAL}}" />
-    <meta property="og:image" content="https://towapc.com/assets/TowaPC.svg" />
+    <meta property="og:image" content="https://towapc.com/assets/ogp.png" />
     <title>{{TITLE}}</title>
 
     <script>
@@ -99,10 +100,13 @@
         class="menu-button"
         aria-label="メニューを開く"
         aria-expanded="false"
+        aria-controls="main-navigation"
       >
         <span class="menu-glyph" aria-hidden="true"><i></i><i></i><i></i></span>
       </button>
-      <nav aria-label="メインナビゲーション">{{HEADER_NAV}}</nav>
+      <nav id="main-navigation" aria-label="メインナビゲーション">
+        {{HEADER_NAV}}
+      </nav>
     </header>
 
     <main id="main">{{MAIN}}</main>

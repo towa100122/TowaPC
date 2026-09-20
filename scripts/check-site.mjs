@@ -97,6 +97,7 @@ const requiredClientFiles = [
   "apple-touch-icon.png",
   "favicon.png",
   "assets/TowaPC.svg",
+  "assets/ogp.png",
   "assets/social-discord.svg",
   "assets/social-x.svg",
   "assets/social-youtube.svg",
@@ -107,6 +108,8 @@ const requiredClientFiles = [
   "editor/server.mjs",
   "files/.gitkeep",
   "assets/uploads/.gitkeep",
+  "robots.txt",
+  "sitemap.xml",
 ];
 for (const file of requiredClientFiles) {
   if (!existsSync(resolve(root, file))) {
@@ -368,6 +371,12 @@ try {
       problem(`${page.file}: canonicalがありません。`);
     if (!/<meta property="og:title" content="[^"]+"/.test(html))
       problem(`${page.file}: OGP titleがありません。`);
+    if (
+      !html.includes(
+        '<meta property="og:image" content="https://towapc.com/assets/ogp.png" />',
+      )
+    )
+      problem(`${page.file}: OGP画像がPNGではありません。`);
     if (!/<main id="main">[\s\S]+<\/main>/.test(html))
       problem(`${page.file}: 静的な主要本文がありません。`);
     const version = html.match(
@@ -387,6 +396,8 @@ try {
     if (/href="\/(?:product|information)(?:\/|\")/.test(html))
       problem(`${page.file}: 旧URLへの内部リンクが残っています。`);
     if (["terms", "privacy"].includes(page.route)) {
+      if ((html.match(/<h1(?:\s|>)/g) || []).length !== 1)
+        problem(`${page.file}: h1はMarkdown本文の1個だけにしてください。`);
       const markdown = await readFile(
         resolve(root, `data/${page.route}.md`),
         "utf8",
@@ -399,7 +410,53 @@ try {
         );
       }
     }
+    if (page.route === "404") {
+      if ((html.match(/<h1(?:\s|>)/g) || []).length !== 1)
+        problem(`${page.file}: 意味上のh1が1個必要です。`);
+      if (!html.includes('<meta name="robots" content="noindex" />'))
+        problem(`${page.file}: noindexがありません。`);
+    }
   }
+  const publicSitemapRoutes = new Set([
+    "",
+    "products",
+    "news",
+    "about",
+    "cooperation",
+    "members",
+    "contact",
+    "join",
+    "terms",
+    "privacy",
+  ]);
+  const expectedSitemapUrls = pages
+    .filter((page) => publicSitemapRoutes.has(page.route))
+    .map((page) =>
+      page.file === "index.html"
+        ? "https://towapc.com/"
+        : `https://towapc.com/${page.file.replace(/index\.html$/, "")}`,
+    );
+  const sitemap = await readFile(resolve(root, "sitemap.xml"), "utf8");
+  for (const url of expectedSitemapUrls) {
+    if (!sitemap.includes(`<loc>${url}</loc>`))
+      problem(`sitemap.xml: ${url}がありません。`);
+  }
+  for (const excluded of [
+    "/404/",
+    "/appearance/",
+    "/product/",
+    "/information/",
+  ]) {
+    if (sitemap.includes(`<loc>https://towapc.com${excluded}`))
+      problem(`sitemap.xml: 除外URL ${excluded} が含まれています。`);
+  }
+  const robots = await readFile(resolve(root, "robots.txt"), "utf8");
+  if (
+    !robots.includes("User-agent: *") ||
+    !robots.includes("Allow: /") ||
+    !robots.includes("Sitemap: https://towapc.com/sitemap.xml")
+  )
+    problem("robots.txt: クロール許可またはsitemap指定がありません。");
   for (const redirect of redirects) {
     const html = await readFile(resolve(root, redirect.file), "utf8");
     if (!html.includes(`href="https://towapc.com${redirect.target}"`))

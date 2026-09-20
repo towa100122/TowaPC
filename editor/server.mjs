@@ -38,7 +38,7 @@ const documents = { terms: "terms.md", privacy: "privacy.md" };
 const uploadRules = {
   image: {
     directory: "assets/uploads",
-    extensions: new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]),
+    extensions: new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]),
   },
   attachment: {
     directory: "files",
@@ -72,6 +72,8 @@ const previewRootFiles = new Set([
   "ui.js",
   "favicon.png",
   "apple-touch-icon.png",
+  "robots.txt",
+  "sitemap.xml",
 ]);
 const previewRootDirectories = new Set([
   "about",

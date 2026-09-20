@@ -220,7 +220,8 @@
   .page-hero {
     padding: 32px 0;
   }
-  .page-hero h1 {
+  .page-hero h1,
+  .page-hero-title {
     font-size: 42px;
   }
   .news-list-row {

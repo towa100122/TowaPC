@@ -137,14 +137,21 @@
   background: #efeee8;
   box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.12);
 }
-.page-hero h1 {
+.page-hero h1,
+.page-hero-title {
+  margin: 0;
   font:
     500 54px "Google Sans",
     sans-serif;
+  color: inherit;
 }
 .page-hero p {
   color: var(--muted);
   margin-top: 7px;
+}
+.page-hero .page-hero-title {
+  margin: 0;
+  color: inherit;
 }
 .breadcrumbs {
   font-size: 11px;
@@ -661,6 +668,7 @@
   color: var(--muted);
 }
 .not-found-label {
+  margin: 0;
   font:
     500 20px "Google Sans",
     sans-serif;
