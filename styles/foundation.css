@@ -1,28 +1,4 @@
 /* Foundation, typography, and header */
-@view-transition {
-  navigation: auto;
-}
-
-::view-transition-old(root) {
-  animation: page-swap-out 0.14s ease-out both;
-}
-
-::view-transition-new(root) {
-  animation: page-swap-in 0.14s ease-out both;
-}
-
-@keyframes page-swap-out {
-  to {
-    opacity: 0.94;
-  }
-}
-
-@keyframes page-swap-in {
-  from {
-    opacity: 0.94;
-  }
-}
-
 :root {
   --ink: #242822;
   --muted: #62675f;
@@ -50,12 +26,6 @@
   --header-duration: 480ms;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-  }
-}
 * {
   box-sizing: border-box;
 }

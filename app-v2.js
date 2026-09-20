@@ -34,11 +34,15 @@ const headerRoutes = [
   ["contact", "Contact"],
 ];
 const NAV_FROM_KEY = "towapc-nav-from";
+const NAV_TIME_KEY = "towapc-nav-time";
+const NAV_SKIP_KEY = "towapc-nav-skip";
 let pendingNavigationRoute = null;
+let skipNavigationAnimation = false;
 let navigationPositioned = false;
 
 try {
   pendingNavigationRoute = sessionStorage.getItem(NAV_FROM_KEY);
+  skipNavigationAnimation = sessionStorage.getItem(NAV_SKIP_KEY) === "true";
 } catch {}
 
 function headerNavigation() {
@@ -341,6 +345,7 @@ function positionSelection() {
     !navigationPositioned &&
     previous &&
     previous !== selected &&
+    !skipNavigationAnimation &&
     !matchMedia("(prefers-reduced-motion:reduce)").matches &&
     appearanceSettings.motion !== "none";
   const appearAtHome =
@@ -348,6 +353,7 @@ function positionSelection() {
     hasPendingNavigation &&
     !previous &&
     selected.dataset.route === "" &&
+    !skipNavigationAnimation &&
     !matchMedia("(prefers-reduced-motion:reduce)").matches &&
     appearanceSettings.motion !== "none";
 
@@ -355,6 +361,7 @@ function positionSelection() {
   pendingNavigationRoute = null;
   try {
     sessionStorage.removeItem(NAV_FROM_KEY);
+    sessionStorage.removeItem(NAV_SKIP_KEY);
   } catch {}
 
   if (animate) {
@@ -414,7 +421,14 @@ document.addEventListener("click", (event) => {
     destination.pathname.split("/").filter(Boolean)[0] || "";
   if (!headerRoutes.some(([route]) => route === destinationRoute)) return;
   try {
+    const now = Date.now();
+    const previousNavigation = Number(sessionStorage.getItem(NAV_TIME_KEY));
     sessionStorage.setItem(NAV_FROM_KEY, currentLocation().route);
+    sessionStorage.setItem(
+      NAV_SKIP_KEY,
+      String(previousNavigation > 0 && now - previousNavigation < 700),
+    );
+    sessionStorage.setItem(NAV_TIME_KEY, String(now));
   } catch {}
 });
 
