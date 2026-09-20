@@ -230,6 +230,9 @@ async function start() {
   renderNavigation(route);
   resetMenu();
   requestAnimationFrame(positionSelection);
+
+  reveal();
+
   const failures = await loadSiteData();
   renderFooterNavigation();
   setupPageControls();
@@ -310,10 +313,17 @@ function reveal() {
     element.dataset.revealDelay = String(
       (index % 4) * appearanceSettings.stagger,
     );
-    if (element.getBoundingClientRect().top <= window.innerHeight * 1.05) {
+
+    const initiallyVisible =
+      element.getBoundingClientRect().top <= window.innerHeight * 1.05;
+
+    if (initiallyVisible) {
+      element.classList.remove("reveal", "play-reveal");
       element.classList.add("is-visible");
       return;
     }
+
+    element.classList.add("reveal");
     element.classList.remove("is-visible", "play-reveal");
     observer.observe(element);
   });
