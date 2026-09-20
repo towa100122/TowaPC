@@ -117,10 +117,12 @@
 :root[data-surface="material"] .footer-legal button {
   color: var(--m3-on-surface);
 }
+:root[data-theme="dark"][data-surface="material"] .about-summary,
 :root[data-theme="dark"][data-surface="material"] .contact-card,
 :root[data-theme="dark"][data-surface="material"] .contact-card.pending,
 :root[data-theme="dark"][data-surface="material"] .join-box,
 :root[data-theme="dark"][data-surface="material"] .join-value,
+:root[data-theme="dark"][data-surface="material"] .intro,
 :root[data-theme="dark"][data-surface="material"] .news-card,
 :root[data-theme="dark"][data-surface="material"] .news-strip,
 :root[data-theme="dark"][data-surface="material"] .news-list-row,
@@ -138,6 +140,7 @@
 :root[data-theme="dark"][data-surface="material"] .contact-card p,
 :root[data-theme="dark"][data-surface="material"] .join-box p,
 :root[data-theme="dark"][data-surface="material"] .join-value p,
+:root[data-theme="dark"][data-surface="material"] .intro p,
 :root[data-theme="dark"][data-surface="material"] .article p,
 :root[data-theme="dark"][data-surface="material"] .product p,
 :root[data-theme="dark"][data-surface="material"] .product-row p {

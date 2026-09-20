@@ -414,11 +414,6 @@
 .about-summary {
   max-width: none;
 }
-.about-summary > p {
-  margin: 15px 0;
-  color: var(--muted);
-  line-height: 2.2;
-}
 .about-heading {
   display: grid;
   justify-items: center;

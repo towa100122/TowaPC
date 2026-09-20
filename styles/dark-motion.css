@@ -43,6 +43,7 @@
   background: #20251f;
   box-shadow: inset 0 0 28px #0008;
 }
+:root[data-theme="dark"] .intro,
 :root[data-theme="dark"] .product,
 :root[data-theme="dark"] .product-row,
 :root[data-theme="dark"] .info-list,
@@ -55,6 +56,7 @@
 :root[data-theme="dark"] .join-value {
   background: #272c26;
 }
+:root[data-theme="dark"] .intro p,
 :root[data-theme="dark"] .product p,
 :root[data-theme="dark"] .product-row p,
 :root[data-theme="dark"] .product-bottom,

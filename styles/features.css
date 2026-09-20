@@ -402,9 +402,8 @@ body.dialog-open {
 }
 
 :root[data-theme="dark"][data-surface="standard"] .about-actions .soft-button {
-  background: #292d28;
-  color: #f1f3ed;
-  box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.05);
+  background: #f4f4f0;
+  color: #20231e;
 }
 
 :root[data-theme="dark"] .member-dialog-copy p {
