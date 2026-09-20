@@ -639,6 +639,7 @@ body.dialog-open {
   align-items: center;
   border-radius: 14px;
   background: var(--accent-soft);
+  color: #242822;
 }
 
 .file-attachment span {
@@ -657,6 +658,7 @@ body.dialog-open {
 .file-attachment small {
   color: var(--muted);
   font-size: 11px;
+  color: #6e7469;
 }
 
 .directory-grid {
