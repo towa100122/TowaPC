@@ -108,6 +108,9 @@ p {
   height: 100%;
   fill: currentColor;
 }
+.icon svg[fill="none"] {
+  fill: none;
+}
 .wrap {
   width: min(var(--content-width), 88%);
   margin: auto;

@@ -433,10 +433,11 @@ function coreContactCards() {
       if (type === "mail") {
         const address = url.replace(/^mailto:/i, "");
         return `<div id="${type}" class="contact-card contact-card-email floating">
-          <a class="contact-primary" href="${escapeHtml(url)}">
-            ${contactIcon}<div><h2>${label}</h2><p>${escapeHtml(detail || address)}</p></div>${icon("right")}
-          </a>
-          <button class="contact-copy" type="button" data-copy-email="${escapeHtml(address)}">アドレスをコピー</button>
+          ${contactIcon}<div><h2>${label}</h2><p>${escapeHtml(detail || address)}</p></div>
+          <div class="contact-card-actions">
+            <button class="contact-copy" type="button" data-copy-email="${escapeHtml(address)}" aria-label="メールアドレスをコピー">${icon("copy")}</button>
+            <a class="contact-arrow" href="${escapeHtml(url)}" aria-label="メールを開く">${icon("right")}</a>
+          </div>
         </div>`;
       }
       return `<a id="${type}" class="contact-card floating" href="${escapeHtml(url)}"${externalAttributes(url)}>

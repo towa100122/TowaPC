@@ -32,7 +32,21 @@ const iconPaths = {
   download: "M11 3h2v10.2l3.6-3.6L18 11l-6 6-6-6 1.4-1.4 3.6 3.6ZM4 19h16v2H4Z",
 };
 
+const outlineIconPaths = {
+  grid: "M4 4h6v6H4Zm10 0h6v6h-6ZM4 14h6v6H4Zm10 0h6v6h-6Z",
+  right: "m9 5 7 7-7 7M16 12H3",
+  left: "m15 5-7 7 7 7M8 12h13",
+  about: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-10v6m0-10v.01",
+  mail: "M3 6h18v12H3Zm1 1 8 6 8-6",
+  join: "M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.87m-2-11.99a4 4 0 0 1 0 7.75",
+  copy: "M9 9h11v11H9Zm-5 6H3V4h11v1",
+};
+
 export function icon(name) {
+  const outlinePath = outlineIconPaths[name];
+  if (outlinePath) {
+    return `<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${outlinePath}"></path></svg></span>`;
+  }
   const path = iconPaths[name] || iconPaths.grid;
   return `<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="${path}"></path></svg></span>`;
 }

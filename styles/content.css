@@ -478,35 +478,6 @@
   transition: transform 0.38s cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
-.contact-primary {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  padding: 22px;
-  align-items: center;
-  gap: 16px;
-}
-.contact-primary > .icon:first-child {
-  width: 31px;
-  height: 31px;
-}
-.contact-primary > .icon:last-child {
-  width: 18px;
-  transition: transform 0.25s ease;
-}
-.contact-primary:hover > .icon:last-child {
-  transform: translateX(3px);
-}
-
-.contact-copy {
-  margin: 0 22px 20px;
-  padding: 10px 14px;
-  border: 0;
-  border-radius: 12px;
-  background: #f1f2ed;
-  color: #20231e;
-  font-size: 12px;
-  font-weight: 600;
-}
 .soft-button span:first-child {
   min-width: 0;
 }
@@ -605,7 +576,8 @@
 }
 .detail-actions {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 14px;
   margin-top: 24px;
 }
@@ -833,9 +805,55 @@ body.animation-mode .nav-selection {
   transform: translateX(3px);
 }
 .contact-card.contact-card-email {
+  display: flex;
+}
+.contact-card > .contact-card-actions {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+}
+.contact-copy,
+.contact-arrow {
   display: grid;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  overflow: hidden;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+}
+.contact-copy .icon,
+.contact-arrow .icon {
+  width: 20px;
+  height: 20px;
+}
+.contact-copy::after {
+  position: absolute;
+  right: 48px;
+  bottom: calc(100% + 7px);
+  width: max-content;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: #242822;
+  color: #fff;
+  content: attr(data-feedback);
+  font-size: 11px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(3px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+.contact-copy[data-feedback]::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+.contact-card-email:hover .contact-arrow .icon {
+  transform: translateX(3px);
 }
 .pending {
   cursor: default;

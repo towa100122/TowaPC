@@ -165,9 +165,13 @@ function setupContactActions() {
   document.querySelectorAll("[data-copy-email]").forEach((button) => {
     button.addEventListener("click", async () => {
       const copied = await copyText(button.dataset.copyEmail || "");
-      const original = button.textContent;
-      button.textContent = copied ? "コピーしました" : "コピーできませんでした";
-      window.setTimeout(() => (button.textContent = original), 1800);
+      const feedback = copied ? "コピーしました" : "コピーできませんでした";
+      button.dataset.feedback = feedback;
+      button.setAttribute("aria-label", feedback);
+      window.setTimeout(() => {
+        delete button.dataset.feedback;
+        button.setAttribute("aria-label", "メールアドレスをコピー");
+      }, 1800);
     });
   });
 }

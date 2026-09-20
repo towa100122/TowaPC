@@ -239,7 +239,6 @@ function motionSettings() {
   ];
   return `<section class="settings-card floating settings-motion">
     <div class="settings-heading">
-      ${icon("motion")}
       <div><h2>Motion</h2><p>カードが現れる動きを調整</p></div>
       <button class="preview-button" type="button" data-play-preview>${icon("sparkle")}再生</button>
     </div>
@@ -265,7 +264,6 @@ function headerSettings() {
   ];
   return `<section class="settings-card floating settings-header">
     <div class="settings-heading">
-      ${icon("header")}
       <div><h2>Header</h2><p>透け方、ぼかし、登場を調整</p></div>
       <button class="preview-button" type="button" data-play-header>${icon("sparkle")}再生</button>
     </div>
@@ -300,7 +298,6 @@ function themeSettings() {
   ];
   return `<section class="settings-card floating">
     <div class="settings-heading">
-      ${icon("palette")}
       <div><h2>Theme</h2><p>色と質感を選択</p></div>
     </div>
     ${settingToggle("themePinned", "テーマを任意で固定する", "オフなら端末の設定を優先")}
@@ -323,7 +320,6 @@ function shapeSettings() {
   ];
   return `<section class="settings-card floating">
     <div class="settings-heading">
-      ${icon("corners")}
       <div><h2>Shape & Size</h2><p>形と画面の密度を調整</p></div>
     </div>
     ${settingChoices("corners", "カードの角", corners)}
@@ -335,7 +331,6 @@ function shapeSettings() {
 function secretSettings() {
   return `<section class="settings-card floating secret-settings">
     <div class="settings-heading">
-      ${icon("sparkle")}
       <div><h2>Secret</h2><p>ここへ移動した謎の機能</p></div>
     </div>
     ${settingToggle("animationMode", "謎のアニメーションモード", "光と浮遊がサイト全体を動き回ります")}
@@ -365,7 +360,6 @@ function importSettings() {
   );
   return `<section class="settings-card floating settings-import">
     <div class="settings-heading">
-      ${icon("upload")}
       <div><h2>External Theme</h2><p>外部テーマをJSONから読み込む</p></div>
     </div>
     <label class="theme-import-button">

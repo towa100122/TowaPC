@@ -820,6 +820,12 @@ body.dialog-open {
   font-size: 18px;
 }
 
+.footer-contact-mail > .icon {
+  width: 15px;
+  height: 15px;
+  font-size: 15px;
+}
+
 :root[data-theme="dark"] .article-sidebar {
   background: #292c27;
 }

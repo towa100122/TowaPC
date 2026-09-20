@@ -206,6 +206,10 @@
 .quick-link > .arrow {
   margin-left: auto;
 }
+.quick-link[href="/contact/"] > .icon {
+  width: 28px;
+  height: 28px;
+}
 .quick-link:hover {
   --card-lift: -3px;
 }

@@ -136,7 +136,12 @@
   }
   .quick-link > .icon {
     width: 18px;
+    height: 18px;
     font-size: 18px;
+  }
+  .quick-link[href="/contact/"] > .icon {
+    width: 24px;
+    height: 24px;
   }
   .quick-link > .arrow {
     margin-left: auto;
