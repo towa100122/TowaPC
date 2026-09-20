@@ -248,7 +248,7 @@ function home() {
       <div class="news-list">${compactNewsRows(site.news.slice(0, 3))}</div>
     </section>
     <section class="quick-links">${quickLinks}</section>
-    <section class="section">
+    <section class="section home-products-section">
       <div class="section-heading">
         <h2>Our products</h2>
         <a class="text-link" href="/products/">すべての製品を見る ${icon("right")}</a>
