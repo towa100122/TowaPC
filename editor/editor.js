@@ -19,7 +19,13 @@ function setStatus(message) {
   status.textContent = message;
 }
 async function request(path, options) {
-  const response = await fetch(path, options);
+  const requestOptions = { ...(options || {}) };
+  if (requestOptions.method === "POST" && state?.csrfToken) {
+    const headers = new Headers(requestOptions.headers || {});
+    headers.set("x-towapc-csrf", state.csrfToken);
+    requestOptions.headers = headers;
+  }
+  const response = await fetch(path, requestOptions);
   const result = await response.json();
   if (!response.ok)
     throw new Error(result.error || result.output || "処理に失敗しました。");

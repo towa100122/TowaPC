@@ -80,7 +80,7 @@
   gap: 18px;
   padding-top: 16px;
   border-top: 1px solid #8e916b38;
-  font-size: 10px;
+  font-size: 11px;
 }
 .footer-legal button {
   padding: 0;
@@ -126,7 +126,7 @@ body.cookie-consent-visible {
 }
 .cookie-consent p {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.7;
 }
 .cookie-consent p a {
@@ -147,7 +147,7 @@ body.cookie-consent-visible {
   color: var(--ink);
   box-shadow: var(--inner);
   white-space: nowrap;
-  font-size: 10px;
+  font-size: 12px;
 }
 .cookie-actions [data-cookie-accept] {
   background: #252922;
@@ -195,13 +195,10 @@ body.cookie-consent-visible {
 @media (max-width: 720px) {
   .legal-page .page-hero,
   body:has(.legal-document) .page-hero {
-    padding: 20px 0 16px;
-  }
-  body:has(.legal-document) .page-hero h1 {
-    font-size: 34px;
+    display: none;
   }
   body:has(.legal-document) .section {
-    padding-top: 24px;
+    padding-top: 16px;
   }
   .legal-document {
     padding: 22px 20px 30px;

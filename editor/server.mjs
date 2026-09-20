@@ -1,5 +1,13 @@
+import { randomBytes, timingSafeEqual } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { basename, extname, resolve } from "node:path";
+import {
+  basename,
+  extname,
+  isAbsolute,
+  relative,
+  resolve,
+  sep,
+} from "node:path";
 import { parseCsv, stringifyCsv } from "../csv.js";
 import {
   csvSchemas,
@@ -10,6 +18,12 @@ import {
 
 const root = resolve(import.meta.dirname, "..");
 const editorRoot = resolve(root, "editor");
+const editorPort = Number(process.env.TOWAPC_EDITOR_PORT || 4175);
+const csrfToken = randomBytes(32).toString("base64url");
+const allowedOrigins = new Set([
+  `http://127.0.0.1:${editorPort}`,
+  `http://localhost:${editorPort}`,
+]);
 const datasets = {
   news: "news.csv",
   products: "products.csv",
@@ -40,7 +54,33 @@ const uploadRules = {
 };
 
 function json(value, status = 200) {
-  return Response.json(value, { status });
+  return Response.json(value, {
+    status,
+    headers: { "cache-control": "no-store" },
+  });
+}
+
+function isInside(directory, target) {
+  const path = relative(directory, target);
+  return (
+    path === "" ||
+    (!isAbsolute(path) && path !== ".." && !path.startsWith(`..${sep}`))
+  );
+}
+
+function sameToken(value) {
+  const supplied = Buffer.from(String(value || ""));
+  const expected = Buffer.from(csrfToken);
+  return (
+    supplied.length === expected.length && timingSafeEqual(supplied, expected)
+  );
+}
+
+function allowWrite(request) {
+  return (
+    allowedOrigins.has(request.headers.get("origin") || "") &&
+    sameToken(request.headers.get("x-towapc-csrf"))
+  );
 }
 
 function safeName(value) {
@@ -60,7 +100,12 @@ async function atomicWrite(path, content) {
 }
 
 async function readState() {
-  const result = { datasets: {}, documents: {}, schemas: csvSchemas };
+  const result = {
+    datasets: {},
+    documents: {},
+    schemas: csvSchemas,
+    csrfToken,
+  };
   for (const [name, file] of Object.entries(datasets)) {
     result.datasets[name] = parseCsv(
       await readFile(resolve(root, "data", file), "utf8"),
@@ -122,7 +167,7 @@ async function upload(request) {
   const directory = resolve(root, rule.directory);
   await mkdir(directory, { recursive: true });
   const target = resolve(directory, name);
-  if (!target.startsWith(`${directory}\\`) && target !== directory)
+  if (!isInside(directory, target) || relative(directory, target) === "")
     return json({ error: "保存先が不正です。" }, 400);
   const temporary = `${target}.${process.pid}.tmp`;
   await Bun.write(temporary, file);
@@ -185,7 +230,7 @@ try {
       let relative = decodeURIComponent(url.pathname).replace(/^\/+/, "");
       if (!relative || relative.endsWith("/")) relative += "index.html";
       const path = resolve(root, relative);
-      if (!path.startsWith(`${root}\\`))
+      if (!isInside(root, path) || path === root)
         return new Response("Forbidden", { status: 403 });
       const file = Bun.file(path);
       if (await file.exists()) {
@@ -212,7 +257,7 @@ try {
 
 Bun.serve({
   hostname: "127.0.0.1",
-  port: Number(process.env.TOWAPC_EDITOR_PORT || 4175),
+  port: editorPort,
   async fetch(request) {
     const url = new URL(request.url);
     if (
@@ -237,6 +282,8 @@ Bun.serve({
         );
       if (request.method === "GET" && url.pathname === "/api/state")
         return json(await readState());
+      if (request.method === "POST" && !allowWrite(request))
+        return json({ error: "OriginまたはCSRF tokenが不正です。" }, 403);
       if (request.method === "POST" && url.pathname === "/api/save")
         return await save(request);
       if (request.method === "POST" && url.pathname === "/api/upload")
@@ -250,4 +297,4 @@ Bun.serve({
   },
 });
 
-console.log("TowaPC Editor: http://127.0.0.1:4175/");
+console.log(`TowaPC Editor: http://127.0.0.1:${editorPort}/`);

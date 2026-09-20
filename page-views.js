@@ -88,13 +88,7 @@ function productRows(items) {
 }
 
 export function productView() {
-  try {
-    return localStorage.getItem("towapc-product-view") === "list"
-      ? "list"
-      : "grid";
-  } catch {
-    return "grid";
-  }
+  return "grid";
 }
 
 export function productResults(items, view) {
@@ -104,19 +98,13 @@ export function productResults(items, view) {
 }
 
 export function newsView() {
-  try {
-    return localStorage.getItem("towapc-news-view") === "list"
-      ? "list"
-      : "grid";
-  } catch {
-    return "grid";
-  }
+  return "grid";
 }
 
-export function informationResults(items, view) {
+export function newsResults(items, view) {
   if (!items.length)
     return '<div class="empty-state">該当するお知らせはありません。</div>';
-  return view === "list" ? informationRows(items) : newsCards(items);
+  return view === "list" ? newsRows(items) : newsCards(items);
 }
 
 function newsBadge(item) {
@@ -179,17 +167,17 @@ function newsArt(item, imageClass) {
     : `<span>${icon("bell")}</span>`;
 }
 
-export function informationRows(items) {
-  return `<div class="information-list">${items
+export function newsRows(items) {
+  return `<div class="news-list-view">${items
     .map(
       (item) =>
-        `<a class="information-row floating" href="/news/${escapeHtml(item.id)}/">
-          <div class="information-row-art">${newsArt(item, "information-row-image")}</div>
-          <div class="information-row-copy">
+        `<a class="news-list-row floating" href="/news/${escapeHtml(item.id)}/">
+          <div class="news-list-art">${newsArt(item, "news-list-image")}</div>
+          <div class="news-list-copy">
             <h2>${escapeHtml(item.title)}</h2>
             <div class="news-meta"><time>${escapeHtml(item.date)}</time>${newsBadge(item)}</div>
             <p>${plainText(item.body)}</p>
-            <span class="information-row-more">詳しく見る ${icon("right")}</span>
+            <span class="news-list-more">詳しく見る ${icon("right")}</span>
           </div>
         </a>`,
     )
@@ -291,7 +279,7 @@ function products() {
     </section>`;
 }
 
-function information() {
+function news() {
   const view = newsView();
   const filters = [["all", "すべて"], ...Object.entries(newsTagLabels)]
     .map(
@@ -301,20 +289,19 @@ function information() {
     .join("");
   return `${pageHero("News", "TowaPCからのお知らせ")}
     <section class="section wrap">
-      <div class="information-toolbar">
+      <div class="news-toolbar">
         <div class="filters">${filters}</div>
         <div class="view-switch" role="group" aria-label="お知らせの表示形式">
           <button class="view-button ${view === "grid" ? "active" : ""}" data-news-view="grid" aria-pressed="${view === "grid"}">${icon("grid")}グリッド</button>
           <button class="view-button ${view === "list" ? "active" : ""}" data-news-view="list" aria-pressed="${view === "list"}">${icon("list")}リスト</button>
         </div>
       </div>
-      <div id="information-results">${informationResults(site.news, view)}</div>
+      <div id="news-results">${newsResults(site.news, view)}</div>
     </section>`;
 }
 
 function historyCards() {
   return site.history
-    .filter((event) => !/20XX|X月|X日/i.test(event.date))
     .map((event) => {
       const colored =
         event.colored === "y" && /^#[0-9a-f]{6}$/i.test(event.color);
@@ -443,6 +430,15 @@ function coreContactCards() {
           ${contactIcon}<div><h2>${label}</h2><p>URL準備中</p></div>${icon("right")}
         </button>`;
       }
+      if (type === "mail") {
+        const address = url.replace(/^mailto:/i, "");
+        return `<div id="${type}" class="contact-card contact-card-email floating">
+          <a class="contact-primary" href="${escapeHtml(url)}">
+            ${contactIcon}<div><h2>${label}</h2><p>${escapeHtml(detail || address)}</p></div>${icon("right")}
+          </a>
+          <button class="contact-copy" type="button" data-copy-email="${escapeHtml(address)}">アドレスをコピー</button>
+        </div>`;
+      }
       return `<a id="${type}" class="contact-card floating" href="${escapeHtml(url)}"${externalAttributes(url)}>
         ${contactIcon}<div><h2>${label}</h2><p>${escapeHtml(detail || "公式ページ")}</p></div>${icon("right")}
       </a>`;
@@ -527,7 +523,7 @@ function detail(kind, id) {
     : "";
   return `${pageHero("News", "お知らせ")}
     <section class="section wrap detail-layout">
-      <article class="article floating information-article">${content}</article>
+      <article class="article floating news-article">${content}</article>
       ${sidebar}
     </section>`;
 }
@@ -562,7 +558,7 @@ export function renderPage(route, id, appearanceView) {
   const pages = {
     "": home,
     products,
-    news: information,
+    news,
     about,
     appearance: appearanceView,
     join,
@@ -590,7 +586,11 @@ export function renderFooterContacts() {
     ["youtube", "YouTube", safeHttpUrl(site.socials.youtube)],
     ["x", "X", safeHttpUrl(site.socials.x)],
     ["discord", "Discord", safeHttpUrl(site.socials.discord)],
-    ["mail", "Email", safeContactUrl(site.contactUrl) || "/contact/"],
+    [
+      "mail",
+      "Email",
+      safeContactUrl(site.contactUrl) ? "/contact/#mail" : "/contact/",
+    ],
   ]
     .filter(([, , url]) => url)
     .map(([type, label, url]) => {

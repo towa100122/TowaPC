@@ -57,10 +57,12 @@ example,2026.09.19,update,更新のお知らせ,"本文です。\n次の行で�
 
 Productsは個別URLを生成せず、一覧カードの「詳細」からポップアップを開きます。主操作には`links`へ入力した名前が表示されます。
 
+ProductsとNewsのグリッド／リスト切替はPCの現在の表示中だけ有効で、再読み込みするとグリッドへ戻ります。スマートフォンは操作が重ならないよう、横幅を使うリスト表示に固定されます。
+
 ## その他のCSV
 
 - `site.csv`: Hero、紹介文、連絡先、About本文
-- `history.csv`: Historyの日時・見出し・説明・色
+- `history.csv`: Historyの日時・見出し・説明・色。`20XX年`などのテンプレート行もAboutへ表示されます。
 - `members.csv`: メンバー
 - `partners.csv`: 協力関係
 - `contacts.csv`: Contactへ追加する任意リンク

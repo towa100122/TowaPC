@@ -117,7 +117,6 @@
 :root[data-density="compact"] main .settings-card {
   padding: 22px;
 }
-:root[data-motion="none"] .page-enter,
 :root[data-motion="none"] .motion-preview.preview-play {
   animation: none;
 }
@@ -318,7 +317,7 @@
 .setting-choices small {
   margin-top: 2px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 .setting-choices button[data-setting="accent"] {
   position: relative;
@@ -386,7 +385,7 @@
 }
 .color-picker small {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 .motion-preview {
   position: relative;
@@ -417,7 +416,7 @@
 }
 .motion-preview small {
   color: #bfc4b8;
-  font-size: 10px;
+  font-size: 11px;
 }
 .motion-preview.preview-play {
   animation: settings-preview var(--reveal-duration)

@@ -481,7 +481,7 @@ function syncRangeOutputs() {
   });
 }
 
-async function importTheme(file, rerender) {
+async function importTheme(file) {
   if (!file) return;
   try {
     if (file.size > 128 * 1024) throw new Error("ファイルが大きすぎます");
@@ -495,14 +495,15 @@ async function importTheme(file, rerender) {
     );
     saveSettings();
     applyAppearance();
-    rerender();
+    syncControls();
+    syncRangeOutputs();
     showStatus(`${String(imported.name || "THEME").slice(0, 40)} // IMPORTED`);
   } catch (error) {
     showStatus(`IMPORT ERROR // ${error.message}`);
   }
 }
 
-export function setupAppearanceControls(rerender) {
+export function setupAppearanceControls() {
   if (!document.querySelector(".appearance-lab")) return;
 
   document.querySelectorAll("[data-setting]").forEach((button) => {
@@ -579,7 +580,7 @@ export function setupAppearanceControls(rerender) {
   document
     .querySelector("[data-theme-import]")
     ?.addEventListener("change", (event) => {
-      importTheme(event.currentTarget.files?.[0], rerender);
+      importTheme(event.currentTarget.files?.[0]);
       event.currentTarget.value = "";
     });
   document
@@ -588,7 +589,8 @@ export function setupAppearanceControls(rerender) {
       appearanceSettings = { ...defaults };
       saveSettings();
       applyAppearance();
-      rerender();
+      syncControls();
+      syncRangeOutputs();
       showStatus("APPEARANCE // RESET");
     });
   syncControls();

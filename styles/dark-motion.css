@@ -80,14 +80,14 @@
 :root[data-theme="dark"] .news-card {
   background: #272c26;
 }
-:root[data-theme="dark"] .information-row {
+:root[data-theme="dark"] .news-list-row {
   background: #272c26;
 }
-:root[data-theme="dark"] .information-row-art {
+:root[data-theme="dark"] .news-list-art {
   background: #fffde9;
   color: #242822;
 }
-:root[data-theme="dark"] .information-row-copy p {
+:root[data-theme="dark"] .news-list-copy p {
   color: var(--muted);
 }
 :root[data-theme="dark"] .news-strip .news-row time {

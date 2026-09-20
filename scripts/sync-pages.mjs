@@ -9,6 +9,10 @@ import {
 
 const root = resolve(import.meta.dirname, "..");
 const template = await readFile(resolve(root, "templates/page.html"), "utf8");
+const themeBootstrap = await readFile(
+  resolve(root, "theme-bootstrap.js"),
+  "utf8",
+);
 const data = await loadSiteDataFromDisk(root);
 
 globalThis.location = new URL("https://towapc.com/");
@@ -87,7 +91,11 @@ function renderDocument(page) {
     "{{MAIN}}": body + homeLink,
     "{{FOOTER_LINKS}}": views.renderFooterLinks(),
     "{{FOOTER_CONTACTS}}": views.renderFooterContacts(),
-    "{{SITE_DATA}}": JSON.stringify(data).replaceAll("<", "\\u003c"),
+    "{{SITE_DATA}}": JSON.stringify(embeddedDataFor(page)).replaceAll(
+      "<",
+      "\\u003c",
+    ),
+    "/*__THEME_BOOTSTRAP__*/": themeBootstrap.trim(),
   };
   return Object.entries(replacements)
     .reduce(
@@ -95,6 +103,36 @@ function renderDocument(page) {
       template,
     )
     .replace(/[ \t]+$/gm, "");
+}
+
+function embeddedDataFor(page) {
+  const {
+    products,
+    news,
+    partners,
+    members,
+    history,
+    legal,
+    attachmentMeta,
+    ...shared
+  } = data;
+  const embedded = { ...shared };
+  if (["", "products"].includes(page.route)) embedded.products = products;
+  if (["", "news"].includes(page.route)) {
+    embedded.news =
+      page.route === "news" && page.id
+        ? news
+            .filter((item) => item.id === page.id)
+            .concat(news.filter((item) => item.id !== page.id).slice(0, 4))
+        : news;
+    embedded.attachmentMeta = attachmentMeta;
+  }
+  if (page.route === "about") embedded.history = history;
+  if (page.route === "members") embedded.members = members;
+  if (page.route === "cooperation") embedded.partners = partners;
+  if (page.route === "terms") embedded.legal = { terms: legal.terms };
+  if (page.route === "privacy") embedded.legal = { privacy: legal.privacy };
+  return embedded;
 }
 
 function redirectDocument(target) {

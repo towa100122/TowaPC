@@ -59,7 +59,7 @@
   color: var(--m3-on-surface-variant);
 }
 :root[data-surface="material"] .product-art,
-:root[data-surface="material"] .information-row-art,
+:root[data-surface="material"] .news-list-art,
 :root[data-surface="material"] .news-card-art {
   background: var(--m3-primary-container);
   color: var(--m3-on-primary-container);
@@ -84,7 +84,7 @@
   box-shadow: none;
 }
 :root[data-surface="material"] .text-link,
-:root[data-surface="material"] .information-row-more,
+:root[data-surface="material"] .news-list-more,
 :root[data-surface="material"] .news-card-more,
 :root[data-surface="material"] .product-bottom {
   color: var(--m3-primary);
@@ -125,7 +125,7 @@
 :root[data-theme="dark"][data-surface="material"] .intro,
 :root[data-theme="dark"][data-surface="material"] .news-card,
 :root[data-theme="dark"][data-surface="material"] .news-strip,
-:root[data-theme="dark"][data-surface="material"] .information-row,
+:root[data-theme="dark"][data-surface="material"] .news-list-row,
 :root[data-theme="dark"][data-surface="material"] .product,
 :root[data-theme="dark"][data-surface="material"] .product-row,
 :root[data-theme="dark"][data-surface="material"] .article,

@@ -28,15 +28,16 @@
 - 表示内容の正本は `data` フォルダー内のCSVと規約Markdown。実際の文章をJavaScriptへ重複させない。
 - `csv.js` がブラウザー表示と検査で共用するCSV解析を担当する。CSV解析を別の場所へ複製しない。
 - `site-schema.js` がCSVの列、必須項目、タグ、製品種別、色、読み込み対象を一元管理する。仕様追加時はここを正本にする。
-- `scripts/load-site-data.mjs` が生成時のデータ読込、`site-data.js` が埋め込みデータの復元、URL検証、HTMLエスケープを担当する。
+- `scripts/load-site-data.mjs` が生成時のデータ読込、`site-data.js` がページ別に絞った埋め込みデータの復元、URL検証、HTMLエスケープを担当する。
 - `cookie-consent.js` がCookie設定の保存、同意バー、アクセス解析の許可・拒否操作を担当する。
 - `app-v2.js` は画面遷移、ナビゲーション、各機能の起動だけを担当する。
 - `page-views.js` が各ページ本文、`legal-markdown.js` が規約Markdownの安全な表示、`appearance-settings.js` が外観設定、`member-dialog.js` と `project-dialog.js` が詳細表示、`easter-eggs.js` が404シュレッダー、`ui.js` が表示用共通部品を担当する。責務を `app-v2.js` へ戻さない。
 - CSSは `styles` 内で基礎、ページ、レスポンシブ、ダーク、Cookie、Appearance Lab、Material 3、Monochrome、特殊演出に分ける。巨大なCSSへ再結合しない。
 - HTML内へ長いJavaScriptやCSSを書かない。初期テーマは `theme-bootstrap.js`、アクセス解析は `analytics.js` を使う。
+- `theme-bootstrap.js`は`sync-pages`がテンプレートの`/*__THEME_BOOTSTRAP__*/`へインライン展開し、外部ファイル待ちより前にテーマを確定する。埋め込みトークンをJavaScriptとして解釈される記法へ変えない。
 - 全ページ共通のHTMLは `templates/page.html` だけを直接編集する。
 - 正式URLは`/products/`、`/news/`、`/news/{id}/`。旧`/product/`、`/information/`、`/information/{id}/`は静的移動ページとしてのみ維持する。
-- `bun run editor`は127.0.0.1専用の管理GUIを起動する。CSV・規約Markdown・画像・News添付を安全な許可先だけへ保存し、Git操作は行わない。
+- `bun run editor`は127.0.0.1専用の管理GUIを起動する。POST APIはEditor自身のOriginと起動ごとのCSRF tokenを両方検証し、CSV・規約Markdown・画像・News添付をOS非依存のパス検証で許可先だけへ保存する。Git操作は行わない。
 - News添付は`news.csv`の`attachments`へ`表示名|/files/ファイル名`で保存し、複数は`;;`で区切る。公開ファイルは`files`直下に限定する。
 - HTML更新後やNewsのID変更後は `bun run sync-pages` を実行する。
 - `bun run sync-pages` はCSVとMarkdownからページ固有title、description、canonical、OGP、主要本文を含む静的HTMLを生成する。News詳細は`news/*/index.html`、Products詳細は一覧ポップアップ。旧`product`と`information`には新URLへの互換ページを生成する。生成HTMLを手作業で編集しない。
@@ -99,8 +100,11 @@
 - Joinは「TowaPCのメンバーになるには、以下のリンクから私たちのDiscordサーバーに参加してください。」とDiscord参加ボタンだけを表示し、下部の説明カードは置かない。
 - Aboutの3つの関連ボタンは紹介文の白いカード内へ置き、カード内カードに見えない静かな背景と影なしの形にする。
 - Discordリンク: `https://towapc.com/discord`
-- News一覧はタグ絞り込みとグリッド／リスト切替を備える。詳細は広い画面で本文の右にほかの記事を表示し、関連リンクと添付の下へ一覧に戻る操作を置く。
-- Productsは詳細ページを持たない。グリッドとリストは専用構造を使い、3行紹介の末尾付近に詳細、下部に`links`先頭の名前を使った大きな主操作を置く。
+- News一覧はPCでタグ絞り込みとグリッド／リスト切替を備え、再読み込み時はグリッドへ戻す。スマートフォンは切替を出さず、横幅を使ったリスト表示に固定する。詳細は広い画面で本文の右にほかの記事を表示し、関連リンクと添付の下へ一覧に戻る操作を置く。
+- Productsは詳細ページを持たない。PCではグリッド／リストを切り替えられ、再読み込み時はグリッドへ戻す。スマートフォンはリスト表示に固定する。3行紹介の末尾付近に詳細、下部に`links`先頭の名前を使った大きな主操作を置く。
+- Revealは初期表示範囲の静的HTMLを後から隠さず、画面外の対象だけを登場アニメーションへ登録する。初期HTMLをJavaScriptで同内容へ描き直さない。
+- 利用規約・プライバシーポリシーの番号付きリストはMarkdownに書かれた開始番号と個別番号を維持する。スマートフォンでは重複する英語Heroを省き、日本語タイトルと本文冒頭を最初の画面へ出す。
+- Emailは`mailto:`リンクに加えてアドレスをコピーする操作を表示し、既定メールアプリがないPCでも利用できるようにする。
 - MembersとCooperationは一覧本文を3行で省略し、カードからアニメーション付き詳細を開く。正方形の協力ロゴはメンバーと同じ配置、横長ロゴはロゴの右に名前を置く。
 - Contactカードの補足表示:
   - YouTube: `@TowaPC`
@@ -134,7 +138,7 @@
 ## v71 完了状態（2026-09-16）
 
 - v71では全ページのHTML、JavaScript、CSSを責務別ファイルへ整理し、長いインラインHTML・スクリプトと巨大CSSを廃止した。
-- Aboutは色付き価値カードを廃止し、`data/history.csv` で編集する履歴と、`data/site.csv` で編集する名前の由来へ変更した。履歴カードは着色有無、背景色、白黒の文字色をCSVで指定する。
+- Aboutは色付き価値カードを廃止し、`data/history.csv` で編集する履歴と、`data/site.csv` で編集する名前の由来へ変更した。テンプレート行も公開表示し、履歴カードは着色有無、背景色、白黒の文字色をCSVで指定する。
 - Contactのメール表記はEmailへ変更し、`data/contacts.csv` から追加リンクを表示できる。JoinはDiscord参加案内と参加ボタンだけに簡略化した。
 - お知らせと製品はタイトルを日付・タグ・カテゴリーより先に表示する。Cookieバーは境界線を削除し、ボタンとバーをドロップシャドウ中心の表示へ変更した。
 

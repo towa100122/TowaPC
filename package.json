@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "editor": "bun editor/server.mjs",
+    "check:editor": "bun scripts/check-editor-security.mjs",
     "sync-pages": "bun scripts/sync-pages.mjs",
     "check": "bun scripts/check-site.mjs",
     "format": "prettier --write \"*.js\" \"scripts/*.mjs\" \"editor/*.{js,mjs,css,html}\" \"styles/*.css\" templates/page.html",

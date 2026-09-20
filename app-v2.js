@@ -2,7 +2,6 @@ import {
   appearanceSettings,
   applyAppearance,
   disableAnimationMode,
-  renderAppearanceLab,
   setupAppearanceControls,
   setupAppearanceEgg,
   setupTheme,
@@ -14,21 +13,18 @@ import {
   setupMemberDialogs,
 } from "./member-dialog.js";
 import {
-  informationResults,
+  newsResults,
   newsView,
   productResults,
   productView,
   renderFooterContacts,
   renderFooterLinks,
-  renderPage,
-  routes,
 } from "./page-views.js";
 import {
   handleProjectDialogEscape,
   setupProjectDialogs,
 } from "./project-dialog.js";
-import { loadSiteData, safeImageSource, site } from "./site-data.js";
-import { icon } from "./ui.js";
+import { loadSiteData, site } from "./site-data.js";
 
 const headerRoutes = [
   ["", "Home"],
@@ -51,19 +47,6 @@ function headerNavigation() {
 function currentLocation() {
   const parts = location.pathname.split("/").filter(Boolean);
   return { route: parts[0] || "", id: parts[1] || "" };
-}
-
-function pageTitle(route) {
-  const specialTitles = {
-    appearance: "Appearance Lab",
-    terms: "Terms of Service",
-    privacy: "Privacy Policy",
-  };
-  return (
-    specialTitles[route] ||
-    routes.find(([path]) => path === `/${route}`)?.[1] ||
-    (route ? "Not found" : "Home")
-  );
 }
 
 function renderNavigation(route) {
@@ -113,9 +96,6 @@ function switchProductView(button) {
     candidate.classList.toggle("active", candidate === button);
     candidate.setAttribute("aria-pressed", String(candidate === button));
   });
-  try {
-    localStorage.setItem("towapc-product-view", button.dataset.productView);
-  } catch {}
   const filter =
     document.querySelector("[data-filter].active")?.dataset.filter || "all";
   const items = site.products.filter(
@@ -137,7 +117,7 @@ function filteredNews() {
 }
 
 function renderNewsResults(view = newsView()) {
-  document.getElementById("information-results").innerHTML = informationResults(
+  document.getElementById("news-results").innerHTML = newsResults(
     filteredNews(),
     view,
   );
@@ -160,10 +140,36 @@ function switchNewsView(button) {
     candidate.classList.toggle("active", candidate === button);
     candidate.setAttribute("aria-pressed", String(candidate === button));
   });
-  try {
-    localStorage.setItem("towapc-news-view", button.dataset.newsView);
-  } catch {}
   renderNewsResults(button.dataset.newsView);
+}
+
+async function copyText(value) {
+  try {
+    await navigator.clipboard.writeText(value);
+    return true;
+  } catch {
+    const field = document.createElement("textarea");
+    field.value = value;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.append(field);
+    field.select();
+    const copied = document.execCommand("copy");
+    field.remove();
+    return copied;
+  }
+}
+
+function setupContactActions() {
+  document.querySelectorAll("[data-copy-email]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const copied = await copyText(button.dataset.copyEmail || "");
+      const original = button.textContent;
+      button.textContent = copied ? "コピーしました" : "コピーできませんでした";
+      window.setTimeout(() => (button.textContent = original), 1800);
+    });
+  });
 }
 
 function setupPageControls() {
@@ -181,34 +187,10 @@ function setupPageControls() {
   });
   setupMemberDialogs();
   setupProjectDialogs();
+  setupContactActions();
   setupAppearanceEgg((path) => location.assign(path));
-  setupAppearanceControls(render);
+  setupAppearanceControls();
   setupShredEgg();
-}
-
-function render() {
-  const { route, id } = currentLocation();
-  const main = document.getElementById("main");
-  const content = renderPage(route, id, renderAppearanceLab);
-  const homeLink = route
-    ? `<div class="page-home-link wrap"><a class="text-link" href="/">${icon("left")} ホームに戻る</a></div>`
-    : "";
-  main.innerHTML = content + homeLink;
-  document.title = `TowaPC — ${pageTitle(route)}`;
-
-  const logo = safeImageSource(site.logo) || "/assets/TowaPC.svg";
-  document.querySelectorAll(".custom-logo").forEach((image) => {
-    image.setAttribute("src", logo);
-  });
-  renderNavigation(route);
-  resetMenu();
-  setupPageControls();
-  window.scrollTo({ top: 0, behavior: "instant" });
-  reveal();
-  main.classList.remove("page-enter");
-  void main.offsetWidth;
-  main.classList.add("page-enter");
-  requestAnimationFrame(positionSelection);
 }
 
 function showDataWarning(failures) {
@@ -222,6 +204,10 @@ function showDataWarning(failures) {
 }
 
 async function start() {
+  try {
+    localStorage.removeItem("towapc-product-view");
+    localStorage.removeItem("towapc-news-view");
+  } catch {}
   const failures = await loadSiteData();
   const { route } = currentLocation();
   renderNavigation(route);
@@ -262,49 +248,55 @@ function setMenuState(open) {
 let observer;
 
 function reveal() {
-  observer?.disconnect();
   const items = [...document.querySelectorAll(".floating,.section-heading")];
   if (
     matchMedia("(prefers-reduced-motion:reduce)").matches ||
     appearanceSettings.motion === "none"
   ) {
+    observer?.disconnect();
+    observer = null;
     items.forEach((element) => {
       element.classList.add("reveal", "is-visible");
+      element.dataset.revealReady = "true";
       element.classList.remove("play-reveal");
     });
     return;
   }
-  const current = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const target = entry.target;
-        target.style.setProperty(
-          "--reveal-delay",
-          `${target.dataset.revealDelay || 0}ms`,
-        );
-        target.classList.add("is-visible", "play-reveal");
-        target.addEventListener(
-          "animationend",
-          () => target.classList.remove("play-reveal"),
-          { once: true },
-        );
-        current.unobserve(target);
-      });
-    },
-    { threshold: 0.08 },
-  );
-  observer = current;
+  if (!observer) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const target = entry.target;
+          target.style.setProperty(
+            "--reveal-delay",
+            `${target.dataset.revealDelay || 0}ms`,
+          );
+          target.classList.add("is-visible", "play-reveal");
+          target.addEventListener(
+            "animationend",
+            () => target.classList.remove("play-reveal"),
+            { once: true },
+          );
+          observer?.unobserve(target);
+        });
+      },
+      { threshold: 0.08 },
+    );
+  }
   items.forEach((element, index) => {
-    element.classList.remove("is-visible", "play-reveal");
+    if (element.dataset.revealReady === "true") return;
+    element.dataset.revealReady = "true";
     element.classList.add("reveal");
     element.dataset.revealDelay = String(
       (index % 4) * appearanceSettings.stagger,
     );
-  });
-  requestAnimationFrame(() => {
-    if (observer === current)
-      items.forEach((element) => current.observe(element));
+    if (element.getBoundingClientRect().top <= window.innerHeight * 1.05) {
+      element.classList.add("is-visible");
+      return;
+    }
+    element.classList.remove("is-visible", "play-reveal");
+    observer.observe(element);
   });
 }
 

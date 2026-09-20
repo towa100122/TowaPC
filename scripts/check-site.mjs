@@ -70,6 +70,7 @@ const clientScripts = [
 ];
 const serverScripts = [
   "editor/server.mjs",
+  "scripts/check-editor-security.mjs",
   "scripts/load-site-data.mjs",
   "scripts/site-files.mjs",
   "scripts/sync-pages.mjs",
@@ -123,6 +124,29 @@ function isHttpUrl(value) {
 
 function isContactUrl(value) {
   return /^mailto:[^\s@]+@[^\s@]+$/i.test(value) || isHttpUrl(value);
+}
+
+function markdownOrderedNumbers(source) {
+  return String(source)
+    .split(/\r?\n/)
+    .map((line) => line.trim().match(/^(\d+)\.\s+/)?.[1])
+    .filter(Boolean)
+    .map(Number);
+}
+
+function htmlOrderedNumbers(html) {
+  const numbers = [];
+  for (const list of html.matchAll(
+    /<ol(?: start="(\d+)")?>([\s\S]*?)<\/ol>/g,
+  )) {
+    let next = Number(list[1] || 1);
+    for (const item of list[2].matchAll(/<li(?: value="(\d+)")?>/g)) {
+      const value = Number(item[1] || next);
+      numbers.push(value);
+      next = value + 1;
+    }
+  }
+  return numbers;
 }
 
 function checkLinks(file, rowNumber, value) {
@@ -328,14 +352,39 @@ try {
     const html = await readFile(resolve(root, page.file), "utf8");
     if (/\{\{[A-Z_]+\}\}/.test(html))
       problem(`${page.file}: 未置換のテンプレート変数があります。`);
+    if (
+      html.includes("__THEME_BOOTSTRAP__") ||
+      !html.includes("applyStoredThemeBeforePaint") ||
+      html.indexOf("applyStoredThemeBeforePaint") >
+        html.indexOf('href="/styles/foundation.css"')
+    ) {
+      problem(
+        `${page.file}: 初期テーマ処理がCSSより前に埋め込まれていません。`,
+      );
+    }
     if (!/<title>[^<]+<\/title>/.test(html))
       problem(`${page.file}: ページ固有titleがありません。`);
     if (!/<link rel="canonical" href="https:\/\/towapc\.com\//.test(html))
       problem(`${page.file}: canonicalがありません。`);
+    if (!/<meta property="og:title" content="[^"]+"/.test(html))
+      problem(`${page.file}: OGP titleがありません。`);
     if (!/<main id="main">[\s\S]+<\/main>/.test(html))
       problem(`${page.file}: 静的な主要本文がありません。`);
     if (/href="\/(?:product|information)(?:\/|\")/.test(html))
       problem(`${page.file}: 旧URLへの内部リンクが残っています。`);
+    if (["terms", "privacy"].includes(page.route)) {
+      const markdown = await readFile(
+        resolve(root, `data/${page.route}.md`),
+        "utf8",
+      );
+      const expected = markdownOrderedNumbers(markdown);
+      const actual = htmlOrderedNumbers(html);
+      if (expected.join(",") !== actual.join(",")) {
+        problem(
+          `${page.file}: 番号付きリストがMarkdownの番号を維持していません。`,
+        );
+      }
+    }
   }
   for (const redirect of redirects) {
     const html = await readFile(resolve(root, redirect.file), "utf8");
@@ -345,6 +394,8 @@ try {
       );
     if (!html.includes('rel="canonical"'))
       problem(`${redirect.file}: canonicalがありません。`);
+    if (!html.includes('http-equiv="refresh"'))
+      problem(`${redirect.file}: meta refreshがありません。`);
   }
   const expectedPages = new Set(
     pageFiles.map((page) => page.replaceAll("\\", "/")),
@@ -363,6 +414,24 @@ try {
   }
 } catch (error) {
   problem(`共通ページ検査: ${error.message}`);
+}
+
+try {
+  const editorSource = await readFile(
+    resolve(root, "editor/server.mjs"),
+    "utf8",
+  );
+  for (const required of [
+    "allowedOrigins",
+    "x-towapc-csrf",
+    "timingSafeEqual",
+    "relative(",
+  ]) {
+    if (!editorSource.includes(required))
+      problem(`editor/server.mjs: Editor安全対策「${required}」がありません。`);
+  }
+} catch (error) {
+  problem(`Editor安全対策の検査: ${error.message}`);
 }
 
 const transpiler = new Bun.Transpiler({ loader: "js" });

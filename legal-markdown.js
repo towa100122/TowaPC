@@ -28,9 +28,11 @@ export function renderLegalMarkdown(source) {
   const output = [];
   let sectionOpen = false;
   let listType = "";
+  let nextOrderedValue = 1;
   const closeList = () => {
     if (listType) output.push(`</${listType}>`);
     listType = "";
+    nextOrderedValue = 1;
   };
   for (const line of body.split("\n")) {
     const text = line.trim();
@@ -57,12 +59,17 @@ export function renderLegalMarkdown(source) {
       }
       output.push(`<li>${inline(text.replace(/^(?:-|\*)\s+/, ""))}</li>`);
     } else if (/^\d+\.\s+/.test(text)) {
+      const [, numberText, itemText] = text.match(/^(\d+)\.\s+(.+)$/);
+      const number = Number(numberText);
       if (listType !== "ol") {
         closeList();
-        output.push("<ol>");
+        output.push(number === 1 ? "<ol>" : `<ol start="${number}">`);
         listType = "ol";
+        nextOrderedValue = number;
       }
-      output.push(`<li>${inline(text.replace(/^\d+\.\s+/, ""))}</li>`);
+      const value = number === nextOrderedValue ? "" : ` value="${number}"`;
+      output.push(`<li${value}>${inline(itemText)}</li>`);
+      nextOrderedValue = number + 1;
     } else {
       closeList();
       output.push(`<p>${inline(text)}</p>`);

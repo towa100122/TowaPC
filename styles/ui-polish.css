@@ -200,19 +200,6 @@ footer,
 .footer-groups a:hover {
   transform: translateX(3px);
 }
-.page-enter {
-  animation: page-enter 0.44s cubic-bezier(0.22, 0.8, 0.24, 1) both;
-}
-@keyframes page-enter {
-  from {
-    opacity: 0.92;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
 :root[data-theme="dark"] .theme-track {
   background: #4c5047;
 }
@@ -279,9 +266,6 @@ footer,
 @media (max-width: 720px) {
   .product-toolbar {
     display: block;
-  }
-  .product-toolbar .view-switch {
-    margin-top: -18px;
   }
 }
 :root[data-theme="dark"] .intro,
