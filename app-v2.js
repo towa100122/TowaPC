@@ -439,6 +439,11 @@ document.addEventListener("keydown", (event) => {
 
 document.fonts.ready.then(positionSelection);
 applyAppearance();
+requestAnimationFrame(() =>
+  requestAnimationFrame(() =>
+    document.documentElement.classList.add("theme-ready"),
+  ),
+);
 setupTheme();
 setupCookieConsent();
 migrateLegacyHash();
