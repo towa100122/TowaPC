@@ -15,7 +15,3 @@ TowaPCの公式Webサイトです。
 サイトは端末幅に応じてレイアウトが変わり、端末のライト・ダーク設定にも追従します。
 
 公開先: [https://towapc.com/](https://towapc.com/)
-
-## 更新
-
-`bun run editor`で、このPCだけから使える管理画面を起動できます。詳しい入力規則、静的ページ生成、検査、公開手順は[data/README.md](data/README.md)にまとめています。
