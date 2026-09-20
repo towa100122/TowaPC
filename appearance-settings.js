@@ -102,6 +102,7 @@ function loadSettings() {
 }
 
 export let appearanceSettings = loadSettings();
+let temporaryTheme = null;
 
 function saveSettings() {
   try {
@@ -111,6 +112,7 @@ function saveSettings() {
 
 function resolvedTheme() {
   if (appearanceSettings.themePinned) return appearanceSettings.theme;
+  if (temporaryTheme) return temporaryTheme;
   return matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light";
 }
 
@@ -549,6 +551,7 @@ export function setupAppearanceControls() {
       const nextValue = !appearanceSettings[key];
       if (key === "themePinned" && nextValue)
         appearanceSettings.theme = resolvedTheme();
+      if (key === "themePinned" && !nextValue) temporaryTheme = null;
       updateSetting(key, nextValue);
       if (key === "animationMode" && nextValue) animationSweep();
     });
@@ -618,8 +621,8 @@ export function setupAppearanceEgg(navigate) {
 export function setupTheme() {
   document.querySelectorAll("[data-theme-option]").forEach((button) => {
     button.addEventListener("click", () => {
-      appearanceSettings.theme = button.dataset.themeOption;
-      appearanceSettings.themePinned = true;
+      temporaryTheme = button.dataset.themeOption;
+      appearanceSettings.themePinned = false;
       saveSettings();
       applyAppearance();
       syncControls();
@@ -627,6 +630,7 @@ export function setupTheme() {
   });
   matchMedia("(prefers-color-scheme:dark)").addEventListener("change", () => {
     if (appearanceSettings.themePinned) return;
+    temporaryTheme = null;
     applyAppearance();
     syncThemeControls();
   });
