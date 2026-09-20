@@ -110,6 +110,8 @@ git diff --check
 
 `sync-pages`はCSVとMarkdownから、本文・title・description・canonical・OGPを含む静的HTMLを生成します。生成された各ページの`index.html`を直接編集しません。共通HTMLは`templates/page.html`、表示構造は`page-views.js`を編集します。
 
+同時にJavaScriptを`generated/app-bundle.js`へまとめ、CSSとJavaScriptの内容からキャッシュ用の版を自動生成します。更新時にURLの番号を手作業で変更する必要はありません。
+
 ## 公開
 
 ```powershell

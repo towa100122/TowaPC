@@ -45,7 +45,7 @@
 - CSVの全列、タグ、改行、リンク、News添付、管理GUI、公開手順は `data/README.md` に集約する。
 - 公開前に必ず `bun run format`、`bun run format:check`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` は固定済み依存関係を導入し、整形とサイト構造を検査する。リポジトリ取得はNode.js 24対応の `actions/checkout@v7` を使う。
-- JavaScriptとCSSは安定URLを使い、手作業のキャッシュ番号更新へ依存しない。
+- `sync-pages`はJavaScriptを`generated/app-bundle.js`へまとめ、CSSとともに内容由来の資産バージョンをURLへ自動付与する。手作業でキャッシュ番号を変更しない。
 - `.gitignore` は依存関係、キャッシュ、出力、ログ、環境変数、OS・エディター固有ファイル、ZIPを除外する。`bun run check` は除外対象が誤ってGit追跡されていないかも検査する。
 - `.gitattributes` でテキストの改行をLFへ統一し、WindowsとGitHub間で内容と無関係な差分を作らない。画像はバイナリとして扱う。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。

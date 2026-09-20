@@ -39,20 +39,35 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Google+Sans&amp;family=Noto+Sans+JP:wght@400;500;600;700&amp;display=swap"
     />
-    <link rel="stylesheet" href="/styles/foundation.css" />
-    <link rel="stylesheet" href="/styles/home.css" />
-    <link rel="stylesheet" href="/styles/content.css" />
-    <link rel="stylesheet" href="/styles/footer.css" />
-    <link rel="stylesheet" href="/styles/responsive.css" />
-    <link rel="stylesheet" href="/styles/dark-motion.css" />
-    <link rel="stylesheet" href="/styles/legal-cookie.css" />
-    <link rel="stylesheet" href="/styles/appearance-lab.css" />
-    <link rel="stylesheet" href="/styles/ui-polish.css" />
-    <link rel="stylesheet" href="/styles/material-theme.css" />
-    <link rel="stylesheet" href="/styles/features.css" />
-    <link rel="stylesheet" href="/styles/shadowless-theme.css" />
-    <link rel="stylesheet" href="/styles/monochrome-theme.css" />
-    <link rel="stylesheet" href="/styles/easter-eggs.css" />
+    <link rel="stylesheet" href="/styles/foundation.css?v={{ASSET_VERSION}}" />
+    <link rel="stylesheet" href="/styles/home.css?v={{ASSET_VERSION}}" />
+    <link rel="stylesheet" href="/styles/content.css?v={{ASSET_VERSION}}" />
+    <link rel="stylesheet" href="/styles/footer.css?v={{ASSET_VERSION}}" />
+    <link rel="stylesheet" href="/styles/responsive.css?v={{ASSET_VERSION}}" />
+    <link rel="stylesheet" href="/styles/dark-motion.css?v={{ASSET_VERSION}}" />
+    <link
+      rel="stylesheet"
+      href="/styles/legal-cookie.css?v={{ASSET_VERSION}}"
+    />
+    <link
+      rel="stylesheet"
+      href="/styles/appearance-lab.css?v={{ASSET_VERSION}}"
+    />
+    <link rel="stylesheet" href="/styles/ui-polish.css?v={{ASSET_VERSION}}" />
+    <link
+      rel="stylesheet"
+      href="/styles/material-theme.css?v={{ASSET_VERSION}}"
+    />
+    <link rel="stylesheet" href="/styles/features.css?v={{ASSET_VERSION}}" />
+    <link
+      rel="stylesheet"
+      href="/styles/shadowless-theme.css?v={{ASSET_VERSION}}"
+    />
+    <link
+      rel="stylesheet"
+      href="/styles/monochrome-theme.css?v={{ASSET_VERSION}}"
+    />
+    <link rel="stylesheet" href="/styles/easter-eggs.css?v={{ASSET_VERSION}}" />
 
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=3" />
     <link
@@ -146,6 +161,9 @@
     <script id="site-data" type="application/json">
       {{SITE_DATA}}
     </script>
-    <script type="module" src="/app-v2.js"></script>
+    <script
+      type="module"
+      src="/generated/app-bundle.js?v={{ASSET_VERSION}}"
+    ></script>
   </body>
 </html>

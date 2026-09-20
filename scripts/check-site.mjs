@@ -67,6 +67,7 @@ const clientScripts = [
   "theme-bootstrap.js",
   "ui.js",
   "editor/editor.js",
+  "generated/app-bundle.js",
 ];
 const serverScripts = [
   "editor/server.mjs",
@@ -356,7 +357,7 @@ try {
       html.includes("__THEME_BOOTSTRAP__") ||
       !html.includes("applyStoredThemeBeforePaint") ||
       html.indexOf("applyStoredThemeBeforePaint") >
-        html.indexOf('href="/styles/foundation.css"')
+        html.indexOf("/styles/foundation.css")
     ) {
       problem(
         `${page.file}: 初期テーマ処理がCSSより前に埋め込まれていません。`,
@@ -370,6 +371,20 @@ try {
       problem(`${page.file}: OGP titleがありません。`);
     if (!/<main id="main">[\s\S]+<\/main>/.test(html))
       problem(`${page.file}: 静的な主要本文がありません。`);
+    const version = html.match(
+      /\/styles\/foundation\.css\?v=([a-f0-9]{12})/,
+    )?.[1];
+    if (!version)
+      problem(`${page.file}: 自動生成された資産バージョンがありません。`);
+    if (
+      version &&
+      (!html.includes(`/generated/app-bundle.js?v=${version}`) ||
+        [...html.matchAll(/href="\/styles\/[^"?]+\.css\?v=([^"&]+)/g)].some(
+          (match) => match[1] !== version,
+        ))
+    ) {
+      problem(`${page.file}: CSSとJavaScriptの資産バージョンが不一致です。`);
+    }
     if (/href="\/(?:product|information)(?:\/|\")/.test(html))
       problem(`${page.file}: 旧URLへの内部リンクが残っています。`);
     if (["terms", "privacy"].includes(page.route)) {

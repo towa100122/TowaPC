@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { loadSiteDataFromDisk } from "./load-site-data.mjs";
@@ -13,6 +14,32 @@ const themeBootstrap = await readFile(
   resolve(root, "theme-bootstrap.js"),
   "utf8",
 );
+const bundleResult = await Bun.build({
+  entrypoints: [resolve(root, "app-v2.js")],
+  target: "browser",
+  format: "esm",
+  minify: false,
+  sourcemap: "none",
+});
+if (!bundleResult.success) {
+  throw new Error(
+    `ブラウザー用JavaScriptの生成に失敗しました。\n${bundleResult.logs.join("\n")}`,
+  );
+}
+const appBundle = await bundleResult.outputs[0].text();
+await mkdir(resolve(root, "generated"), { recursive: true });
+await writeFile(resolve(root, "generated/app-bundle.js"), appBundle, "utf8");
+const styleFiles = [...template.matchAll(/href="\/(styles\/[^"?]+\.css)/g)].map(
+  (match) => match[1],
+);
+const styleSources = await Promise.all(
+  styleFiles.map((file) => readFile(resolve(root, file), "utf8")),
+);
+const assetVersion = createHash("sha256")
+  .update(appBundle)
+  .update(styleSources.join("\n"))
+  .digest("hex")
+  .slice(0, 12);
 const data = await loadSiteDataFromDisk(root);
 
 globalThis.location = new URL("https://towapc.com/");
@@ -91,6 +118,7 @@ function renderDocument(page) {
     "{{MAIN}}": body + homeLink,
     "{{FOOTER_LINKS}}": views.renderFooterLinks(),
     "{{FOOTER_CONTACTS}}": views.renderFooterContacts(),
+    "{{ASSET_VERSION}}": assetVersion,
     "{{SITE_DATA}}": JSON.stringify(embeddedDataFor(page)).replaceAll(
       "<",
       "\\u003c",
