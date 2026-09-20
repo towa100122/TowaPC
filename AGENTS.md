@@ -34,18 +34,20 @@
 - `page-views.js` が各ページ本文、`legal-markdown.js` が規約Markdownの安全な表示、`appearance-settings.js` が外観設定、`member-dialog.js` と `project-dialog.js` が詳細表示、`easter-eggs.js` が404シュレッダー、`ui.js` が表示用共通部品を担当する。責務を `app-v2.js` へ戻さない。
 - CSSは `styles` 内で基礎、ページ、レスポンシブ、ダーク、Cookie、Appearance Lab、Material 3、Monochrome、特殊演出に分ける。巨大なCSSへ再結合しない。
 - HTML内へ長いJavaScriptやCSSを書かない。初期テーマは `theme-bootstrap.js`、アクセス解析は `analytics.js` を使う。
-- `theme-bootstrap.js`は`sync-pages`がテンプレートの`/*__THEME_BOOTSTRAP__*/`へインライン展開し、外部ファイル待ちより前にテーマを確定する。埋め込みトークンをJavaScriptとして解釈される記法へ変えない。
+- `theme-bootstrap.js`は`sync-pages`がテンプレートの`/*__THEME_BOOTSTRAP__*/`へインライン展開し、外部ファイル待ちより前にテーマを確定する。Cloudflare Rocket Loaderによる遅延を防ぐため、このscriptの`data-cfasync="false"`を外さない。
 - 全ページ共通のHTMLは `templates/page.html` だけを直接編集する。
 - 正式URLは`/products/`、`/news/`、`/news/{id}/`。旧`/product/`、`/information/`、`/information/{id}/`は静的移動ページとしてのみ維持する。
-- `bun run editor`は127.0.0.1専用の管理GUIを起動する。POST APIはEditor自身のOriginと起動ごとのCSRF tokenを両方検証し、CSV・規約Markdown・画像・News添付をOS非依存のパス検証で許可先だけへ保存する。Git操作は行わない。
+- `bun run editor`は127.0.0.1専用の管理GUIを起動する。POST APIはEditor自身のOriginと起動ごとのCSRF tokenを両方検証し、CSV・規約Markdown・画像・News添付をOS非依存のパス検証で許可先だけへatomic writeする。画像uploadはPNG、JPEG、WebP、GIFだけを許可し、SVGは追加できない。Git操作は行わない。
+- Preview Serverは127.0.0.1:4174とlocalhost:4174だけを許可し、公開サイト用allowlist外の`.git`、`.github`、`editor`、`scripts`、`data`、`node_modules`、環境変数ファイルを403にする。
 - News添付は`news.csv`の`attachments`へ`表示名|/files/ファイル名`で保存し、複数は`;;`で区切る。公開ファイルは`files`直下に限定する。
 - HTML更新後やNewsのID変更後は `bun run sync-pages` を実行する。
 - `bun run sync-pages` はCSVとMarkdownからページ固有title、description、canonical、OGP、主要本文を含む静的HTMLを生成する。News詳細は`news/*/index.html`、Products詳細は一覧ポップアップ。旧`product`と`information`には新URLへの互換ページを生成する。生成HTMLを手作業で編集しない。
 - `scripts/check-site.mjs` がCSVの列、必須値、ID重複、日付、URL、画像、固定表示資産、共通HTML、JavaScript、Git管理対象を検査する。
 - CSVの全列、タグ、改行、リンク、News添付、管理GUI、公開手順は `data/README.md` に集約する。
-- 公開前に必ず `bun run format`、`bun run format:check`、`bun run sync-pages`、`bun run check`、`git diff --check` を実行する。
+- 公開前に必ず `bun run format`、`bun run format:check`、`bun run sync-pages`、`bun run check`、`bun run check:editor`、`git diff --check` を実行する。
 - GitHub Actionsの `.github/workflows/check-site.yml` は固定済み依存関係を導入し、整形とサイト構造を検査する。リポジトリ取得はNode.js 24対応の `actions/checkout@v7` を使う。
 - `sync-pages`はCSSとJavaScriptの内容由来の資産バージョンをURLとImport Mapへ自動付与する。手作業でキャッシュ番号を変更しない。
+- `sync-pages`は公開ページから`sitemap.xml`と`robots.txt`も生成する。404、Appearance Lab、Editor、旧redirect URLはsitemapへ含めない。OGPは`assets/ogp.png`を使う。
 - `.gitignore` は依存関係、キャッシュ、出力、ログ、環境変数、OS・エディター固有ファイル、ZIPを除外する。`bun run check` は除外対象が誤ってGit追跡されていないかも検査する。
 - `.gitattributes` でテキストの改行をLFへ統一し、WindowsとGitHub間で内容と無関係な差分を作らない。画像はバイナリとして扱う。
 - 旧 `app.js`、`content.js`、`style.css` は未使用のため削除済み。Git履歴から復元できる。
@@ -61,7 +63,7 @@
 - About固有の文章:
   - `かゆいところに手が届く、派手でもないけれど確実に便利。日常の細やかな部分を良くしていきたい。TowaPCはそう考えます。`
 - Aboutのリンクは「TowaPCのメンバー」「協力関係がある団体・個人」「私たちの一員になる」の順。
-- Aboutは白い紹介カード、History、名前の由来を中心に構成する。紹介カード内のTowaPCロゴを1.8秒以内に5回押すと、イースターエッグ1の隠し外観設定 `/appearance/` を開く。
+- Aboutは白い紹介カード、History、名前の由来を中心に構成する。MembersとCooperationはURLを維持したままAbout配下として扱い、パンくずと本文下の戻り先をAboutにする。紹介カード内のTowaPCロゴを1.8秒以内に5回押すと、隠し外観設定 `/appearance/` を開く。
 - Homeの「What’s TowaPC?」は白いカード表示を維持する。
 - News、Products、History、Members、Partners、Contacts、規約本文など変化しやすい内容は、それぞれ対応する `data` 内のCSVまたはMarkdownを正とする。
 
@@ -74,15 +76,15 @@
 - 規約本文カードに `TOWAPC.COM` のような飾り用の英字ラベルを追加しない。Homeと同じ内側シャドウを使い、リンク色を選択中のカラーテーマへ追従させる。
 - 添付された利用規約・プライバシーポリシーの本文は原文を維持する。明示された変更、実リンクへの置換、実装に必要な追記以外では、要約・言い換え・段落結合をしない。
 - 利用規約は `data/terms.md`、プライバシーポリシーは `data/privacy.md` を正本とし、本文変更のためにJavaScriptや生成HTMLを編集しない。
-- 利用規約・プライバシーポリシーは共通のAppearance設定に追従させる。ライト／ダーク、カラーパレット、標準／Material／Liquid Glass／紙、角丸、密度、ページ遷移の適用を維持する。
-- ライト／ダークは初期状態および通常の外観変更後も端末設定を優先する。Appearance Labの「テーマを任意で固定する」を有効にした場合だけ、選択したLightまたはDarkを端末設定より優先する。
+- 利用規約・プライバシーポリシーは共通のAppearance設定に追従させる。ライト／ダーク、カラーパレット、標準／Material／Liquid Glass／紙、角丸、密度を維持する。Markdown側の日本語タイトルだけをh1にする。
+- フッターのLight／Darkは同一タブ内だけの一時選択で、端末テーマ変更時に追従へ戻す。Appearance Labで選択・固定した場合だけ端末設定より優先する。初回Dark表示でLightを挟まないことを公開環境でも確認する。
 
 - ヘッダー: `Home / Products / News / About / Contact`
-- ホーム以外の全ページは、本文の下・フッターの手前に「← ホームに戻る」を表示する。
+- ホーム以外の全ページは、本文の下・フッターの手前に戻るリンクを表示する。MembersとCooperationだけは「Aboutに戻る」、それ以外は「ホームに戻る」とする。
 - HomeはNews最新3件、Products代表3件まで表示する。スマートフォンではHomeのProductsも一覧ページと同じ横長リストにする。Newsの「すべて見る」とProductsの一覧リンクから各正式URLへ移動する。ショートカットは `Products / About / Contact / Join` の順。
 - ダークテーマの選択中ヘッダータブは、薄い背景 `#eef1e8` と濃い文字 `#171a16` で表示する。スマートフォンの展開メニューでも同じ配色を使う。
 - Productsの説明は「私たちの製品の紹介」、Joinの説明は「私たちの一員になる」。
-- 製品・お知らせのリンクは各CSVの `links` 列へ `ボタン名|URL` で記入する。複数リンクは `;;` またはセル内改行で区切る。製品は先頭のURLを一覧とポップアップの移動ボタンに使い、お知らせ詳細は左に一覧へ戻るリンク、右に名前付き関連リンクを表示する。
+- 製品・お知らせのリンクは各CSVの `links` 列へ `ボタン名|URL` で記入する。複数リンクは `;;` またはセル内改行で区切る。製品は先頭のURLを一覧とポップアップの移動ボタンに使う。お知らせ詳細は広い画面で左に一覧へ戻るリンク、右に名前付き関連リンクを同じ行へ置き、狭い画面だけ縦へ折り返す。
 - 製品の説明とお知らせ本文は `\\n` またはCSVセル内の実改行を詳細ページの改行として表示する。一覧では改行を空白へ整えてレイアウトを崩さない。
 - Newsの `tag` は `new`、`important`、`release`、`update` の4種類とし、表示は `NEW`、`Important`、`Release`、`Update` にする。
 - テキストリンクには下線を付けず、ホーム内の「TowaPCについて」や一覧リンクは右揃えにする。
@@ -98,7 +100,7 @@
 - Productsは詳細ページを持たない。PCではグリッド／リストを切り替えられ、再読み込み時はグリッドへ戻す。スマートフォンはリスト表示に固定する。3行紹介の末尾付近に詳細、下部に`links`先頭の名前を使った大きな主操作を置く。
 - Revealは初期表示範囲の静的HTMLを後から隠さず、画面外の対象だけを登場アニメーションへ登録する。初期HTMLをJavaScriptで同内容へ描き直さない。
 - 利用規約・プライバシーポリシーの番号付きリストはMarkdownに書かれた開始番号と個別番号を維持する。スマートフォンでは重複する英語Heroを省き、日本語タイトルと本文冒頭を最初の画面へ出す。
-- Emailは`mailto:`リンクに加えてアドレスをコピーする操作を表示し、既定メールアプリがないPCでも利用できるようにする。
+- Emailは`mailto:`リンクに加え、矢印の左に44pxの小さなoutlineコピーアイコンを置く。成功・失敗フィードバックを維持し、横長のコピーボタンへ戻さない。
 - MembersとCooperationは一覧本文を3行で省略し、カードからアニメーション付き詳細を開く。正方形の協力ロゴはメンバーと同じ配置、横長ロゴはロゴの右に名前を置く。
 - Contactカードの補足表示:
   - YouTube: `@TowaPC`
@@ -109,12 +111,13 @@
 - ContactのXロゴは、ライト・ダークとも黒で固定する。
 - フッター下部に「利用規約」「プライバシーポリシー」「Cookie設定」を表示する。規約は `/terms/`、プライバシーポリシーは `/privacy/`。
 - Google Analytics（`G-6FF3KH40W6`）は初期状態で読み込まず、Cookie同意後だけ読み込む。拒否してもサイトの主要機能は利用でき、フッターの「Cookie設定」から選択を変更できる。
-- 通常カードとセクション見出しの標準登場は、下42px・0.965倍・8pxぼかし・透明から定位置・等倍・ぼかしなしへ0.52秒でフェードアップする。減速カーブは `cubic-bezier(0.16, 1, 0.3, 1)`、カード間の遅延は42ms。v52の軽い動きを標準にする。
-- `/appearance/` は通常のヘッダー・フッターリンクへ載せない隠し外観設定ページ。設定は `towapc-appearance-v1` として端末のlocalStorageへ保存する。
-- 外観設定では、登場アニメーションのプリセットに加えて、速度200〜1200ms、カード間隔、移動量、ぼかし、開始時の大きさをスライダーで個別調整できる。標準は0.52秒、ゆったりはv53の0.68秒、ほかにきびきび・静止を用意する。
+- 通常カードとセクション見出しの標準登場は、下42px・0.965倍・8pxぼかし・透明から定位置・等倍・ぼかしなしへ0.52秒でフェードアップする。減速カーブは `cubic-bezier(0.16, 1, 0.3, 1)`、カード間の遅延は42ms。
+- `/appearance/` は通常のヘッダー・フッターリンクへ載せない隠し外観設定ページ。設定は `towapc-appearance-v1` として端末のlocalStorageへ保存する。設定区画の見出しにはカテゴリーアイコンを付けない。
+- 外観設定では、登場アニメーションのプリセットに加えて、速度200〜1200ms、カード間隔、移動量、ぼかし、開始時の大きさをスライダーで個別調整できる。標準は0.52秒、ゆったりは0.68秒、ほかにきびきび・静止を用意する。
 - 外観設定では、端末設定へ追従する明るさ、任意固定時のLight・Dark、差し色（標準・藤・若葉・夕焼け・自由色カラーパレット）、デザインテーマ（標準・Material 3・Liquid Glass・Paper・Monochrome）、カードの角、余白、UIの大きさも変更できる。Material 3は専用のsurface container、outline、primary container、filled button、低いelevationを全ページに適用する。
 - デザインテーマには、線とモノクロで構成しドロップシャドウを使わないMonochromeも含める。Appearance Labでは安全なJSON形式の外部テーマを読み込めるようにし、同ページへ作成ガイドラインと例を載せる。外部テーマからHTML、CSS、JavaScript、外部URLを実行しない。
-- ヘッダーは標準で透明度42%・背景ブラー14px。外観設定で透明度、ブラー、アニメーション時間、スライド・フェード・静止、ガラス効果を変更できる。
+- ヘッダーは標準で透明度42%・背景ブラー14px。外観設定では透明度、ブラー、ガラス効果だけを変更できる。ヘッダー本体の出現アニメーションは常時静止とし、選択・時間・再生項目を復活させない。
+- PCヘッダーの選択ピルは通常ページ遷移を維持したまま移動元から移動先へ滑らかに動かす。Home起点とロゴからHomeへの移動も対象にし、非選択ページからHomeへ戻る場合はHome位置で出現させる。ピル移動中に次の操作が入った場合は次のアニメーションを省略する。reduced-motionとmotion:noneでも動かさない。
 - 旧Aboutロゴ5回押しの謎のアニメーションモードは、外観設定内の保存可能なスイッチへ移す。Escキーでも解除できる。
 - 隠し外観設定へ移動するときはスナックバーや花火を出さない。設定ページの回転する菱形は維持する。謎のアニメーションモードを有効化したときは、画面下から上へ抜ける白いオーバーレイを1回だけ表示する。`EASTER EGG 01` の文字は表示しない。
 - 404ページは上部ヒーローを表示せず、白またはダーク配色のカード中央に `404`、`Not found`、`お探しのページは迷子かもしれません。` の順で表示する。
@@ -129,50 +132,13 @@
 - Arielogicの画像は `assets/partner-arielogic.png`。利用者から提供された正方形のロゴ画像を使用する。
 - メンバー一覧の説明は3行で省略する。カードを押すと、背景ブラーと暗転を使ったシャドウなしの詳細カードを開き、上に画像、下に全文、右上に×を表示する。
 
-## v71 完了状態（2026-09-16）
+## 現行の確認基準
 
-- v71では全ページのHTML、JavaScript、CSSを責務別ファイルへ整理し、長いインラインHTML・スクリプトと巨大CSSを廃止した。
-- Aboutは色付き価値カードを廃止し、`data/history.csv` で編集する履歴と、`data/site.csv` で編集する名前の由来へ変更した。テンプレート行も公開表示し、履歴カードは着色有無、背景色、白黒の文字色をCSVで指定する。
-- Contactのメール表記はEmailへ変更し、`data/contacts.csv` から追加リンクを表示できる。JoinはDiscord参加案内と参加ボタンだけに簡略化した。
-- お知らせと製品はタイトルを日付・タグ・カテゴリーより先に表示する。Cookieバーは境界線を削除し、ボタンとバーをドロップシャドウ中心の表示へ変更した。
-
-## この変更の確認状況
-
-- ローカル表示で `data/products.csv` と `data/news.csv` の内容が反映されることを確認済み。
-- Contactの表示はYouTube、X、Discord、Emailの4件。`contacts.csv`へ一時的に追加したリンクがContactカードとフッター文字リンクの両方へ出ることも確認済み。
-- Aboutはロゴ、本文、3つの関連ボタンを同じ白い紹介カードへ置き、その下へ履歴と名前の由来を表示する。
-- JoinはDiscord参加案内と参加ボタンだけを表示する。
-- メンバー詳細カードの表示・×・Esc、協力関係ロゴの上配置、Monochromeのライト・ダーク、外部テーマJSON読込を確認済み。
-- サンプル注記が表示されないことを確認済み。
-- ブラウザーの警告・エラーなし。
-- 変更を公開するときは、最終検査、コミット、`main`へのpush、配布ZIP更新、公開サイト確認までを一続きで行う。
-
-## v70 完了状態（2026-09-14）
-
-- v70ではPC版トップのヒーロー画像を `clamp(440px, 38vw, 600px)` に変更し、横長画面でも縦へ伸びすぎないようにした。720px以下のスマートフォンは従来の高さを維持する。
-- v69では保守性監査を行い、`.gitignore`、`.gitattributes`、Git追跡検査を追加した。ブラウザーと検査で重複していたCSV解析、CSV列・タグ・色・種別の定義を共通化し、Cookie同意処理を専用モジュールへ分離し、Prettier 3.9.6と依存関係を固定した。Appearance Labとユーザー選択テーマのCSSは `appearance.css` へ分離し、未参照だったサンプル・旧ヘッダー・小型favicon画像を削除した。HTML生成はカード・ページ・設定区画ごとの関数へ分け、最長行を1091文字から161文字へ短縮した。
-- v68ではCookie同意バーとフッターの間に隙間を作らず、バーのレイアウト上の高さを正確にページ末尾へ確保するよう修正した。
-- v67ではCookie同意バーの表示中に、その実測高さ分だけページ末尾へ余白を追加し、フッター最下部まで隠れずにスクロールできるようにした。同意・拒否後は余白を解除する。
-- v66ではMaterial 3を専用の面・輪郭・色・ボタン・elevationへ作り直し、後段のダークテーマ指定による上書きを解消した。
-- v65では製品・お知らせ本文の改行、名前付き複数リンク、4種類のお知らせタグ、詳細ページの操作位置、お知らせ一覧とホーム欄の位置ずれを整備した。更新方法は `data/README.md` に集約し、ルートREADMEはサイト紹介へ変更した。
-- v64ではライト／ダークの標準動作を端末設定優先にし、Appearance Labへ任意固定スイッチを追加した。
-- v63では利用規約とプライバシーポリシーを添付原文の文言・段落へ復元し、日付を2026年9月13日にした。実リンクへの置換とCookie同意機能に関する追記のみ維持した。
-- v62では規約本文上の `TOWAPC.COM` 表記を削除し、規約内リンクをカラーテーマ追従へ変更した。
-- v61ではAppearance Lab、利用規約、プライバシーポリシーのカード・ヒーロー・余白・影を通常ページと同じ視覚規則へ統一した。
-- v60ではCookie同意表示を浮いたカードから画面下端に密着するサイト配色のバーへ変更した。
-- v59では利用規約、プライバシーポリシー、Cookie同意表示、同意後のみ起動するGoogle Analyticsを追加した。規約本文の不要な空白は整理済み。
-- v58ではヘッダーの標準透明度を42%へ戻し、謎モードの白い上昇オーバーレイを75%透明にした。
-- v56では謎のアニメーションモード有効化時の花火を、下から上へ動く白いオーバーレイへ変更した。
-- v55の外観設定拡張とArielogic画像差し替えはコミット `4386070 Expand the appearance lab controls` で確定。
-- v54の隠し外観設定と標準アニメーション復帰はコミット `1b2a428 Add a hidden appearance lab` で確定。
-- v53の通常カード登場アニメーションはコミット `52ef31c Slow the card reveal slightly` で確定。表示時間を0.68秒、カード間の遅延を48msへ調整した。
-- v51の404シュレッダーはコミット `1da2c11 Shred the 404 page on repeated clicks` で確定。
-- v50の404イースターエッグ撤去はコミット `cc86740 Remove the 404 Easter egg` で確定。
-- 通常時の404は `404 / Not found / お探しのページは迷子かもしれません。` とホームへ戻るリンクを表示し、404の数字だけを発動ボタンとして使う。
-- 発動すると金属製の裁断機が現れ、ヘッダー・本文・フッターを吸い込んで24本の紙片を落とす。完了画面の「ページを再構成する」で通常表示へ復元できる。
-- 旧404の発光点、えにいゲーム4種類、334警報、ゲーム用ダイアログは引き続き削除状態。
-- Aboutロゴを5回押すイースターエッグ1は404とは別機能で、`/appearance/` を開く。旧アニメーションモードは同ページ内へ移動済み。
-- PCのライトテーマと390×844のダークテーマで、4回押下、吸い込み、紙片落下、完了表示、復元を目視・操作確認済み。横はみ出しとブラウザーエラーなし。
-- 動きを減らす設定では静止した裁断済み表示に切り替える。`bun run format`、`bun run sync-pages`、`bun run check`、`git diff --check` は成功済み。
-- PCと390×844で隠し入口、設定操作、保存、リセット、標準・ゆったり・静止の通常ページ反映を確認済み。ヘッダー調整、自由色、4種のデザインテーマ、遷移演出の削除、謎モードだけの花火、Arielogic画像も確認済み。390×844では横はみ出しなし、ブラウザーエラーなし。
-- 動きを減らす設定では通常カードのぼかし・透明・変形も残さず、即時表示する。
+- DialogはMember、Partner、Productで共通して、開いた直後に閉じるボタンへfocusし、Tabを内部へ閉じ込め、背景を`inert`にする。Escまたは×で閉じ、元のtriggerへfocusを戻す。
+- モバイルメニューはタップ、外側クリック、Escで閉じる。Escでは`aria-expanded`、open class、bodyのmenu lockを解除し、メニューボタンへfocusを戻す。
+- 主要UIアイコンはoutlineを基準とし、SNSロゴだけはブランド形状を維持する。Footerは24pxのクリック領域を保ち、Email図形を21px、YouTube・X・Discord図形を18pxにする。
+- ProductsとNews一覧はPCでHeroからtoolbarまで36px、toolbarからカードまで30pxを基準にする。720px以下は既存responsiveの44pxと18pxを優先する。
+- TermsとPrivacyはh1を1個だけ持ち、404は`Not found`のh1と`noindex`を持つ。
+- 初期テーマscriptはCloudflareで遅延させない。初回表示ではテーマ用transitionを有効化せず、描画完了後だけ通常のテーマ切替transitionを許可する。
+- 公開前検査後はコミットして`main`へpushし、GitHub ActionsのCheck siteとPages公開が成功するまで確認する。公開後は実サイトで資産version、主要操作、Dark初期表示、PCと390pxのレイアウトを確認する。
+- 古いコミット番号や固定件数を運用仕様として追加しない。履歴はGit、変化する表示内容は`data`、編集手順は`data/README.md`を正とする。
