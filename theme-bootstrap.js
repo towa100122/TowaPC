@@ -10,8 +10,13 @@
     const pinnedTheme = ["light", "dark"].includes(settings.theme)
       ? settings.theme
       : systemTheme;
+    const temporaryTheme = sessionStorage.getItem("towapc-temporary-theme");
     root.dataset.theme =
-      settings.themePinned === true ? pinnedTheme : systemTheme;
+      settings.themePinned === true
+        ? pinnedTheme
+        : ["light", "dark"].includes(temporaryTheme)
+          ? temporaryTheme
+          : systemTheme;
     document
       .querySelector("[data-theme-color]")
       ?.setAttribute(

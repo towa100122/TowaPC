@@ -4,17 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5e6ac" data-theme-color />
-    <meta name="description" content="TowaPCの考え方、歩み、名前の由来を紹介します。" />
-
-    <link rel="canonical" href="https://towapc.com/about/" />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="TowaPC" />
-    <meta property="og:title" content="TowaPC — About" />
-    <meta property="og:description" content="TowaPCの考え方、歩み、名前の由来を紹介します。" />
-    <meta property="og:url" content="https://towapc.com/about/" />
-    <meta property="og:image" content="https://towapc.com/assets/ogp.png" />
-    <title>TowaPC — About</title>
-
     <script>
       (function applyStoredThemeBeforePaint() {
   const root = document.documentElement;
@@ -28,8 +17,13 @@
     const pinnedTheme = ["light", "dark"].includes(settings.theme)
       ? settings.theme
       : systemTheme;
+    const temporaryTheme = sessionStorage.getItem("towapc-temporary-theme");
     root.dataset.theme =
-      settings.themePinned === true ? pinnedTheme : systemTheme;
+      settings.themePinned === true
+        ? pinnedTheme
+        : ["light", "dark"].includes(temporaryTheme)
+          ? temporaryTheme
+          : systemTheme;
     document
       .querySelector("[data-theme-color]")
       ?.setAttribute(
@@ -64,6 +58,17 @@
   }
 })();
     </script>
+    <meta name="description" content="TowaPCの考え方、歩み、名前の由来を紹介します。" />
+
+    <link rel="canonical" href="https://towapc.com/about/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TowaPC" />
+    <meta property="og:title" content="TowaPC — About" />
+    <meta property="og:description" content="TowaPCの考え方、歩み、名前の由来を紹介します。" />
+    <meta property="og:url" content="https://towapc.com/about/" />
+    <meta property="og:image" content="https://towapc.com/assets/ogp.png" />
+    <title>TowaPC — About</title>
+
     <style>
       html {
         color-scheme: light;
@@ -86,35 +91,35 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Google+Sans&amp;family=Noto+Sans+JP:wght@400;500;600;700&amp;display=swap"
     />
-    <link rel="stylesheet" href="/styles/foundation.css?v=87055201a8e6" />
-    <link rel="stylesheet" href="/styles/home.css?v=87055201a8e6" />
-    <link rel="stylesheet" href="/styles/content.css?v=87055201a8e6" />
-    <link rel="stylesheet" href="/styles/footer.css?v=87055201a8e6" />
-    <link rel="stylesheet" href="/styles/responsive.css?v=87055201a8e6" />
-    <link rel="stylesheet" href="/styles/dark-motion.css?v=87055201a8e6" />
+    <link rel="stylesheet" href="/styles/foundation.css?v=3d789368145d" />
+    <link rel="stylesheet" href="/styles/home.css?v=3d789368145d" />
+    <link rel="stylesheet" href="/styles/content.css?v=3d789368145d" />
+    <link rel="stylesheet" href="/styles/footer.css?v=3d789368145d" />
+    <link rel="stylesheet" href="/styles/responsive.css?v=3d789368145d" />
+    <link rel="stylesheet" href="/styles/dark-motion.css?v=3d789368145d" />
     <link
       rel="stylesheet"
-      href="/styles/legal-cookie.css?v=87055201a8e6"
+      href="/styles/legal-cookie.css?v=3d789368145d"
     />
     <link
       rel="stylesheet"
-      href="/styles/appearance-lab.css?v=87055201a8e6"
+      href="/styles/appearance-lab.css?v=3d789368145d"
     />
-    <link rel="stylesheet" href="/styles/ui-polish.css?v=87055201a8e6" />
+    <link rel="stylesheet" href="/styles/ui-polish.css?v=3d789368145d" />
     <link
       rel="stylesheet"
-      href="/styles/material-theme.css?v=87055201a8e6"
+      href="/styles/material-theme.css?v=3d789368145d"
     />
-    <link rel="stylesheet" href="/styles/features.css?v=87055201a8e6" />
+    <link rel="stylesheet" href="/styles/features.css?v=3d789368145d" />
     <link
       rel="stylesheet"
-      href="/styles/shadowless-theme.css?v=87055201a8e6"
+      href="/styles/shadowless-theme.css?v=3d789368145d"
     />
     <link
       rel="stylesheet"
-      href="/styles/monochrome-theme.css?v=87055201a8e6"
+      href="/styles/monochrome-theme.css?v=3d789368145d"
     />
-    <link rel="stylesheet" href="/styles/easter-eggs.css?v=87055201a8e6" />
+    <link rel="stylesheet" href="/styles/easter-eggs.css?v=3d789368145d" />
 
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=3" />
     <link
@@ -249,21 +254,21 @@
     <script type="importmap">
       {
         "imports": {
-          "/analytics.js": "/analytics.js?v=87055201a8e6",
-          "/appearance-settings.js": "/appearance-settings.js?v=87055201a8e6",
-          "/cookie-consent.js": "/cookie-consent.js?v=87055201a8e6",
-          "/csv.js": "/csv.js?v=87055201a8e6",
-          "/easter-eggs.js": "/easter-eggs.js?v=87055201a8e6",
-          "/legal-markdown.js": "/legal-markdown.js?v=87055201a8e6",
-          "/member-dialog.js": "/member-dialog.js?v=87055201a8e6",
-          "/page-views.js": "/page-views.js?v=87055201a8e6",
-          "/project-dialog.js": "/project-dialog.js?v=87055201a8e6",
-          "/site-data.js": "/site-data.js?v=87055201a8e6",
-          "/site-schema.js": "/site-schema.js?v=87055201a8e6",
-          "/ui.js": "/ui.js?v=87055201a8e6"
+          "/analytics.js": "/analytics.js?v=3d789368145d",
+          "/appearance-settings.js": "/appearance-settings.js?v=3d789368145d",
+          "/cookie-consent.js": "/cookie-consent.js?v=3d789368145d",
+          "/csv.js": "/csv.js?v=3d789368145d",
+          "/easter-eggs.js": "/easter-eggs.js?v=3d789368145d",
+          "/legal-markdown.js": "/legal-markdown.js?v=3d789368145d",
+          "/member-dialog.js": "/member-dialog.js?v=3d789368145d",
+          "/page-views.js": "/page-views.js?v=3d789368145d",
+          "/project-dialog.js": "/project-dialog.js?v=3d789368145d",
+          "/site-data.js": "/site-data.js?v=3d789368145d",
+          "/site-schema.js": "/site-schema.js?v=3d789368145d",
+          "/ui.js": "/ui.js?v=3d789368145d"
         }
       }
     </script>
-    <script type="module" src="/app-v2.js?v=87055201a8e6"></script>
+    <script type="module" src="/app-v2.js?v=3d789368145d"></script>
   </body>
 </html>

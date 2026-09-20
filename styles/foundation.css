@@ -181,10 +181,10 @@ p {
 }
 .nav-ready .nav-selection {
   transition:
-    transform 0.48s cubic-bezier(0.22, 0.8, 0.24, 1),
-    width 0.42s cubic-bezier(0.22, 0.8, 0.24, 1),
-    height 0.42s ease,
-    opacity 0.24s ease;
+    transform 0.36s cubic-bezier(0.2, 0.82, 0.24, 1),
+    width 0.32s cubic-bezier(0.2, 0.82, 0.24, 1),
+    height 0.32s ease,
+    opacity 0.2s ease;
 }
 .nav-menu {
   position: relative;

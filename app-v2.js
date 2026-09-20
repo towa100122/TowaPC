@@ -62,6 +62,9 @@ function renderNavigation(route) {
   nav.querySelectorAll("[data-route]").forEach((link) => {
     link.classList.toggle("active", link.dataset.route === route);
   });
+}
+
+function renderFooterNavigation() {
   document.querySelector("[data-footer-links]").innerHTML = renderFooterLinks();
   document.querySelector("[data-footer-contact]").innerHTML =
     renderFooterContacts();
@@ -219,13 +222,14 @@ async function start() {
     localStorage.removeItem("towapc-product-view");
     localStorage.removeItem("towapc-news-view");
   } catch {}
-  const failures = await loadSiteData();
   const { route } = currentLocation();
   renderNavigation(route);
   resetMenu();
+  requestAnimationFrame(positionSelection);
+  const failures = await loadSiteData();
+  renderFooterNavigation();
   setupPageControls();
   reveal();
-  requestAnimationFrame(positionSelection);
   showDataWarning(failures);
 }
 

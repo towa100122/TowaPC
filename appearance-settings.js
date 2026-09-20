@@ -2,6 +2,7 @@ import { escapeHtml } from "./site-data.js";
 import { icon } from "./ui.js";
 
 const STORAGE_KEY = "towapc-appearance-v1";
+const TEMP_THEME_KEY = "towapc-temporary-theme";
 
 const defaults = {
   theme: "light",
@@ -103,6 +104,18 @@ function loadSettings() {
 
 export let appearanceSettings = loadSettings();
 let temporaryTheme = null;
+try {
+  const storedTemporaryTheme = sessionStorage.getItem(TEMP_THEME_KEY);
+  if (["light", "dark"].includes(storedTemporaryTheme))
+    temporaryTheme = storedTemporaryTheme;
+} catch {}
+
+function clearTemporaryTheme() {
+  temporaryTheme = null;
+  try {
+    sessionStorage.removeItem(TEMP_THEME_KEY);
+  } catch {}
+}
 
 function saveSettings() {
   try {
@@ -506,7 +519,10 @@ export function setupAppearanceControls() {
     button.addEventListener("click", () => {
       const { setting, value } = button.dataset;
       appearanceSettings[setting] = value;
-      if (setting === "theme") appearanceSettings.themePinned = true;
+      if (setting === "theme") {
+        appearanceSettings.themePinned = true;
+        clearTemporaryTheme();
+      }
       if (setting === "motion")
         Object.assign(appearanceSettings, motionPresets[value]);
       saveSettings();
@@ -545,7 +561,7 @@ export function setupAppearanceControls() {
       const nextValue = !appearanceSettings[key];
       if (key === "themePinned" && nextValue)
         appearanceSettings.theme = resolvedTheme();
-      if (key === "themePinned" && !nextValue) temporaryTheme = null;
+      if (key === "themePinned") clearTemporaryTheme();
       updateSetting(key, nextValue);
       if (key === "animationMode" && nextValue) animationSweep();
     });
@@ -617,6 +633,9 @@ export function setupTheme() {
     button.addEventListener("click", () => {
       temporaryTheme = button.dataset.themeOption;
       appearanceSettings.themePinned = false;
+      try {
+        sessionStorage.setItem(TEMP_THEME_KEY, temporaryTheme);
+      } catch {}
       saveSettings();
       applyAppearance();
       syncControls();
@@ -624,7 +643,7 @@ export function setupTheme() {
   });
   matchMedia("(prefers-color-scheme:dark)").addEventListener("change", () => {
     if (appearanceSettings.themePinned) return;
-    temporaryTheme = null;
+    clearTemporaryTheme();
     applyAppearance();
     syncThemeControls();
   });
