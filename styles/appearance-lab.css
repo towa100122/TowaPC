@@ -54,26 +54,8 @@
 :root[data-theme="dark"][data-glass="off"] .header {
   background: color-mix(in srgb, var(--accent) 24%, #24261d 76%);
 }
-:root[data-header-motion="slide"] .header.header-replay {
-  animation: header-slide-replay var(--header-duration)
-    cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-:root[data-header-motion="fade"] .header.header-replay {
-  animation: header-fade-replay var(--header-duration) ease both;
-}
-:root[data-header-motion="none"] .header {
+.header {
   animation: none;
-}
-@keyframes header-slide-replay {
-  from {
-    opacity: 0;
-    transform: translateY(-24px);
-  }
-}
-@keyframes header-fade-replay {
-  from {
-    opacity: 0;
-  }
 }
 :root[data-corners="round"] main .floating,
 :root[data-corners="round"] main .settings-card,

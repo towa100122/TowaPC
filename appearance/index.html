@@ -24,6 +24,10 @@
         : ["light", "dark"].includes(temporaryTheme)
           ? temporaryTheme
           : systemTheme;
+    root.style.backgroundColor =
+      root.dataset.theme === "dark" ? "#10120f" : "#f5f5f2";
+    root.style.color = root.dataset.theme === "dark" ? "#f1f3ed" : "#242822";
+    root.style.colorScheme = root.dataset.theme;
     document
       .querySelector("[data-theme-color]")
       ?.setAttribute(
@@ -36,7 +40,7 @@
     root.dataset.corners = settings.corners || "soft";
     root.dataset.density = settings.density || "comfortable";
     root.dataset.glass = settings.glass === false ? "off" : "on";
-    root.dataset.headerMotion = settings.headerMotion || "slide";
+    root.dataset.headerMotion = "none";
     root.style.setProperty(
       "--custom-accent",
       settings.customColor || "#ffff99",
@@ -46,12 +50,11 @@
       `${100 - (settings.headerTransparency ?? 42)}%`,
     );
     root.style.setProperty("--header-blur", `${settings.headerBlur ?? 14}px`);
-    root.style.setProperty(
-      "--header-duration",
-      `${settings.headerDuration ?? 480}ms`,
-    );
   } catch {
     root.dataset.theme = systemTheme;
+    root.style.backgroundColor = systemTheme === "dark" ? "#10120f" : "#f5f5f2";
+    root.style.color = systemTheme === "dark" ? "#f1f3ed" : "#242822";
+    root.style.colorScheme = systemTheme;
     document
       .querySelector("[data-theme-color]")
       ?.setAttribute("content", systemTheme === "dark" ? "#24261d" : "#f5e6ac");
@@ -91,35 +94,35 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Google+Sans&amp;family=Noto+Sans+JP:wght@400;500;600;700&amp;display=swap"
     />
-    <link rel="stylesheet" href="/styles/foundation.css?v=3d789368145d" />
-    <link rel="stylesheet" href="/styles/home.css?v=3d789368145d" />
-    <link rel="stylesheet" href="/styles/content.css?v=3d789368145d" />
-    <link rel="stylesheet" href="/styles/footer.css?v=3d789368145d" />
-    <link rel="stylesheet" href="/styles/responsive.css?v=3d789368145d" />
-    <link rel="stylesheet" href="/styles/dark-motion.css?v=3d789368145d" />
+    <link rel="stylesheet" href="/styles/foundation.css?v=2bafbe494b00" />
+    <link rel="stylesheet" href="/styles/home.css?v=2bafbe494b00" />
+    <link rel="stylesheet" href="/styles/content.css?v=2bafbe494b00" />
+    <link rel="stylesheet" href="/styles/footer.css?v=2bafbe494b00" />
+    <link rel="stylesheet" href="/styles/responsive.css?v=2bafbe494b00" />
+    <link rel="stylesheet" href="/styles/dark-motion.css?v=2bafbe494b00" />
     <link
       rel="stylesheet"
-      href="/styles/legal-cookie.css?v=3d789368145d"
+      href="/styles/legal-cookie.css?v=2bafbe494b00"
     />
     <link
       rel="stylesheet"
-      href="/styles/appearance-lab.css?v=3d789368145d"
+      href="/styles/appearance-lab.css?v=2bafbe494b00"
     />
-    <link rel="stylesheet" href="/styles/ui-polish.css?v=3d789368145d" />
+    <link rel="stylesheet" href="/styles/ui-polish.css?v=2bafbe494b00" />
     <link
       rel="stylesheet"
-      href="/styles/material-theme.css?v=3d789368145d"
+      href="/styles/material-theme.css?v=2bafbe494b00"
     />
-    <link rel="stylesheet" href="/styles/features.css?v=3d789368145d" />
+    <link rel="stylesheet" href="/styles/features.css?v=2bafbe494b00" />
     <link
       rel="stylesheet"
-      href="/styles/shadowless-theme.css?v=3d789368145d"
+      href="/styles/shadowless-theme.css?v=2bafbe494b00"
     />
     <link
       rel="stylesheet"
-      href="/styles/monochrome-theme.css?v=3d789368145d"
+      href="/styles/monochrome-theme.css?v=2bafbe494b00"
     />
-    <link rel="stylesheet" href="/styles/easter-eggs.css?v=3d789368145d" />
+    <link rel="stylesheet" href="/styles/easter-eggs.css?v=2bafbe494b00" />
 
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=3" />
     <link
@@ -232,8 +235,7 @@
   </section>
         <section class="settings-card floating settings-header">
     <div class="settings-heading">
-      <div><h2>Header</h2><p>透け方、ぼかし、登場を調整</p></div>
-      <button class="preview-button" type="button" data-play-header><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 2 1.7 5.3L19 9l-5.3 1.7L12 16l-1.7-5.3L5 9l5.3-1.7Zm6 12 .9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9Z"></path></svg></span>再生</button>
+      <div><h2>Header</h2><p>透け方とぼかしを調整</p></div>
     </div>
     <div class="range-grid">
       <label class="setting-range">
@@ -246,25 +248,7 @@
     <input type="range" min="0" max="30" step="1" value="14" data-setting-range="headerBlur" aria-label="背景のブラー">
 
   </label>
-      <label class="setting-range">
-    <span><strong>アニメーション時間</strong><output data-setting-output="headerDuration">480ms</output></span>
-    <input type="range" min="200" max="1200" step="20" value="480" data-setting-range="headerDuration" aria-label="アニメーション時間">
-
-  </label>
     </div>
-    <div class="setting-field">
-    <span class="setting-label">ヘッダーのアニメーション</span>
-    <div class="setting-choices" role="group" aria-label="ヘッダーのアニメーション"><button type="button" data-setting="headerMotion" data-value="slide" aria-pressed="true">
-          <strong>スライド</strong>
-          <small>上からなめらかに</small>
-        </button><button type="button" data-setting="headerMotion" data-value="fade" aria-pressed="false">
-          <strong>フェード</strong>
-          <small>その場で現れる</small>
-        </button><button type="button" data-setting="headerMotion" data-value="none" aria-pressed="false">
-          <strong>静止</strong>
-          <small>動かさない</small>
-        </button></div>
-  </div>
     <button class="setting-toggle" type="button" role="switch" aria-checked="true" data-setting-toggle="glass">
     <span><strong>ガラス効果</strong><small>透けとブラーを有効にする</small></span>
     <i aria-hidden="true"></i>
@@ -477,21 +461,21 @@
     <script type="importmap">
       {
         "imports": {
-          "/analytics.js": "/analytics.js?v=3d789368145d",
-          "/appearance-settings.js": "/appearance-settings.js?v=3d789368145d",
-          "/cookie-consent.js": "/cookie-consent.js?v=3d789368145d",
-          "/csv.js": "/csv.js?v=3d789368145d",
-          "/easter-eggs.js": "/easter-eggs.js?v=3d789368145d",
-          "/legal-markdown.js": "/legal-markdown.js?v=3d789368145d",
-          "/member-dialog.js": "/member-dialog.js?v=3d789368145d",
-          "/page-views.js": "/page-views.js?v=3d789368145d",
-          "/project-dialog.js": "/project-dialog.js?v=3d789368145d",
-          "/site-data.js": "/site-data.js?v=3d789368145d",
-          "/site-schema.js": "/site-schema.js?v=3d789368145d",
-          "/ui.js": "/ui.js?v=3d789368145d"
+          "/analytics.js": "/analytics.js?v=2bafbe494b00",
+          "/appearance-settings.js": "/appearance-settings.js?v=2bafbe494b00",
+          "/cookie-consent.js": "/cookie-consent.js?v=2bafbe494b00",
+          "/csv.js": "/csv.js?v=2bafbe494b00",
+          "/easter-eggs.js": "/easter-eggs.js?v=2bafbe494b00",
+          "/legal-markdown.js": "/legal-markdown.js?v=2bafbe494b00",
+          "/member-dialog.js": "/member-dialog.js?v=2bafbe494b00",
+          "/page-views.js": "/page-views.js?v=2bafbe494b00",
+          "/project-dialog.js": "/project-dialog.js?v=2bafbe494b00",
+          "/site-data.js": "/site-data.js?v=2bafbe494b00",
+          "/site-schema.js": "/site-schema.js?v=2bafbe494b00",
+          "/ui.js": "/ui.js?v=2bafbe494b00"
         }
       }
     </script>
-    <script type="module" src="/app-v2.js?v=3d789368145d"></script>
+    <script type="module" src="/app-v2.js?v=2bafbe494b00"></script>
   </body>
 </html>

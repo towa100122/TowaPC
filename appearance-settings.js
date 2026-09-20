@@ -23,8 +23,7 @@ const defaults = {
   uiScale: 100,
   headerTransparency: 42,
   headerBlur: 14,
-  headerMotion: "slide",
-  headerDuration: 480,
+  headerMotion: "none",
 };
 
 const choices = {
@@ -41,7 +40,6 @@ const choices = {
   ],
   corners: ["soft", "round", "precise"],
   density: ["comfortable", "compact"],
-  headerMotion: ["slide", "fade", "none"],
 };
 
 const ranges = {
@@ -53,7 +51,6 @@ const ranges = {
   uiScale: [90, 110],
   headerTransparency: [0, 80],
   headerBlur: [0, 30],
-  headerDuration: [200, 1200],
 };
 
 const motionPresets = {
@@ -131,7 +128,11 @@ function resolvedTheme() {
 
 export function applyAppearance() {
   const root = document.documentElement;
-  root.dataset.theme = resolvedTheme();
+  const theme = resolvedTheme();
+  root.dataset.theme = theme;
+  root.style.backgroundColor = theme === "dark" ? "#10120f" : "#f5f5f2";
+  root.style.color = theme === "dark" ? "#f1f3ed" : "#242822";
+  root.style.colorScheme = theme;
   root.dataset.themePinned = appearanceSettings.themePinned ? "on" : "off";
   root.dataset.motion = appearanceSettings.motion;
   root.dataset.accent = appearanceSettings.accent;
@@ -139,17 +140,13 @@ export function applyAppearance() {
   root.dataset.corners = appearanceSettings.corners;
   root.dataset.density = appearanceSettings.density;
   root.dataset.glass = appearanceSettings.glass ? "on" : "off";
-  root.dataset.headerMotion = appearanceSettings.headerMotion;
+  root.dataset.headerMotion = "none";
   root.style.setProperty("--custom-accent", appearanceSettings.customColor);
   root.style.setProperty(
     "--header-opacity",
     `${100 - appearanceSettings.headerTransparency}%`,
   );
   root.style.setProperty("--header-blur", `${appearanceSettings.headerBlur}px`);
-  root.style.setProperty(
-    "--header-duration",
-    `${appearanceSettings.headerDuration}ms`,
-  );
   root.style.setProperty(
     "--reveal-duration",
     `${appearanceSettings.duration}ms`,
@@ -270,22 +267,14 @@ function motionSettings() {
 }
 
 function headerSettings() {
-  const options = [
-    ["slide", "スライド", "上からなめらかに"],
-    ["fade", "フェード", "その場で現れる"],
-    ["none", "静止", "動かさない"],
-  ];
   return `<section class="settings-card floating settings-header">
     <div class="settings-heading">
-      <div><h2>Header</h2><p>透け方、ぼかし、登場を調整</p></div>
-      <button class="preview-button" type="button" data-play-header>${icon("sparkle")}再生</button>
+      <div><h2>Header</h2><p>透け方とぼかしを調整</p></div>
     </div>
     <div class="range-grid">
       ${settingRange("headerTransparency", "透明度", 0, 80, 2, "%")}
       ${settingRange("headerBlur", "背景のブラー", 0, 30, 1, "px")}
-      ${settingRange("headerDuration", "アニメーション時間", 200, 1200, 20, "ms")}
     </div>
-    ${settingChoices("headerMotion", "ヘッダーのアニメーション", options)}
     ${settingToggle("glass", "ガラス効果", "透けとブラーを有効にする")}
   </section>`;
 }
@@ -532,9 +521,6 @@ export function setupAppearanceControls() {
         syncRangeOutputs();
         playPreview("[data-motion-preview]", "preview-play");
       }
-      if (setting === "headerMotion") {
-        playPreview(".header", "header-replay");
-      }
     });
   });
 
@@ -572,9 +558,6 @@ export function setupAppearanceControls() {
     ?.addEventListener("click", () =>
       playPreview("[data-motion-preview]", "preview-play"),
     );
-  document
-    .querySelector("[data-play-header]")
-    ?.addEventListener("click", () => playPreview(".header", "header-replay"));
   document
     .querySelector("[data-custom-color]")
     ?.addEventListener("input", (event) => {

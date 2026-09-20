@@ -17,6 +17,10 @@
         : ["light", "dark"].includes(temporaryTheme)
           ? temporaryTheme
           : systemTheme;
+    root.style.backgroundColor =
+      root.dataset.theme === "dark" ? "#10120f" : "#f5f5f2";
+    root.style.color = root.dataset.theme === "dark" ? "#f1f3ed" : "#242822";
+    root.style.colorScheme = root.dataset.theme;
     document
       .querySelector("[data-theme-color]")
       ?.setAttribute(
@@ -29,7 +33,7 @@
     root.dataset.corners = settings.corners || "soft";
     root.dataset.density = settings.density || "comfortable";
     root.dataset.glass = settings.glass === false ? "off" : "on";
-    root.dataset.headerMotion = settings.headerMotion || "slide";
+    root.dataset.headerMotion = "none";
     root.style.setProperty(
       "--custom-accent",
       settings.customColor || "#ffff99",
@@ -39,12 +43,11 @@
       `${100 - (settings.headerTransparency ?? 42)}%`,
     );
     root.style.setProperty("--header-blur", `${settings.headerBlur ?? 14}px`);
-    root.style.setProperty(
-      "--header-duration",
-      `${settings.headerDuration ?? 480}ms`,
-    );
   } catch {
     root.dataset.theme = systemTheme;
+    root.style.backgroundColor = systemTheme === "dark" ? "#10120f" : "#f5f5f2";
+    root.style.color = systemTheme === "dark" ? "#f1f3ed" : "#242822";
+    root.style.colorScheme = systemTheme;
     document
       .querySelector("[data-theme-color]")
       ?.setAttribute("content", systemTheme === "dark" ? "#24261d" : "#f5e6ac");
