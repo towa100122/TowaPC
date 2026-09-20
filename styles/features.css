@@ -739,6 +739,14 @@ body.dialog-open {
   background: transparent;
 }
 
+.project-dialog:has(> .project-dialog-image) .project-dialog-close {
+  background: rgba(255, 255, 255, 0.86);
+  color: #171a16;
+  box-shadow: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 .member-dialog-image {
   width: 132px;
 }
