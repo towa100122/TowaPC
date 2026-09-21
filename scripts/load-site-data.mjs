@@ -55,10 +55,20 @@ export async function loadSiteDataFromDisk(root) {
       const path = entry.slice(entry.indexOf("|") + 1).trim();
       if (!/^\/files\/[a-zA-Z0-9._-]+$/.test(path)) continue;
       try {
-        data.attachmentMeta[path] = formatSize(
-          (await stat(resolve(root, path.slice(1)))).size,
-        );
-      } catch {}
+        const filePath = resolve(root, path.slice(1));
+        const extension = path.split(".").pop()?.toLowerCase();
+
+        if (["txt", "md", "csv", "json", "js", "css", "html"].includes(extension)) {
+          const content = await readFile(filePath, "utf8");
+          const normalized = content.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+          data.attachmentMeta[path] = formatSize(
+            Buffer.byteLength(normalized, "utf8"),
+          );
+        } else {
+          data.attachmentMeta[path] = formatSize((await stat(filePath)).size);
+        }
+      } catch { }
     }
   }
   return data;
