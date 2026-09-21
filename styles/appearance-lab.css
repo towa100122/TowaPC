@@ -633,6 +633,10 @@
   background: #4a4f46;
 }
 
+:root[data-theme="dark"] .setting-toggle[aria-checked="true"] i {
+  background: var(--accent-strong);
+}
+
 :root[data-theme="dark"] .setting-toggle i::after {
   background: #f4f5ef;
 }
