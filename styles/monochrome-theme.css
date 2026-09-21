@@ -343,3 +343,83 @@
   small {
   color: #444;
 }
+
+/* Monochrome toggle */
+
+/* Light */
+:root[data-surface="monochrome"]:not([data-theme="dark"]) .setting-toggle i {
+  border: 1px solid #111;
+  background: #fff;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .setting-toggle
+  i::after {
+  background: #111;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .setting-toggle[aria-checked="true"]
+  i {
+  background: #111;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .setting-toggle[aria-checked="true"]
+  i::after {
+  background: #fff;
+}
+
+/* Dark */
+:root[data-theme="dark"][data-surface="monochrome"] .setting-toggle i {
+  border: 1px solid #fff;
+  background: #111;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .setting-toggle i::after {
+  background: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"]
+  .setting-toggle[aria-checked="true"]
+  i {
+  background: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"]
+  .setting-toggle[aria-checked="true"]
+  i::after {
+  background: #111;
+}
+
+/* Monochrome - contact cards */
+:root[data-surface="monochrome"] .contact-card {
+  color: #111;
+}
+
+:root[data-surface="monochrome"] .contact-card p,
+:root[data-surface="monochrome"] .contact-card small {
+  color: #555;
+}
+
+:root[data-surface="monochrome"] .contact-card .brand-icon,
+:root[data-surface="monochrome"] .contact-card .icon,
+:root[data-surface="monochrome"] .contact-card .arrow {
+  opacity: 1;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card {
+  color: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card p,
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card small {
+  color: #bfc3bb;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card .brand-icon,
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card .icon,
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card .arrow {
+  opacity: 1;
+  filter: grayscale(1) invert(1);
+}

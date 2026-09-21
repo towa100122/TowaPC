@@ -157,3 +157,51 @@
   color: var(--m3-on-primary);
   box-shadow: none;
 }
+
+/* Join */
+:root[data-surface="material"] .join-box h2 {
+  color: var(--m3-on-surface);
+}
+
+:root[data-surface="material"] .join-box p {
+  color: var(--m3-on-surface-variant);
+}
+
+/* About logo */
+:root[data-theme="dark"][data-surface="material"] .about-logo {
+  filter: invert(1);
+}
+
+/* Attachments */
+:root[data-surface="material"] .file-attachment {
+  border: 1px solid var(--m3-outline-variant);
+  background: var(--m3-surface-container-high);
+  color: var(--m3-on-surface);
+}
+
+:root[data-surface="material"] .file-attachment small {
+  color: var(--m3-on-surface-variant);
+}
+
+:root[data-surface="material"] .file-attachment .icon {
+  color: var(--m3-on-surface);
+}
+
+/* Material toggle */
+:root[data-surface="material"] .setting-toggle i {
+  border: 1px solid var(--m3-outline);
+  background: var(--m3-outline-variant);
+}
+
+:root[data-surface="material"] .setting-toggle i::after {
+  background: var(--m3-on-surface);
+}
+
+:root[data-surface="material"] .setting-toggle[aria-checked="true"] i {
+  border-color: var(--m3-primary);
+  background: var(--m3-primary);
+}
+
+:root[data-surface="material"] .setting-toggle[aria-checked="true"] i::after {
+  background: var(--m3-on-primary);
+}

@@ -376,9 +376,12 @@
   object-fit: contain;
   flex: 0 0 auto;
 }
-.brand-x,
-:root[data-theme="dark"] .brand-x {
+.brand-x {
   filter: none;
+}
+
+:root[data-theme="dark"] .brand-x {
+  filter: invert(1);
 }
 :root[data-theme="dark"] .data-warning {
   border-color: #755f2e;

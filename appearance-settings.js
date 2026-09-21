@@ -426,6 +426,22 @@ function syncThemeControls() {
   });
 }
 
+function currentAccentPreviewColor() {
+  switch (appearanceSettings.accent) {
+    case "standard":
+      return "#ffff99";
+    case "lavender":
+      return "#dcd7ff";
+    case "mint":
+      return "#ccefdc";
+    case "peach":
+      return "#ffd8c3";
+    case "custom":
+    default:
+      return appearanceSettings.customColor;
+  }
+}
+
 function syncControls() {
   document.querySelectorAll("[data-setting]").forEach((button) => {
     button.setAttribute(
@@ -435,15 +451,29 @@ function syncControls() {
       ),
     );
   });
+
   document.querySelectorAll("[data-setting-toggle]").forEach((button) => {
     button.setAttribute(
       "aria-checked",
       String(Boolean(appearanceSettings[button.dataset.settingToggle])),
     );
   });
-  document
-    .querySelector(".color-picker")
-    ?.classList.toggle("active", appearanceSettings.accent === "custom");
+
+  const colorPicker = document.querySelector(".color-picker");
+  colorPicker?.classList.toggle(
+    "active",
+    appearanceSettings.accent === "custom",
+  );
+
+  const colorInput = document.querySelector("[data-custom-color]");
+  if (colorInput) {
+    colorInput.value = appearanceSettings.customColor;
+    colorInput
+      .closest(".color-picker")
+      ?.querySelector("span")
+      ?.style.setProperty("--picked-color", currentAccentPreviewColor());
+  }
+
   syncThemeControls();
 }
 
