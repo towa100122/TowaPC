@@ -4,8 +4,11 @@ TowaPC.comの文章と掲載項目は、この`data`フォルダーで管理し�
 
 ## ローカル管理画面
 
+```powershell
 cd "C:\Users\towa\towapc\TowaPC-repo"
-リポジトリ直下で次を実行します。
+```
+
+その後、次を実行します。
 
 ```powershell
 bun install --frozen-lockfile
@@ -117,7 +120,6 @@ git diff --check
 
 ```powershell
 git status --short
-git diff
 git add .
 git commit -m "サイトを更新"
 git push origin HEAD:main

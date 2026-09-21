@@ -600,3 +600,29 @@
     transform: rotate(1turn);
   }
 }
+
+/* Liquid Glass selected state */
+:root[data-surface="liquid"] .setting-choices button[aria-pressed="true"],
+:root[data-surface="liquid"] .color-picker.active {
+  border-color: color-mix(in srgb, var(--accent-strong) 58%, #ffffff80);
+  background-color: color-mix(in srgb, var(--accent) 24%, #ffffff72);
+}
+
+:root[data-theme="dark"][data-surface="liquid"]
+  .setting-choices
+  button[aria-pressed="true"],
+:root[data-theme="dark"][data-surface="liquid"] .color-picker.active {
+  border-color: color-mix(in srgb, var(--accent) 65%, #ffffff55);
+  background-color: color-mix(in srgb, var(--accent) 24%, #ffffff12);
+}
+
+/* Liquid Glass - Home dark fixes */
+:root[data-theme="dark"][data-surface="liquid"] .news-strip,
+:root[data-theme="dark"][data-surface="liquid"] .quick-link {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"][data-surface="liquid"] .news-strip .news-row time,
+:root[data-theme="dark"][data-surface="liquid"] .quick-link small {
+  color: var(--muted);
+}

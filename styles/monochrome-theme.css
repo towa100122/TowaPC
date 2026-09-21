@@ -142,3 +142,204 @@
 :root[data-theme="dark"][data-surface="monochrome"] .history-timeline::before {
   background: #fff;
 }
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .header
+  nav
+  > a.active {
+  color: #fff;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"]) .theme-selection {
+  background: #111;
+  border: 1px solid #111;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .theme-switch
+  button.active {
+  color: #fff;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .theme-switch
+  button:not(.active) {
+  color: #111;
+}
+
+/* Monochrome Light */
+:root[data-surface="monochrome"]:not([data-theme="dark"]) .join-box {
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"]) .join-box h2 {
+  color: #111;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"]) .join-box p {
+  color: #444;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"]) .file-attachment {
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .file-attachment
+  small {
+  color: #555;
+}
+
+/* Monochrome Dark */
+:root[data-theme="dark"][data-surface="monochrome"] .join-box {
+  border-color: #fff;
+  background: #111;
+  color: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .join-box h2 {
+  color: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .join-box p {
+  color: #cfcfcf;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .file-attachment {
+  border: 1px solid #fff;
+  background: #111;
+  color: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .file-attachment small {
+  color: #cfcfcf;
+}
+
+/* Final monochrome normalization */
+
+/* ---------- Light ---------- */
+
+:root[data-surface="monochrome"]:not([data-theme="dark"]) {
+  --ink: #111;
+  --muted: #555;
+  --paper: #fff;
+  --line: #111;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"]) .motion-preview {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"]) .motion-preview span {
+  background: #fff;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .motion-preview
+  small {
+  color: #ccc;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"]) .badge {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+}
+
+/* ---------- Dark ---------- */
+
+:root[data-theme="dark"][data-surface="monochrome"] {
+  --ink: #fff;
+  --muted: #cfcfcf;
+  --paper: #111;
+  --line: #fff;
+}
+
+/* About logo */
+:root[data-theme="dark"][data-surface="monochrome"] .about-logo {
+  filter: invert(1) grayscale(1) contrast(1.05);
+}
+
+/* Explicitly kill leftover fixed dark text colors */
+:root[data-theme="dark"][data-surface="monochrome"] .about-summary p,
+:root[data-theme="dark"][data-surface="monochrome"] .article p,
+:root[data-theme="dark"][data-surface="monochrome"] .quick-link small,
+:root[data-theme="dark"][data-surface="monochrome"] .news-row time,
+:root[data-theme="dark"][data-surface="monochrome"] .settings-heading p,
+:root[data-theme="dark"][data-surface="monochrome"] .setting-choices small,
+:root[data-theme="dark"][data-surface="monochrome"] .setting-label,
+:root[data-theme="dark"][data-surface="monochrome"] .range-hints {
+  color: #cfcfcf;
+}
+
+/* Home cards / News */
+:root[data-theme="dark"][data-surface="monochrome"] .quick-link,
+:root[data-theme="dark"][data-surface="monochrome"] .quick-link strong,
+:root[data-theme="dark"][data-surface="monochrome"] .quick-link .icon,
+:root[data-theme="dark"][data-surface="monochrome"] .news-strip,
+:root[data-theme="dark"][data-surface="monochrome"] .news-title,
+:root[data-theme="dark"][data-surface="monochrome"] .news-label,
+:root[data-theme="dark"][data-surface="monochrome"] .news-strip .text-link,
+:root[data-theme="dark"][data-surface="monochrome"] .news-strip .arrow {
+  color: #fff;
+}
+
+/* Badges must actually be monochrome, shocking concept */
+:root[data-theme="dark"][data-surface="monochrome"] .badge {
+  border: 1px solid #fff;
+  background: #fff;
+  color: #111;
+}
+
+/* Appearance motion preview */
+:root[data-theme="dark"][data-surface="monochrome"] .motion-preview {
+  border: 1px solid #fff;
+  background: #111;
+  color: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .motion-preview span {
+  background: #fff;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"] .motion-preview small {
+  color: #cfcfcf;
+}
+
+/* Appearance Lab selected state */
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .setting-choices
+  button[aria-pressed="true"] {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .setting-choices
+  button[aria-pressed="true"]
+  small {
+  color: #ddd;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"]
+  .setting-choices
+  button[aria-pressed="true"] {
+  border-color: #fff;
+  background: #fff;
+  color: #111;
+}
+
+:root[data-theme="dark"][data-surface="monochrome"]
+  .setting-choices
+  button[aria-pressed="true"]
+  small {
+  color: #444;
+}

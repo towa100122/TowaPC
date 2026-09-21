@@ -272,7 +272,7 @@ body.dialog-open {
 
 .news-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 30px;
+  grid-template-columns: minmax(0, 1fr) auto max-content;
   grid-template-areas:
     "title title actions"
     "meta meta actions";
@@ -289,6 +289,7 @@ body.dialog-open {
 
 .news-row .row-actions {
   grid-area: actions;
+  margin-left: 0;
 }
 
 .detail-copy h2 {
