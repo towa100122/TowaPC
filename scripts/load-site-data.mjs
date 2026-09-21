@@ -58,9 +58,13 @@ export async function loadSiteDataFromDisk(root) {
         const filePath = resolve(root, path.slice(1));
         const extension = path.split(".").pop()?.toLowerCase();
 
-        if (["txt", "md", "csv", "json", "js", "css", "html"].includes(extension)) {
+        if (
+          ["txt", "md", "csv", "json", "js", "css", "html"].includes(extension)
+        ) {
           const content = await readFile(filePath, "utf8");
-          const normalized = content.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+          const normalized = content
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n");
 
           data.attachmentMeta[path] = formatSize(
             Buffer.byteLength(normalized, "utf8"),
@@ -68,7 +72,7 @@ export async function loadSiteDataFromDisk(root) {
         } else {
           data.attachmentMeta[path] = formatSize((await stat(filePath)).size);
         }
-      } catch { }
+      } catch {}
     }
   }
   return data;

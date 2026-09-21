@@ -417,9 +417,31 @@
   color: #bfc3bb;
 }
 
-:root[data-theme="dark"][data-surface="monochrome"] .contact-card .brand-icon,
-:root[data-theme="dark"][data-surface="monochrome"] .contact-card .icon,
-:root[data-theme="dark"][data-surface="monochrome"] .contact-card .arrow {
+/* Brand images */
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card .brand-icon {
   opacity: 1;
   filter: grayscale(1) invert(1);
+}
+
+/* Inline icons */
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card .icon,
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card .arrow,
+:root[data-theme="dark"][data-surface="monochrome"] .contact-copy,
+:root[data-theme="dark"][data-surface="monochrome"] .contact-arrow {
+  opacity: 1;
+  color: #fff;
+  filter: none;
+}
+
+/* Monochrome - Discord logo */
+:root[data-surface="monochrome"]:not([data-theme="dark"])
+  .contact-card
+  .brand-discord {
+  filter: grayscale(1) brightness(0);
+}
+
+:root[data-theme="dark"][data-surface="monochrome"]
+  .contact-card
+  .brand-discord {
+  filter: grayscale(1) brightness(0) invert(1);
 }

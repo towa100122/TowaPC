@@ -380,11 +380,19 @@
   filter: none;
 }
 
-:root[data-theme="dark"] .brand-x {
-  filter: invert(1);
-}
 :root[data-theme="dark"] .data-warning {
   border-color: #755f2e;
   background: #3a311c;
   color: #f3dfaa;
+}
+
+/* Dark contact cards that actually use dark backgrounds */
+:root[data-theme="dark"][data-surface="material"] .contact-card .brand-x,
+:root[data-theme="dark"][data-surface="liquid"] .contact-card .brand-x,
+:root[data-theme="dark"][data-surface="monochrome"] .contact-card .brand-x {
+  filter: invert(1);
+}
+
+:root[data-theme="dark"] footer .brand-x {
+  filter: invert(1);
 }
